@@ -1,0 +1,39 @@
+Storage/Schema
+--------------------------
+QueueData
+-----------
+Key: Murmur3("[X]/Y") 
+	Columns: 
+		"LastClaimedOn": 
+
+Items
+-----------
+Key: Murmur3("[X]/Y/[Version]")
+	Columns:
+		"messages": list<blob>
+		
+Claiming Items
+--------------------
+Claiming Items currently in "[X]/Y":
+        
+	lastClaimed = QueueData[Murmur3("[X]/Y")].LastClaimed
+	lastClaimed = SetHoursMinutesSecondsToMidnight(lastClaimed)
+
+	timeNow = SetHoursMinutesSecondsToMidnight(now)
+
+	if DaysBetween(lastClaimed, timeNow) > 30:
+		lastClaimed = timeNow - 30
+
+	for each Day including lastClaimed to timeNow:
+		Read Items[Murmur3("[X]/Y/Day")]
+		Day = Day + OneDay
+	
+	for each Day including lastClaimed to timeNow:
+		Delete Items[Murmur3("[X]/Y/Day")]
+
+	QueueData[Murmur3("[X]/Y")].LastClaimed = timeNow
+
+Inserting Items
+--------------------
+	timeNow = SetHoursMinutesSecondsToMidnight(now)
+	Items[Murmur3("[X]/Y")].messages.add([newMessage])

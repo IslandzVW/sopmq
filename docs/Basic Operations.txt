@@ -1,0 +1,50 @@
+SubscribeQueue
+----------------
+Subscribe to a queue, and optionally peek or claim messages that it contains
+
+Parameters:
+	QueueID
+		- User supplied identifier for the queue
+
+	DownloadType = None, ClaimStoredMessages, PeekStoredMessages
+		- None 
+			Do not download stored messages. Only subscribe to new messages coming in on the queue
+
+		- ClaimStoredMessages
+			Claim messages that are currently in persistent storage in the given queue
+			Claiming removes the messages and resets the queue's last claimed pointer
+
+		- PeekStoredMessages
+			Peek at messages that are currently in persistent storage in the given queue
+			Peeking does not remove the messages
+
+	MaxLookbackDays
+		- The number of days we will look back into the queue for stored messages.
+			Setting this number too high can lead to performance problems
+
+
+PostMessage
+-----------------
+Posts a message to a queue optionally storing it if a subscriber could not be reached
+
+Parameters:
+	QueueID
+		- User supplied identifier for the queue
+	
+	StoreIfCantPipe
+		- Should we store the message if it could not be directly piped to at least one subscriber?
+
+	TTL
+		- Time to live for the message if it could not be piped
+ 
+	Message
+		-Binary blob
+
+
+UnsubscribeQueue
+------------------
+Unsubscribes from a queue. Messages will no longer be piped
+
+Parameters:
+	QueueID
+		- User supplied identifier for the queue

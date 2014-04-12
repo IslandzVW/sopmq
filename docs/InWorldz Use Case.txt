@@ -1,0 +1,24 @@
+User login
+-------------------
+	For each friend - Subscribe: [FriendUUID]/PresenceChange, DownloadType.None
+	For each group - Subscribe: [GroupUUID]/GroupChat, DonwloadType.None
+	Subscribe: [SelfUUID]/IM, DownloadType.ClaimStoredMessages, MaxLookbackDays = 30
+	Subscribe: [SelfUUID]/GroupNotice, DownloadType.ClaimStoredMessages, MaxLookbackDays = 30
+	Subscribe: [SelfUUID]/Items, DownloadType.ClaimStoredMessages, MaxLookbackDays = 30
+	
+IM
+-----------
+	Post Message: [FriendUUID]/IM, StoreIfCantPipe = true, TTL = 30 days
+	
+Group Chat
+------------
+	Post Message: [GroupUUID]/GroupChat, StoreIfCantPipe = false
+
+Give Item
+-------------
+	Post Message: [FriendUUID]/Items, StoreIfCantPipe = true, TTL = 30 days
+	
+Group Notice
+--------------
+	for each member in group
+		Post Message: [MemberUUID]/GroupNotice
