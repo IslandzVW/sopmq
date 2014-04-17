@@ -79,7 +79,8 @@ Parameters:
 		-Binary blob
 
 Returns:
-	OK,
+	MessagePiped,
+	MessageStored,
 	NotAuth
 
 
