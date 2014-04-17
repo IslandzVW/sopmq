@@ -1,5 +1,12 @@
 Storage/Schema
 --------------------------
+Users
+--------------
+Key: username
+	Columns:
+		pwHash: varchar = sha256([plainPW])
+		userLevel: integer
+
 QueueData
 -----------
 Key: Murmur3("[X]/Y") 

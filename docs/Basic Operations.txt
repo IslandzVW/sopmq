@@ -1,3 +1,37 @@
+Client to server messages
+----------------------------------------------------------------------------------
+
+Authentication
+——————————--------------------------------------------
+
+GetChallenge
+--------------
+Begins a session with the server.
+
+Parameters:
+	Type = server / client
+		- Indicates if this is a server or a client connection
+
+Returns:
+	A random challenge string
+
+
+AnswerChallenge
+--------------
+Answers a server challenge and completes authentication
+
+Parameters:
+	Client Answer
+		- The result of Twofish(key=sha256(sha256([password])[challenge]), content=[username])
+
+	Server Answer
+		- The result of sha256([ringKey][challenge])
+
+
+
+Functionality
+——————————--------------------------------------------
+
 SubscribeQueue
 ----------------
 Subscribe to a queue, and optionally peek or claim messages that it contains
@@ -22,6 +56,10 @@ Parameters:
 		- The number of days we will look back into the queue for stored messages.
 			Setting this number too high can lead to performance problems
 
+Returns:
+	The queue data, or an empty message OR
+	NotAuth
+
 
 PostMessage
 -----------------
@@ -40,6 +78,10 @@ Parameters:
 	Message
 		-Binary blob
 
+Returns:
+	OK,
+	NotAuth
+
 
 UnsubscribeQueue
 ------------------
@@ -48,3 +90,7 @@ Unsubscribes from a queue. Messages will no longer be piped
 Parameters:
 	QueueID
 		- User supplied identifier for the queue
+
+Returns:
+	OK,
+	NotAuth

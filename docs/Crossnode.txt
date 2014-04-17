@@ -1,0 +1,44 @@
+ProxySubscribe
+-----------------------
+From a coordinator node. Subscribes to a queue and send the subscription events back to the
+Coordinator
+
+Parameters:
+	SubscriptionID
+		- UUID identifier for this subscription
+
+	QueueID
+		- User supplied identifier for the queue
+
+	DownloadType = None, ClaimStoredMessages, PeekStoredMessages
+		- None 
+			Do not download stored messages. Only subscribe to new messages coming in on the queue
+
+		- ClaimStoredMessages
+			Claim messages that are currently in persistent storage in the given queue
+			Claiming removes the messages and resets the queue's last claimed pointer
+
+		- PeekStoredMessages
+			Peek at messages that are currently in persistent storage in the given queue
+			Peeking does not remove the messages
+
+	MaxLookbackDays
+		- The number of days we will look back into the queue for stored messages.
+			Setting this number too high can lead to performance problems
+Returns:
+	OK,
+	NotAuth
+
+
+ProxyUnsubscribe
+-----------------------
+From a coordinator node. Unsubscribes from a queue
+
+Parameters:
+	SubscriptionID
+		- UUID identifier for this subscription
+
+Returns:
+	OK,
+	NotAuth,
+
