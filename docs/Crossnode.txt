@@ -42,3 +42,23 @@ Returns:
 	OK,
 	NotAuth,
 
+
+RingUpdate
+-----------------------
+From a new node, or a node forwarding a message from another about a change of state
+
+Parameters:
+	UpdateType = Commission, Decommission, Heartbeat
+		- The type of update this is
+
+	ContactInfo
+		- The URI to contact the node at
+
+	Range
+		- The range that this node handles
+
+		
+		
+
+
+
