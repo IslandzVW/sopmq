@@ -30,6 +30,7 @@ Returns:
 	NotAuth
 
 
+
 ProxyUnsubscribe
 -----------------------
 From a coordinator node. Unsubscribes from a queue
@@ -43,22 +44,41 @@ Returns:
 	NotAuth,
 
 
+
 RingUpdate
 -----------------------
 From a new node, or a node forwarding a message from another about a change of state
 
 Parameters:
-	UpdateType = Commission, Decommission, Heartbeat
+	UpdateType = Heartbeat, Decommission
 		- The type of update this is
 
-	ContactInfo
+	ContactURI
 		- The URI to contact the node at
 
 	Range
 		- The range that this node handles
 
+
+Returns:
+	OK,
+	NotAuth
+
+
+GetRing
+------------------------
+Returns data about the nodes in the ring including contact information and ranges
+
+Return:
+ 	Nodes
+	{
+		Node
+		{
+			LastHeartbeat = "[time]",
+			ContactURI = "[URI]",
+			Range = "[range]"
+		},
 		
-		
+	}
 
-
-
+	OR NotAuth

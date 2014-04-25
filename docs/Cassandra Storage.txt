@@ -1,5 +1,11 @@
 Storage/Schema
 --------------------------
+Ring
+--------------
+Key: ContactURI
+	Columns:
+		Range: blob
+
 Users
 --------------
 Key: username
