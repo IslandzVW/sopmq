@@ -34,7 +34,7 @@ const string& VERSION = "0.1";
 
 const unsigned short DEFAULT_PORT = 8481;
 
-const string required_options[] = {"range", "bind_addr", "port", "storage_nodes"};
+const string required_options[] = {"range", "bind_addr", "port", "storage_nodes", "seed_nodes"};
 
 bool process_options(int argc, char* argv[])
 {
@@ -46,6 +46,7 @@ bool process_options(int argc, char* argv[])
         ("bind_addr", po::value<string>(), "address to bind to")
         ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on")
         ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
+        ("seed_nodes", po::value<vector<string> >()->multitoken(), "list of seed nodes to get us into the ring")
     ;
     
     try
@@ -78,7 +79,7 @@ bool process_options(int argc, char* argv[])
         settings::instance().bindAddress = vm["bind_addr"].as<string>();
         settings::instance().port = vm["port"].as<unsigned short>();
         settings::instance().cassandraSeeds = vm["storage_nodes"].as<vector<string> >();
-        
+        settings::instance().mqSeeds = vm["seed_nodes"].as<vector<string> >();
     }
     catch (const po::error& e)
     {

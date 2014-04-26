@@ -58,7 +58,7 @@ Parameters:
 	ContactURI
 		- The URI to contact the node at
 
-	Range
+	RangeStart
 		- The range that this node handles
 
 
@@ -81,7 +81,7 @@ Return:
 		{
 			LastHeartbeat = "[time]",
 			ContactURI = "[URI]",
-			Range = "[range]"
+			RangeStart = "[range]"
 		},
 		
 	}

@@ -15,46 +15,40 @@
  * limitations under the License.
  */
 
-#ifndef __Project__settings__
-#define __Project__settings__
+#ifndef __Project__node__
+#define __Project__node__
+
+#include <boost/shared_ptr.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include <string>
-#include <vector>
 
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/noncopyable.hpp>
-
-namespace bmp = boost::multiprecision;
+#include "endpoint.h"
 
 namespace sopmq {
     namespace node {
         
         ///
-        /// Settings singleton for a sopmq node
+        /// Represents a node that we're aware of in our ring that can service
+        /// requests. This could be the local node, or a remote node
         ///
-        class settings : public boost::noncopyable
+        class node
         {
-        public:
-            ///
-            /// Returns our singleton instance
-            ///
-            static settings& instance();
-            
-            bmp::uint128_t range;
-            std::string bindAddress;
-            unsigned short port;
-            
-            std::vector<std::string> cassandraSeeds;
-            std::vector<std::string> mqSeeds;
-            
-            
-            
         private:
-            settings();
-            ~settings();
+            ///
+            /// The beginning of the range that we handle
+            ///
+            boost::multiprecision::uint128_t _rangeStart;
+            
+            ///
+            /// The endpoint to contact this node at
+            ///
+            net::endpoint _endpoint;
+            
         };
         
+        typedef boost::shared_ptr<node> node_ptr;
     }
 }
 
-#endif /* defined(__Project__settings__) */
+#endif /* defined(__Project__node__) */

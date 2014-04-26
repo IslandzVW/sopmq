@@ -15,46 +15,37 @@
  * limitations under the License.
  */
 
-#ifndef __Project__settings__
-#define __Project__settings__
+#ifndef __Project__ring__
+#define __Project__ring__
 
-#include <string>
-#include <vector>
-
+#include <map>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <boost/noncopyable.hpp>
 
-namespace bmp = boost::multiprecision;
+#include "node.h"
+#include "endpoint.h"
 
 namespace sopmq {
     namespace node {
         
         ///
-        /// Settings singleton for a sopmq node
+        /// Represents the ring as we currently understand it
         ///
-        class settings : public boost::noncopyable
+        class ring
         {
-        public:
-            ///
-            /// Returns our singleton instance
-            ///
-            static settings& instance();
-            
-            bmp::uint128_t range;
-            std::string bindAddress;
-            unsigned short port;
-            
-            std::vector<std::string> cassandraSeeds;
-            std::vector<std::string> mqSeeds;
-            
-            
-            
         private:
-            settings();
-            ~settings();
+            ///
+            /// Map to the ring, sorted by the range start of each node
+            ///
+            std::map<boost::multiprecision::uint128_t, node_ptr> _ringByRange;
+            
+            ///
+            /// Map to the nodes of the ring by their endpoints
+            ///
+            std::map<net::endpoint, node_ptr> _ringByEndpoint;
+            
         };
         
     }
 }
 
-#endif /* defined(__Project__settings__) */
+#endif /* defined(__Project__ring__) */

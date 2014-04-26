@@ -1,10 +1,19 @@
-//
-//  cassandra_storage.cpp
-//  Project
-//
-//  Created by David Daeschler on 4/26/14.
-//
-//
+/*
+ * SOPMQ - Scalable optionally persistent message queue
+ * Copyright 2014 InWorldz, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "cassandra_storage.h"
 #include "settings.h"
@@ -28,6 +37,8 @@ namespace sopmq {
     namespace node {
         namespace storage {
             
+            const std::string& cassandra_storage::KEYSPACE_NAME = "sopmq";
+            
             cassandra_storage::cassandra_storage()
             {
                 // initialize cql
@@ -41,7 +52,7 @@ namespace sopmq {
                     builder->add_contact_point(boost::asio::ip::address::from_string(endpoint));
                 }
                 
-                // Now build a model of cluster and connect it to DB.
+                //build the cluster
                 _cluster = builder->build();
             }
             
@@ -58,7 +69,7 @@ namespace sopmq {
             
             shared_ptr<cql_session_t> cassandra_storage::new_session()
             {
-                return _cluster->connect();
+                return _cluster->connect(KEYSPACE_NAME);
             }
         }
     }
