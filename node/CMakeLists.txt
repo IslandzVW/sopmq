@@ -1,3 +1,4 @@
+# SOPMQ - Scalable optionally persistent message queue
 # Copyright 2014 InWorldz, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
