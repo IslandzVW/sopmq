@@ -16,9 +16,10 @@
  */
 
 #include <string>
-#include <iostream>
+#include <exception>
 #include <boost/program_options.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/log/trivial.hpp>
 #include "settings.h"
 
 namespace bmp = boost::multiprecision;
@@ -32,10 +33,10 @@ const string& VERSION = "0.1";
 
 const unsigned short DEFAULT_PORT = 8481;
 
-int main(int argc, char* argv[])
+const string required_options[] = {"range", "bind_addr", "port"};
+
+bool process_options(int argc, char* argv[])
 {
-    cout << PRODUCT << " v" << VERSION << endl;
-    
     //read in options from the command line
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -53,13 +54,22 @@ int main(int argc, char* argv[])
         
         if (vm.count("help")) {
             cout << desc << "\n";
-            return 1;
+            return false;
         }
         
-        if (vm["range"].empty() || vm["bind_addr"].empty() || vm["port"].empty())
+        bool wasMissingOption = false;
+        for (string opt : required_options)
         {
-            cout << "range, bind_addr, and port options must be specified" << endl;
-            return 1;
+            if (vm[opt].empty())
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "Option " << opt << " must be defined";
+                wasMissingOption = true;
+            }
+        }
+        
+        if (wasMissingOption)
+        {
+            return false;
         }
         
         settings::instance().range = vm["range"].as<bmp::uint128_t>();
@@ -67,9 +77,27 @@ int main(int argc, char* argv[])
         settings::instance().port = vm["port"].as<unsigned short>();
         
     }
-    catch (const po::invalid_command_line_syntax& e)
+    catch (const po::error& e)
     {
-        cout << e.what() << endl;
+        cerr << e.what() << endl;
+        return false;
+    }
+    catch (const std::exception& e)
+    {
+        cerr << e.what() << endl;
+        return false;
+    }
+    
+    return true;
+}
+
+int main(int argc, char* argv[])
+{
+    BOOST_LOG_TRIVIAL(info) << PRODUCT << " v" << VERSION << endl;
+    
+    if (! process_options(argc, argv))
+    {
+        return 1;
     }
     
     

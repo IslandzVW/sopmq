@@ -18,10 +18,12 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system program_options REQUIRED)
+#Set(Boost_DEBUG 1)
+find_package(Boost COMPONENTS system program_options log thread REQUIRED)
 include_directories(${Boost_INCLUDE_DIR} )
 
-set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY})
+set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY}
+    ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY})
 
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
 	
