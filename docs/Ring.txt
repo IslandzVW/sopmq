@@ -1,0 +1,13 @@
+General Ring Structure
+-------------------------
+*	Each node has a 128 bit range identifier
+	* 	Each node is responsible for handling subscriptions from its range identifier up to the following one
+ 	* 	If a node goes down, subscriptions and posts for its range must be handled by the next node in the ring.
+		Therefore, when a message is posted to a queue, it must be forwarded to not only the primary handler 
+		of the range, but also the next node in the ring
+		
+*	Any node can act as a client handler for subscriptions or posting messages
+	*	Subscriptions and posting messages are proxied from the client handler to the appropriate node(s)
+	
+*	If a node is added to the ring, any nodes proxying subscriptions that have been affected
+	by the range changes should resubscribe to the new handling node
