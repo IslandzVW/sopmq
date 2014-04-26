@@ -30,8 +30,9 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)
 set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
-set(INCLUDES ${INCLUDES} /usr/local/include)
-set(LIBS ${LIBS} /usr/local/lib/libcql.dylib)
+find_package(LibCQL REQUIRED)
+set(INCLUDES ${INCLUDES} ${LIBCQL_INCLUDE_DIR})
+set(LIBS ${LIBS} ${LIBCQL_LIBRARIES})
 
 add_definitions(${DEFS})
 include_directories(${INCLUDES})
