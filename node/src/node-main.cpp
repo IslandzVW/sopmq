@@ -15,11 +15,13 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <exception>
 #include <boost/program_options.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/log/trivial.hpp>
+
+#include <string>
+#include <exception>
+#include <fstream>
 
 #include "settings.h"
 
@@ -41,8 +43,9 @@ bool process_options(int argc, char* argv[])
     //read in options from the command line
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help", "produce help message")
-        ("range", po::value<bmp::uint128_t>(), "the range for this node to handle")
+        ("help,h", "produce help message")
+        ("config_file", po::value<string>()->default_value(""), "path to configuration file")
+        ("range", po::value<bmp::uint128_t>(), "the start of the range for this node to handle")
         ("bind_addr", po::value<string>(), "address to bind to")
         ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on")
         ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
@@ -58,6 +61,29 @@ bool process_options(int argc, char* argv[])
         if (vm.count("help")) {
             cout << desc << "\n";
             return false;
+        }
+        
+        string configFile;
+        
+        if (! vm["config_file"].empty())
+        {
+            configFile = vm["config_file"].as<string>();
+        }
+        
+        if (! configFile.empty())
+        {
+            //use the config file
+            ifstream ifs(configFile);
+            if (!ifs)
+            {
+                BOOST_LOG_TRIVIAL(fatal) << "can not open config file: " << configFile << "\n";
+                return 0;
+            }
+            else
+            {
+                po::store(po::parse_config_file(ifs, desc), vm);
+                notify(vm);
+            }
         }
         
         bool wasMissingOption = false;
