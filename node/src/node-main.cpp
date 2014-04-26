@@ -15,9 +15,43 @@
  * limitations under the License.
  */
 
+#include <string>
+#include <iostream>
+#include <boost/program_options.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
+namespace bmp = boost::multiprecision;
+namespace po = boost::program_options;
+
+using namespace std;
+
+const string& PRODUCT = "InWorldz SOPMQ";
+const string& VERSION = "0.1";
+
+const unsigned short DEFAULT_PORT = 8481;
 
 int main(int argc, char* argv[])
 {
+    cout << PRODUCT << " v" << VERSION << endl;
     
+    //read in options from the command line
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "produce help message")
+        ("range", po::value<bmp::uint128_t>(), "the range for this node to handle")
+        ("bind_addr", po::value<string>(), "address to bind to")
+        ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on (default: 8481)")
+    ;
+    
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+    
+    if (vm.count("help")) {
+        cout << desc << "\n";
+        return 1;
+    }
+    
+    return 0;
 }
 
