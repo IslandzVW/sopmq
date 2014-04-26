@@ -1,7 +1,7 @@
 ProxySubscribe
 -----------------------
-From a coordinator node. Subscribes to a queue and send the subscription events back to the
-Coordinator
+From a client handler node. Subscribes to a queue and send the subscription events back to the
+client handler
 
 Parameters:
 	SubscriptionID
@@ -27,7 +27,9 @@ Parameters:
 			Setting this number too high can lead to performance problems
 Returns:
 	OK,
-	NotAuth
+	NotAuth,
+	NotHere
+		- This node does not handle the requested range. Client handler should recheck the ring and retry
 
 
 
@@ -69,6 +71,9 @@ GetRing
 ------------------------
 Returns data about the nodes in the ring including contact information and ranges
 
+Parameters:
+	None
+
 Return:
  	Nodes
 	{
@@ -82,3 +87,6 @@ Return:
 	}
 
 	OR NotAuth
+
+
+

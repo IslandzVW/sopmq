@@ -57,8 +57,10 @@ Parameters:
 			Setting this number too high can lead to performance problems
 
 Returns:
-	The queue data, or an empty message OR
-	NotAuth
+	OK + The queue data/empty message,
+	NotAuth,
+	Unavailable
+		- The range is unavailable for subscriptions. The client must retry later 
 
 
 PostMessage
@@ -81,7 +83,9 @@ Parameters:
 Returns:
 	MessagePiped,
 	MessageStored,
-	NotAuth
+	NotAuth,
+	Unavailable
+		- The range is unavailable. The client must retry later 
 
 
 UnsubscribeQueue
@@ -94,4 +98,4 @@ Parameters:
 
 Returns:
 	OK,
-	NotAuth
+	NotAuth,
