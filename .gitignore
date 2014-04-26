@@ -20,6 +20,12 @@
 *.out
 *.app
 
-# Cmake
+# Cmake generated
 CMakeCache.txt
 CMakeFiles
+cmake_install.cmake
+Makefile
+
+#CDT
+.cproject
+.project
