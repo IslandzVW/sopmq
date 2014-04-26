@@ -20,6 +20,7 @@
 #include <boost/program_options.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/log/trivial.hpp>
+
 #include "settings.h"
 
 namespace bmp = boost::multiprecision;
@@ -33,7 +34,7 @@ const string& VERSION = "0.1";
 
 const unsigned short DEFAULT_PORT = 8481;
 
-const string required_options[] = {"range", "bind_addr", "port"};
+const string required_options[] = {"range", "bind_addr", "port", "storage_nodes"};
 
 bool process_options(int argc, char* argv[])
 {
@@ -43,7 +44,8 @@ bool process_options(int argc, char* argv[])
         ("help", "produce help message")
         ("range", po::value<bmp::uint128_t>(), "the range for this node to handle")
         ("bind_addr", po::value<string>(), "address to bind to")
-        ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on (default: 8481)")
+        ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on")
+        ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
     ;
     
     try
@@ -75,20 +77,33 @@ bool process_options(int argc, char* argv[])
         settings::instance().range = vm["range"].as<bmp::uint128_t>();
         settings::instance().bindAddress = vm["bind_addr"].as<string>();
         settings::instance().port = vm["port"].as<unsigned short>();
+        settings::instance().cassandraSeeds = vm["storage_nodes"].as<vector<string> >();
         
     }
     catch (const po::error& e)
     {
-        cerr << e.what() << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Error processing options: " << e.what();
         return false;
     }
     catch (const std::exception& e)
     {
-        cerr << e.what() << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Error processing options: " << e.what();
         return false;
     }
     
     return true;
+}
+
+void print_option_summary()
+{
+    BOOST_LOG_TRIVIAL(info) << "range: " << settings::instance().range;
+    BOOST_LOG_TRIVIAL(info) << "bind_address: " << settings::instance().bindAddress;
+    BOOST_LOG_TRIVIAL(info) << "port: " << settings::instance().port;
+    
+    for (string seed : settings::instance().cassandraSeeds)
+    {
+        BOOST_LOG_TRIVIAL(info) << "storage: " << seed;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -99,6 +114,8 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
+    
+    print_option_summary();
     
     
     

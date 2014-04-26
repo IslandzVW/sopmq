@@ -30,6 +30,12 @@ namespace sopmq {
             
         }
         
+        settings& settings::instance()
+        {
+            static settings inst;
+            return inst;
+        }
+        
     }
 }
 

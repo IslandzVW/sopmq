@@ -19,7 +19,10 @@
 #define __Project__settings__
 
 #include <string>
+#include <vector>
+
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace bmp = boost::multiprecision;
 
@@ -27,19 +30,23 @@ namespace sopmq {
     namespace node {
         
         ///
-        /// Settings singleton for the node
+        /// Settings singleton for a sopmq node
         ///
-        class settings
+        class settings : public boost::noncopyable
         {
         public:
+            ///
+            /// Returns our singleton instance
+            ///
+            static settings& instance();
+            
             bmp::uint128_t range;
             std::string bindAddress;
             unsigned short port;
             
-            static settings& instance() {
-                static settings inst;
-                return inst;
-            }
+            std::vector<std::string> cassandraSeeds;
+            
+            
             
         private:
             settings();

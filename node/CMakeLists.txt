@@ -17,15 +17,25 @@ PROJECT( sopmq-node )
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-set(Boost_USE_STATIC_LIBS ON)
-#Set(Boost_DEBUG 1)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_RUNTIME OFF)
+#set(Boost_DEBUG 1)
+
+set(DEFS ${DEFS} -DBOOST_ALL_DYN_LINK)
+
 find_package(Boost COMPONENTS system program_options log thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIR} )
+set(INCLUDES ${INCLUDES} ${Boost_INCLUDE_DIR})
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
-set(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY}
-    ${Boost_LOG_LIBRARY} ${Boost_THREAD_LIBRARY})
+find_package(OpenSSL REQUIRED)
+set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
+set(INCLUDES ${INCLUDES} /usr/local/include)
+set(LIBS ${LIBS} /usr/local/lib/libcql.dylib)
+
+add_definitions(${DEFS})
+include_directories(${INCLUDES})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
-	
+
 ADD_EXECUTABLE(sopmq-node ${LIB_SRCS})
 target_link_libraries(sopmq-node ${LIBS})
