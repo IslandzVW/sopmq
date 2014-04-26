@@ -19,11 +19,13 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include "settings.h"
 
 namespace bmp = boost::multiprecision;
 namespace po = boost::program_options;
 
 using namespace std;
+using namespace sopmq::node;
 
 const string& PRODUCT = "InWorldz SOPMQ";
 const string& VERSION = "0.1";
@@ -43,14 +45,34 @@ int main(int argc, char* argv[])
         ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on (default: 8481)")
     ;
     
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-    
-    if (vm.count("help")) {
-        cout << desc << "\n";
-        return 1;
+    try
+    {
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+        
+        if (vm.count("help")) {
+            cout << desc << "\n";
+            return 1;
+        }
+        
+        if (vm["range"].empty() || vm["bind_addr"].empty() || vm["port"].empty())
+        {
+            cout << "range, bind_addr, and port options must be specified" << endl;
+            return 1;
+        }
+        
+        settings::instance().range = vm["range"].as<bmp::uint128_t>();
+        settings::instance().bindAddress = vm["bind_addr"].as<string>();
+        settings::instance().port = vm["port"].as<unsigned short>();
+        
     }
+    catch (const po::invalid_command_line_syntax& e)
+    {
+        cout << e.what() << endl;
+    }
+    
+    
     
     return 0;
 }
