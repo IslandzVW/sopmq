@@ -19,25 +19,45 @@
 #define __Project__endpoint__
 
 #include <string>
+#include <exception>
 
 namespace sopmq {
     namespace node {
         namespace net {
             
             ///
-            /// The endpoint protocol
-            ///
-            enum class endpoint_proto { SOPMQv1 };
-            
-            ///
             /// The endpoint for a node
             ///
             class endpoint
             {
+            public:
+                ///
+                /// The endpoint protocol
+                ///
+                enum endpoint_proto
+                {
+                    SOPMQv1
+                };
+                
             private:
                 std::string _hostname;
                 unsigned short _port;
                 endpoint_proto _proto;
+                
+                ///
+                /// Internal function to parse an input URI
+                ///
+                void parse_uri(const std::string& uri);
+                
+                ///
+                /// Returns the tcp/ip port that is the default for the given protocol
+                ///
+                unsigned short get_default_port_for_proto(endpoint_proto proto) const;
+                
+                ///
+                /// Returns the protocol that is assciated with the given scheme name
+                ///
+                endpoint_proto scheme_name_to_protocol(const std::string& scheme) const;
                 
             public:
                 ///
@@ -65,6 +85,25 @@ namespace sopmq {
                 /// The protocol this endpoint speaks
                 ///
                 endpoint_proto protocol() const;
+            };
+            
+            ///
+            /// Error thrown when the URI fed to the endpoint constructor is invalid
+            ///
+            class uri_parse_error : public std::runtime_error
+            {
+            public:
+                uri_parse_error(const std::string& message) : std::runtime_error(message) {}
+            };
+            
+            
+            ///
+            /// Error thrown when the protocol specified in a URI is invalid
+            ///
+            class invalid_protocol_error : public std::runtime_error
+            {
+            public:
+                invalid_protocol_error(const std::string& message) : std::runtime_error(message) {}
             };
             
         }
