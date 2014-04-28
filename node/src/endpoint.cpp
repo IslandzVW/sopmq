@@ -131,9 +131,10 @@ namespace sopmq {
                 {
                     case SOPMQv1:
                         return 8481;
+                        
+                    default:
+                        throw invalid_protocol_error("port number for protocol is unknown");
                 }
-                
-                return 0;
             }
             
             endpoint::endpoint_proto endpoint::scheme_name_to_protocol(const std::string& scheme) const

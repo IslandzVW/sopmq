@@ -37,6 +37,12 @@ set(LIBS ${LIBS} ${LIBCQL_LIBRARIES})
 add_definitions(${DEFS})
 include_directories(${INCLUDES})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
+list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/node-main.cpp)
 
-ADD_EXECUTABLE(sopmq-node ${LIB_SRCS})
-target_link_libraries(sopmq-node ${LIBS})
+#message(${LIB_SRCS})
+
+add_library(sopmq-nodelib ${LIB_SRCS})
+target_link_libraries(sopmq-nodelib ${LIBS})
+
+add_executable(sopmq-node src/node-main.cpp)
+target_link_libraries(sopmq-node ${LIBS} sopmq-nodelib)

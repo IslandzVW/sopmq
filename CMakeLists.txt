@@ -14,4 +14,11 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 2.8)
+set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
+
 add_subdirectory(node)
+add_subdirectory(gtest-1.7.0)
+add_subdirectory(test)
+
+enable_testing ()
+add_test (NAME NodeTest COMMAND Test)
