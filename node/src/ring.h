@@ -20,6 +20,7 @@
 
 #include <map>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "node.h"
 #include "endpoint.h"
@@ -30,7 +31,7 @@ namespace sopmq {
         ///
         /// Represents the ring as we currently understand it
         ///
-        class ring
+        class ring : public boost::noncopyable
         {
         private:
             ///
@@ -43,6 +44,19 @@ namespace sopmq {
             ///
             std::map<net::endpoint, node_ptr> _ringByEndpoint;
             
+        public:
+            ring();
+            virtual ~ring();
+            
+            ///
+            /// Adds a new node to the ring
+            ///
+            void add_node(node_ptr node);
+            
+            ///
+            /// Finds the node that we believe to be primary for the given key
+            ///
+            node_ptr find_primary_node_for_key(boost::multiprecision::uint128_t key) const;
         };
         
     }

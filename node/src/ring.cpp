@@ -16,3 +16,46 @@
  */
 
 #include "ring.h"
+
+#include <boost/assert.hpp>
+
+using namespace std;
+
+namespace bmp = boost::multiprecision;
+
+namespace sopmq {
+    namespace node {
+        
+        ring::ring()
+        {
+            
+        }
+        
+        ring::~ring()
+        {
+            
+        }
+        
+        void ring::add_node(node_ptr node)
+        {
+            _ringByRange.insert(make_pair(node->range_start(), node));
+            _ringByEndpoint.insert(make_pair(node->endpoint(), node));
+        }
+        
+        node_ptr ring::find_primary_node_for_key(bmp::uint128_t key) const
+        {
+            if (_ringByRange.empty())
+            {
+                return node_ptr();
+            }
+            
+            auto upperIter = _ringByRange.upper_bound(key); //find the node after the primary
+            upperIter--; //find the primary
+            
+            BOOST_ASSERT(upperIter != _ringByRange.end());
+            
+            return upperIter->second;
+        }
+        
+    }
+}

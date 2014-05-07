@@ -16,3 +16,45 @@
  */
 
 #include "node.h"
+
+namespace bc = boost::chrono;
+namespace bmp = boost::multiprecision;
+
+namespace sopmq {
+    namespace node {
+        
+        node::node(bmp::uint128_t rangeStart, net::endpoint endPoint)
+        : _rangeStart(rangeStart), _endpoint(endPoint)
+        {
+            
+        }
+        
+        node::~node()
+        {
+            
+        }
+        
+        bmp::uint128_t node::range_start() const
+        {
+            return _rangeStart;
+        }
+        
+        net::endpoint node::endpoint() const
+        {
+            return _endpoint;
+        }
+        
+        bool node::is_alive() const
+        {
+            auto duration = bc::steady_clock::now() - _lastHeartbeat;
+            auto diffSecs = bc::duration_cast<bc::seconds>(duration);
+            
+            if (diffSecs.count() > HEARTBEAT_TIMEOUT_SECS)
+            {
+                return false;
+            }
+            
+            return true;
+        }
+    }
+}

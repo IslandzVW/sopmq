@@ -34,6 +34,7 @@ namespace sopmq {
             endpoint::endpoint(const std::string& uri)
             {
                 this->parse_uri(uri);
+                _stringUri = uri;
             }
 
             endpoint::~endpoint()
@@ -162,6 +163,15 @@ namespace sopmq {
                 return _proto;
             }
             
+            const string& endpoint::str() const
+            {
+                return _stringUri;
+            }
+            
+            bool operator < (const endpoint& lhs, const endpoint& rhs)
+            {
+                return lhs.str() < rhs.str();
+            }
             
         }
     }

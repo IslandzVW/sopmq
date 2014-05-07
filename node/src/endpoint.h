@@ -44,6 +44,8 @@ namespace sopmq {
                 unsigned short _port;
                 endpoint_proto _proto;
                 
+                std::string _stringUri;
+                
                 ///
                 /// Internal function to parse an input URI
                 ///
@@ -85,7 +87,17 @@ namespace sopmq {
                 /// The protocol this endpoint speaks
                 ///
                 endpoint_proto protocol() const;
+                
+                ///
+                /// Returns a string/URI representation of this endpoint
+                ///
+                const std::string& str() const;
             };
+            
+            ///
+            /// Comparison to allow EPs to be used in ordered collections
+            ///
+            bool operator < (const endpoint& lhs, const endpoint& rhs);
             
             ///
             /// Error thrown when the URI fed to the endpoint constructor is invalid
