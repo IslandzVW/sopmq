@@ -50,6 +50,12 @@ namespace sopmq {
             }
             
             auto upperIter = _ringByRange.upper_bound(key); //find the node after the primary
+            
+            if (upperIter == _ringByRange.begin()) //special case, we need to wrap to the end of the ring
+            {
+                upperIter = _ringByRange.end();
+            }
+            
             upperIter--; //find the primary
             
             BOOST_ASSERT(upperIter != _ringByRange.end());

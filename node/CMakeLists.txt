@@ -23,7 +23,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 
 set(DEFS ${DEFS} -DBOOST_ALL_DYN_LINK)
 
-find_package(Boost COMPONENTS system program_options log thread REQUIRED)
+find_package(Boost COMPONENTS system program_options log thread chrono REQUIRED)
 set(INCLUDES ${INCLUDES} ${Boost_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 

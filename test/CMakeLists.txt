@@ -8,7 +8,9 @@ include_directories (${NODE_DIR}/src
 set(DEFS ${DEFS} -DBOOST_ALL_DYN_LINK)
 add_definitions (${DEFS})
 
-add_executable (Test src/test-endpoint.cpp)
+file(GLOB TEST_SRCS src/*.h src/*.cpp)
+
+add_executable (Test ${TEST_SRCS})
 target_link_libraries (Test
                        sopmq-nodelib
                        ${Boost_FILESYSTEM_LIBRARY}
