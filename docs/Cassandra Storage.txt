@@ -8,8 +8,9 @@ Key: ContactURI
 
 Users
 --------------
-Key: username
+Key: sha256(username)
 	Columns:
+		userName: [plainUserName]
 		pwHash: varchar = sha256([plainPW])
 		userLevel: integer
 

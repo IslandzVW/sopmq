@@ -34,6 +34,10 @@ find_package(LibCQL REQUIRED)
 set(INCLUDES ${INCLUDES} ${LIBCQL_INCLUDE_DIR})
 set(LIBS ${LIBS} ${LIBCQL_LIBRARIES})
 
+find_package(CryptoPP REQUIRED)
+set(INCLUDES ${INCLUDES} ${CRYPTOPP_INCLUDE_DIR})
+set(LIBS ${LIBS} ${CRYPTOPP_LIBRARIES})
+
 add_definitions(${DEFS})
 include_directories(${INCLUDES})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)

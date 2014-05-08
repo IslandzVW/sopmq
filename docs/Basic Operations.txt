@@ -13,7 +13,7 @@ Parameters:
 		- Indicates if this is a server or a client connection
 
 Returns:
-	A random challenge string
+	A random challenge string of 1024 characters
 
 
 AnswerChallenge
@@ -22,10 +22,10 @@ Answers a server challenge and completes authentication
 
 Parameters:
 	Client Answer
-		- The result of Twofish(key=sha256(sha256([password])[challenge]), content=[username])
+		- The result of sha256([username]) + " " + sha256(sha256([password])[challenge])
 
 	Server Answer
-		- The result of sha256([ringKey][challenge])
+		- The result of sha256(sha256([ringKey])[challenge])
 
 
 
