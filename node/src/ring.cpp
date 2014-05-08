@@ -46,22 +46,62 @@ namespace sopmq {
         {
             if (_ringByRange.empty())
             {
-                return node_ptr();
+                return nullptr;
             }
             
-            auto upperIter = _ringByRange.upper_bound(key); //find the node after the primary
+            const_ring_iterator secondaryIter = this->find_secondary_node(key);
+            const_ring_iterator primaryIter = this->find_primary_node(secondaryIter);
             
-            if (upperIter == _ringByRange.begin()) //special case, we need to wrap to the end of the ring
-            {
-                upperIter = _ringByRange.end();
-            }
+            BOOST_ASSERT(primaryIter != _ringByRange.end());
             
-            upperIter--; //find the primary
-            
-            BOOST_ASSERT(upperIter != _ringByRange.end());
-            
-            return upperIter->second;
+            return primaryIter->second;
         }
         
+        std::array<node_ptr, 2> ring::find_nodes_for_key(boost::multiprecision::uint128_t key) const
+        {
+            if (_ringByRange.empty())
+            {
+                return std::array<node_ptr, 2>{ {nullptr, nullptr} };
+            }
+            
+            const_ring_iterator secondaryIter = this->find_secondary_node(key);
+            const_ring_iterator primaryIter = this->find_primary_node(secondaryIter);
+            
+            BOOST_ASSERT(primaryIter != _ringByRange.end());
+            
+            auto ret = std::array<node_ptr, 2>{
+                {
+                    primaryIter->second,
+                    
+                    //if secondary==end, we only have 1 node
+                    secondaryIter != _ringByRange.end() ? secondaryIter->second : nullptr
+                } };
+            
+            return ret;
+        }
+        
+        ring::const_ring_iterator ring::find_secondary_node(boost::multiprecision::uint128_t key) const
+        {
+            auto iter = _ringByRange.upper_bound(key); //find the secondary node
+            
+            if (iter == _ringByRange.end()) //wrap around
+            {
+                iter = _ringByRange.begin();
+            }
+            
+            return iter;
+        }
+        
+        ring::const_ring_iterator ring::find_primary_node(const_ring_iterator secondaryIter) const
+        {
+            if (secondaryIter == _ringByRange.begin()) //special case, we need to wrap to the end of the ring
+            {
+                secondaryIter = _ringByRange.end();
+            }
+            
+            secondaryIter--; //find the primary
+            
+            return secondaryIter;
+        }
     }
 }

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 2.8)
+SET(CMAKE_CXX_FLAGS "-std=c++0x")
 set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
 
 add_subdirectory(node)
