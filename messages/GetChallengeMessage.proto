@@ -1,0 +1,5 @@
+message GetChallengeMessage {
+	enum Type { CLIENT = 1; SERVER = 2; }
+
+	required Type type = 1;
+}

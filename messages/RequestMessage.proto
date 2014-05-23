@@ -1,0 +1,10 @@
+import "GetChallengeMessage.proto";
+
+// union type for all request messages that go to the server
+message RequestMessage {
+	enum Type { GET_CHALLENGE = 1; }
+
+	required Type type = 1;
+
+	optional GetChallengeMessage getChallenge = 2; 
+}
