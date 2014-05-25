@@ -13,14 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 2.8)
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
-set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
+file(MAKE_DIRECTORY cpp_out)
 
-add_subdirectory(messages)
-add_subdirectory(node)
-add_subdirectory(gtest-1.7.0)
-add_subdirectory(test)
+file(GLOB PROTO_FILES *.proto)
 
-enable_testing ()
-add_test (NAME NodeTest COMMAND Test)
+execute_process(COMMAND protoc -I=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=cpp_out ${PROTO_FILES} 
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

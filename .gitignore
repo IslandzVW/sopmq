@@ -30,3 +30,6 @@ build/
 #CDT
 .cproject
 .project
+
+#protoc output
+cpp_out/
