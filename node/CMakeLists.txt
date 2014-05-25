@@ -48,7 +48,9 @@ list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/node-main.cpp)
 
 #message(${LIB_SRCS})
 
-add_library(sopmq-nodelib ${LIB_SRCS})
+file(GLOB MESSAGE_SRCS ../messages/cpp_out/*.h ../messages/cpp_out/*.cc)
+
+add_library(sopmq-nodelib ${LIB_SRCS} ${MESSAGE_SRCS})
 target_link_libraries(sopmq-nodelib ${LIBS})
 
 add_executable(sopmq-node src/node-main.cpp)
