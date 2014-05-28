@@ -18,6 +18,7 @@
 #include <boost/program_options.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/asio.hpp>
 
 #include <string>
 #include <exception>
@@ -144,7 +145,11 @@ int main(int argc, char* argv[])
     
     print_option_summary();
     
+    boost::asio::io_service ioService;
     
+    
+    
+    ioService.run();
     
     return 0;
 }
