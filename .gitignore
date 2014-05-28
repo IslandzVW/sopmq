@@ -33,3 +33,6 @@ build/
 
 #protoc output
 cpp_out/
+
+#mac cruft
+.DS_Store

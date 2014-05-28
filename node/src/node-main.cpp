@@ -25,6 +25,7 @@
 #include <fstream>
 
 #include "settings.h"
+#include "server.h"
 
 namespace bmp = boost::multiprecision;
 namespace po = boost::program_options;
@@ -147,7 +148,9 @@ int main(int argc, char* argv[])
     
     boost::asio::io_service ioService;
     
+    sopmq::node::server s(ioService, settings::instance().port);
     
+    s.start();
     
     ioService.run();
     

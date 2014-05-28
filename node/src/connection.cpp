@@ -18,6 +18,7 @@
 #include "connection.h"
 
 #include "server.h"
+#include "logging.h"
 
 namespace ba = boost::asio;
 
@@ -39,6 +40,15 @@ namespace sopmq {
         {
             _server = server;
             _server->connection_started(shared_from_this());
+            
+            try {
+                _ep = _conn.remote_endpoint();
+                LOG_SRC(debug) << "new connection from " << _ep.address().to_string();
+            } catch (...) {
+                //remote_endpoint can throw if the socket is disconnected
+            }
+            
+            
         }
     }
 }

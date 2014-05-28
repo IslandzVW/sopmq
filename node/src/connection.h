@@ -40,6 +40,7 @@ namespace sopmq {
             boost::asio::io_service& _ioService;
             boost::asio::ip::tcp::socket _conn;
             server* _server;
+            boost::asio::ip::tcp::endpoint _ep;
             
         public:
             connection(boost::asio::io_service& ioService);
