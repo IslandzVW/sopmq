@@ -36,11 +36,11 @@ namespace sopmq {
             unsigned short _port;
             boost::asio::ip::tcp::endpoint _endpoint;
             boost::asio::ip::tcp::acceptor _acceptor;
-            std::set<connection::ptr> _connections;
+            std::set<connection::connection::ptr> _connections;
             
             
             void accept_new();
-            void handle_accept(connection::ptr conn, const boost::system::error_code& error);
+            void handle_accept(connection::connection::ptr conn, const boost::system::error_code& error);
             
             
         public:
@@ -54,12 +54,12 @@ namespace sopmq {
             ///
             /// Called when a connection has been started and is alive
             ///
-            void connection_started(connection::ptr conn);
+            void connection_started(connection::connection::ptr conn);
             
             ///
             /// Called when a connection has been terminated either locally or remotely
             ///
-            void connection_terminated(connection::ptr conn);
+            void connection_terminated(connection::connection::ptr conn);
         };
         
     }

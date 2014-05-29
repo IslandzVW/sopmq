@@ -19,45 +19,53 @@
 #define __Project__connection__
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
+
+#include "iconnection_state.h"
 
 namespace sopmq {
     namespace node {
         
         class server;
         
-        ///
-        /// Connections from clients or other servers to this server
-        ///
-        class connection : public boost::noncopyable, public boost::enable_shared_from_this<connection>
-        {
-        public:
-            typedef boost::shared_ptr<connection> ptr;
+        namespace connection {
         
-        private:
-            boost::asio::io_service& _ioService;
-            boost::asio::ip::tcp::socket _conn;
-            server* _server;
-            boost::asio::ip::tcp::endpoint _ep;
+            ///
+            /// Connections from clients or other servers to this server
+            ///
+            class connection :  public boost::noncopyable,
+                                public boost::enable_shared_from_this<connection>
+            {
+            public:
+                typedef boost::shared_ptr<connection> ptr;
+                typedef boost::weak_ptr<connection> wptr;
             
-        public:
-            connection(boost::asio::io_service& ioService);
-            
-            ///
-            /// Returns the TCP socket associated with this connection
-            ///
-            boost::asio::ip::tcp::socket& get_socket();
-            
-            ///
-            /// Starts this connection and informs our server we're alive
-            ///
-            void start(server* server);
-        };
+            private:
+                boost::asio::io_service& _ioService;
+                boost::asio::ip::tcp::socket _conn;
+                server* _server;
+                boost::asio::ip::tcp::endpoint _ep;
+                iconnection_state::ptr _state;
+                
+            public:
+                connection(boost::asio::io_service& ioService);
+                
+                ///
+                /// Returns the TCP socket associated with this connection
+                ///
+                boost::asio::ip::tcp::socket& get_socket();
+                
+                ///
+                /// Starts this connection and informs our server we're alive
+                ///
+                void start(server* server);
+            };
         
         
-        
+        }
     }
 }
 

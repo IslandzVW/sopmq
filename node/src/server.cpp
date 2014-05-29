@@ -41,14 +41,14 @@ namespace sopmq {
         
         void server::accept_new()
         {
-            connection::ptr conn(new connection(_ioService));
+            connection::connection::ptr conn(new connection::connection(_ioService));
             
             _acceptor.async_accept(conn->get_socket(),
                                    boost::bind(&server::handle_accept, this, conn,
                                                boost::asio::placeholders::error));
         }
         
-        void server::handle_accept(connection::ptr conn, const boost::system::error_code& error)
+        void server::handle_accept(connection::connection::ptr conn, const boost::system::error_code& error)
         {
             if (! error)
             {
@@ -62,12 +62,12 @@ namespace sopmq {
             }
         }
         
-        void server::connection_started(connection::ptr conn)
+        void server::connection_started(connection::connection::ptr conn)
         {
             _connections.insert(conn);
         }
         
-        void server::connection_terminated(connection::ptr conn)
+        void server::connection_terminated(connection::connection::ptr conn)
         {
             _connections.erase(conn);
         }

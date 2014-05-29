@@ -15,45 +15,33 @@
  * limitations under the License.
  */
 
-#include "connection.h"
-
-#include "server.h"
-#include "logging.h"
 #include "csunauthenticated.h"
-#include "server.h"
-
-namespace ba = boost::asio;
 
 namespace sopmq {
     namespace node {
         namespace connection {
             
-            connection::connection(ba::io_service& ioService)
-            : _ioService(ioService), _conn(_ioService)
+            csunauthenticated::csunauthenticated(connection::wptr conn)
+            : _conn(conn)
             {
                 
             }
             
-            ba::ip::tcp::socket& connection::get_socket()
+            csunauthenticated::~csunauthenticated()
             {
-                return _conn;
+                
             }
             
-            void connection::start(server* server)
+            void csunauthenticated::start()
             {
-                _server = server;
-                _server->connection_started(shared_from_this());
                 
-                try {
-                    _ep = _conn.remote_endpoint();
-                    LOG_SRC(debug) << "new connection from " << _ep.address().to_string();
-                    
-                } catch (...) {
-                    //remote_endpoint can throw if the socket is disconnected
-                }
-                
-                _state.reset(new csunauthenticated(shared_from_this()));
             }
+            
+            std::string csunauthenticated::get_description() const
+            {
+                return "unauthenticated";
+            }
+            
         }
     }
 }
