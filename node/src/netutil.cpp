@@ -112,26 +112,57 @@ namespace sopmq {
                                        boost::asio::ip::tcp::socket& socket,
                                        message_callback callback)
             {
+                message_context ctx;
+                ctx.callback = callback;
+                
                 //read the message type
                 read_u16(ioService, socket, std::bind(&after_read_message_type,
                                                       std::ref(ioService), std::ref(socket),
-                                                      callback,
+                                                      ctx,
                                                       _1, _2));
             }
             
             void netutil::after_read_message_type(boost::asio::io_service& ioService,
                                                   boost::asio::ip::tcp::socket& socket,
-                                                  message_callback callback,
+                                                  message_context ctx,
                                                   uint16_t messageType,
                                                   const boost::system::error_code& error)
             {
                 if (error)
                 {
-                    callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
                     return;
                 }
                 
+                //validate the message
+                if (messageType <= sopmq::messages::MT_INVALID || messageType >= sopmq::messages::MT_INVALID_OUT_OF_RANGE)
+                {
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    return;
+                }
                 
+                ctx.type = (sopmq::messages::message_type)messageType;
+                
+                //read the message size
+                read_u32(ioService, socket, std::bind(&after_read_message_size,
+                                                      std::ref(ioService), std::ref(socket),
+                                                      ctx,
+                                                      _1, _2));
+            }
+            
+            void netutil::after_read_message_size(boost::asio::io_service& ioService,
+                                                  boost::asio::ip::tcp::socket& socket,
+                                                  message_context ctx,
+                                                  uint32_t messageSize,
+                                                  const boost::system::error_code& error)
+            {
+                if (error)
+                {
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    return;
+                }
+                
+                //alloc
             }
             
         }

@@ -24,10 +24,12 @@ namespace sopmq {
         enum message_type
         {
             MT_INVALID = 0,
+            
             MT_GET_CHALLENGE,
             MT_CHALLENGE,
-            MT_ANSWER_CHALLENGE
+            MT_ANSWER_CHALLENGE,
             
+            MT_INVALID_OUT_OF_RANGE
         };
         
     }

@@ -32,6 +32,8 @@ namespace sopmq {
     namespace node {
         namespace util {
             
+            struct message_context;
+            
             class netutil
             {
             public:
@@ -79,12 +81,29 @@ namespace sopmq {
                 
                 static void after_read_message_type(boost::asio::io_service& ioService,
                                                     boost::asio::ip::tcp::socket& socket,
-                                                    message_callback callback,
+                                                    message_context ctx,
                                                     uint16_t messageType,
+                                                    const boost::system::error_code& error);
+                
+                static void after_read_message_size(boost::asio::io_service& ioService,
+                                                    boost::asio::ip::tcp::socket& socket,
+                                                    message_context ctx,
+                                                    uint32_t messageSize,
                                                     const boost::system::error_code& error);
                 
                 netutil();
                 ~netutil();
+            };
+            
+            ///
+            /// Context for read_message
+            ///
+            struct message_context
+            {
+                netutil::message_callback callback;
+                sopmq::messages::message_type type;
+                uint32_t message_size;
+                char* message_buffer;
             };
             
         }
