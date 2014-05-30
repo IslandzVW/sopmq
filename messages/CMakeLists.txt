@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-file(MAKE_DIRECTORY cpp_out)
+#file(MAKE_DIRECTORY cpp_out)
 
 file(GLOB PROTO_FILES *.proto)
 
-execute_process(COMMAND protoc -I=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=cpp_out ${PROTO_FILES} 
+execute_process(COMMAND protoc -I=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=cpp ${PROTO_FILES} 
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

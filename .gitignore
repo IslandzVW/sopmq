@@ -32,7 +32,7 @@ build/
 .project
 
 #protoc output
-cpp_out/
+*.pb.*
 
 #mac cruft
 .DS_Store

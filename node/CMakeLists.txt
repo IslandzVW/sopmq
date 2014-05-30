@@ -42,13 +42,15 @@ find_package(Protobuf REQUIRED)
 set(INCLUDES ${INCLUDES} ${PROTOBUF_INCLUDE_DIR})
 
 add_definitions(${DEFS})
-include_directories(${INCLUDES})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
 list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/node-main.cpp)
 
 #message(${LIB_SRCS})
 
-file(GLOB MESSAGE_SRCS ../messages/cpp_out/*.h ../messages/cpp_out/*.cc)
+file(GLOB MESSAGE_SRCS ../messages/cpp/*.h ../messages/cpp/*.cc ../messages/cpp/*.cpp)
+
+set(INCLUDES ${INCLUDES} ../messages/cpp)
+include_directories(${INCLUDES})
 
 add_library(sopmq-nodelib ${LIB_SRCS} ${MESSAGE_SRCS})
 target_link_libraries(sopmq-nodelib ${LIBS})

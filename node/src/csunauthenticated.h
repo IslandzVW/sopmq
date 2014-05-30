@@ -37,10 +37,13 @@ namespace sopmq {
                 csunauthenticated(connection::wptr conn);
                 virtual ~csunauthenticated();
                 
-                //
+
                 // iconnection_state
                 virtual void start();
                 virtual std::string get_description() const;
+                // iconnection_state
+                
+                
             };
         }
     }
