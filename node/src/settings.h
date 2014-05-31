@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/noncopyable.hpp>
@@ -40,13 +41,37 @@ namespace sopmq {
             ///
             static settings& instance();
             
+        public:
+            ///
+            /// The beginning of the range we're in charge of
+            ///
             bmp::uint128_t range;
-            std::string bindAddress;
-            unsigned short port;
             
+            ///
+            /// The IP address to bind to
+            ///
+            std::string bindAddress;
+            
+            ///
+            /// The port to bind the node to
+            ///
+            uint16_t port;
+            
+            ///
+            /// IP adresses of cassandra nodes we should connect to for reading
+            /// and writing data
+            ///
             std::vector<std::string> cassandraSeeds;
+            
+            ///
+            /// Seed nodes we should initiate our initial connection to
+            ///
             std::vector<std::string> mqSeeds;
             
+            ///
+            /// The maximum message size that we allow
+            ///
+            uint32_t maxMessageSize;
             
             
         private:

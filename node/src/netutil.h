@@ -22,11 +22,13 @@
 #include <boost/asio.hpp>
 #include <boost/pool/poolfwd.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 #include <cstdint>
 
 #include <google/protobuf/message.h>
 
 #include "message_types.h"
+#include "network_error.h"
 
 namespace sopmq {
     namespace node {
@@ -39,7 +41,7 @@ namespace sopmq {
             public:
                 typedef std::function<void(boost::shared_ptr<::google::protobuf::Message>,
                                            sopmq::messages::message_type messageType,
-                                           const boost::system::error_code& error)>
+                                           const sopmq::error::network_error& error)>
                 message_callback;
                 
                 
@@ -62,17 +64,18 @@ namespace sopmq {
                 ///
                 static void read_message(boost::asio::io_service& ioService,
                                          boost::asio::ip::tcp::socket& socket,
-                                         message_callback callback);
+                                         message_callback callback,
+                                         uint32_t maxSize);
                 
             private:
                 static boost::pool<> s_mem_pool;
                 
-                static void after_u32_read(char* buffer,
+                static void after_u32_read(boost::shared_array<char> buffer,
                                            std::function<void(uint32_t, const boost::system::error_code& error)> callback,
                                            const boost::system::error_code& error,
                                            std::size_t bytes_transferred);
                 
-                static void after_u16_read(char* buffer,
+                static void after_u16_read(boost::shared_array<char> buffer,
                                            std::function<void(uint16_t, const boost::system::error_code& error)> callback,
                                            const boost::system::error_code& error,
                                            std::size_t bytes_transferred);
@@ -91,6 +94,12 @@ namespace sopmq {
                                                     uint32_t messageSize,
                                                     const boost::system::error_code& error);
                 
+                static void after_read_message_content(boost::asio::io_service& ioService,
+                                                       boost::asio::ip::tcp::socket& socket,
+                                                       message_context ctx,
+                                                       const boost::system::error_code& error,
+                                                       std::size_t bytes_transferred);
+                
                 netutil();
                 ~netutil();
             };
@@ -101,9 +110,10 @@ namespace sopmq {
             struct message_context
             {
                 netutil::message_callback callback;
+                uint32_t max_message_size;
                 sopmq::messages::message_type type;
                 uint32_t message_size;
-                char* message_buffer;
+                boost::shared_array<char> message_buffer;
             };
             
         }

@@ -23,6 +23,7 @@
 #include <string>
 #include <exception>
 #include <fstream>
+#include <cstdint>
 
 #include "settings.h"
 #include "server.h"
@@ -36,7 +37,8 @@ using namespace sopmq::node;
 const string& PRODUCT = "InWorldz SOPMQ";
 const string& VERSION = "0.1";
 
-const unsigned short DEFAULT_PORT = 8481;
+const uint16_t DEFAULT_PORT = 8481;
+const uint32_t DEFAULT_MAX_MESSAGE_SIZE = 10485760;
 
 const string required_options[] = {"range", "bind_addr", "port", "storage_nodes", "seed_nodes"};
 
@@ -49,9 +51,10 @@ bool process_options(int argc, char* argv[])
         ("config_file", po::value<string>()->default_value(""), "path to configuration file")
         ("range", po::value<bmp::uint128_t>(), "the start of the range for this node to handle")
         ("bind_addr", po::value<string>(), "address to bind to")
-        ("port", po::value<unsigned short>()->default_value(DEFAULT_PORT), "port to listen on")
+        ("port", po::value<uint16_t>()->default_value(DEFAULT_PORT), "port to listen on")
         ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
         ("seed_nodes", po::value<vector<string> >()->multitoken(), "list of seed nodes to get us into the ring")
+        ("max_message_size", po::value<uint32_t>()->default_value(DEFAULT_MAX_MESSAGE_SIZE), "the maximum size of any message")
     ;
     
     try
@@ -108,6 +111,7 @@ bool process_options(int argc, char* argv[])
         settings::instance().port = vm["port"].as<unsigned short>();
         settings::instance().cassandraSeeds = vm["storage_nodes"].as<vector<string> >();
         settings::instance().mqSeeds = vm["seed_nodes"].as<vector<string> >();
+        settings::instance().maxMessageSize = vm["max_message_size"].as<uint32_t>();
     }
     catch (const po::error& e)
     {

@@ -18,10 +18,13 @@
 #include "netutil.h"
 
 #include <boost/pool/pool.hpp>
-#include <boost/shared_array.hpp>
 #include <boost/asio/detail/socket_ops.hpp>
 
+#include "logging.h"
+
 using namespace std::placeholders;
+
+using sopmq::error::network_error;
 
 namespace sopmq {
     namespace node {
@@ -43,9 +46,9 @@ namespace sopmq {
                                    boost::asio::ip::tcp::socket& socket,
                                    std::function<void(uint32_t, const boost::system::error_code& error)> callback)
             {
-                char* buffer = (char*)s_mem_pool.malloc();
+                boost::shared_array<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
                 boost::asio::async_read(socket,
-                                        boost::asio::buffer(buffer, 4),
+                                        boost::asio::buffer(buffer.get(), 4),
                                         std::bind(&netutil::after_u32_read,
                                                     buffer,
                                                     callback,
@@ -59,9 +62,9 @@ namespace sopmq {
                                    boost::asio::ip::tcp::socket& socket,
                                    std::function<void(uint16_t, const boost::system::error_code& error)> callback)
             {
-                char* buffer = (char*)s_mem_pool.malloc();
+                boost::shared_array<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
                 boost::asio::async_read(socket,
-                                        boost::asio::buffer(buffer, 2),
+                                        boost::asio::buffer(buffer.get(), 2),
                                         std::bind(&netutil::after_u16_read,
                                                   buffer,
                                                   callback,
@@ -69,37 +72,33 @@ namespace sopmq {
                                                   _2));
             }
             
-            void netutil::after_u32_read(char* buffer,
+            void netutil::after_u32_read(boost::shared_array<char> buffer,
                                          std::function<void(uint32_t, const boost::system::error_code& error)> callback,
                                          const boost::system::error_code& error,
                                          std::size_t bytes_transferred)
             {
-                boost::shared_array<char> bufferptr(buffer, &netutil::free_mem);
-                
                 if (error)
                 {
                     callback(0, error);
                     return;
                 }
                 
-                uint32_t hl = boost::asio::detail::socket_ops::network_to_host_long(*(uint32_t*)buffer);
+                uint32_t hl = boost::asio::detail::socket_ops::network_to_host_long(*(uint32_t*)buffer.get());
                 callback(hl, error);
             }
             
-            void netutil::after_u16_read(char* buffer,
+            void netutil::after_u16_read(boost::shared_array<char> buffer,
                                          std::function<void(uint16_t, const boost::system::error_code& error)> callback,
                                          const boost::system::error_code& error,
                                          std::size_t bytes_transferred)
             {
-                boost::shared_array<char> bufferptr(buffer, &netutil::free_mem);
-                
                 if (error)
                 {
                     callback(0, error);
                     return;
                 }
                 
-                uint16_t hl = boost::asio::detail::socket_ops::network_to_host_short(*(uint16_t*)buffer);
+                uint16_t hl = boost::asio::detail::socket_ops::network_to_host_short(*(uint16_t*)buffer.get());
                 callback(hl, error);
             }
             
@@ -110,10 +109,12 @@ namespace sopmq {
             
             void netutil::read_message(boost::asio::io_service& ioService,
                                        boost::asio::ip::tcp::socket& socket,
-                                       message_callback callback)
+                                       message_callback callback,
+                                       uint32_t maxSize)
             {
                 message_context ctx;
                 ctx.callback = callback;
+                ctx.max_message_size = maxSize;
                 
                 //read the message type
                 read_u16(ioService, socket, std::bind(&after_read_message_type,
@@ -130,14 +131,14 @@ namespace sopmq {
             {
                 if (error)
                 {
-                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
                     return;
                 }
                 
                 //validate the message
                 if (messageType <= sopmq::messages::MT_INVALID || messageType >= sopmq::messages::MT_INVALID_OUT_OF_RANGE)
                 {
-                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error("Message type was invalid"));
                     return;
                 }
                 
@@ -158,11 +159,46 @@ namespace sopmq {
             {
                 if (error)
                 {
-                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, error);
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
+                    return;
+                }
+                
+                //sanity check the size
+                if (messageSize > ctx.max_message_size)
+                {
+                    LOG_SRC(error) << "message is too large (" << messageSize / 1024 << " MB)";
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error("Message was too large"));
                     return;
                 }
                 
                 //alloc
+                boost::shared_array<char> buffer(new char[messageSize]);
+                ctx.message_buffer = buffer;
+                
+                boost::asio::async_read(socket,
+                                        boost::asio::buffer(buffer.get(), messageSize),
+                                        std::bind(&netutil::after_read_message_content,
+                                                  std::ref(ioService),
+                                                  std::ref(socket),
+                                                  ctx,
+                                                  _1,
+                                                  _2));
+            }
+            
+            void netutil::after_read_message_content(boost::asio::io_service& ioService,
+                                                     boost::asio::ip::tcp::socket& socket,
+                                                     message_context ctx,
+                                                     const boost::system::error_code& error,
+                                                     std::size_t bytes_transferred)
+            {
+                if (error)
+                {
+                    ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
+                    return;
+                }
+                
+                //we have a message, decode it
+                
             }
             
         }
