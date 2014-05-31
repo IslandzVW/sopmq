@@ -21,15 +21,66 @@
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
 #include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <functional>
+#include <map>
 
 #include "message_types.h"
 #include "network_error.h"
+#include "message_dispatcher.h"
 
 namespace sopmq {
-    namespace util {
+    namespace message {
         
-        struct message_context;
+        typedef std::function<void(const sopmq::error::network_error& error)> network_error_callback;
+        
+        ///
+        /// Context for read_message
+        ///
+        struct message_context : public boost::noncopyable
+        {
+            ///
+            /// Dispatcher to handle the message with
+            ///
+            message_dispatcher& dispatcher;
+            
+            ///
+            /// Callback for error conditions
+            ///
+            network_error_callback error_callback;
+            
+            ///
+            /// The maximum size for any message
+            ///
+            uint32_t max_message_size;
+            
+            ///
+            /// The type of message we're handling
+            ///
+            sopmq::message::message_type type;
+            
+            ///
+            /// Size of the message we're handling
+            ///
+            uint32_t message_size;
+            
+            ///
+            /// Buffer for our message
+            ///
+            boost::shared_array<char> message_buffer;
+            
+            
+            
+            message_context(message_dispatcher& dispatcher)
+            : dispatcher(dispatcher)
+            {
+            }
+        };
+        
+        typedef boost::shared_ptr<message_context> message_context_ptr;
         
         ///
         /// Utility functions that deal with network messages
@@ -37,52 +88,58 @@ namespace sopmq {
         class messageutil
         {
         public:
-            typedef std::function<void(boost::shared_ptr<::google::protobuf::Message>,
-                                       sopmq::messages::message_type messageType,
-                                       const sopmq::error::network_error& error)>
-            message_callback;
-            
-        public:
             ///
             /// Reads an unknown message type from the wire
             ///
             static void read_message(boost::asio::io_service& ioService,
                                      boost::asio::ip::tcp::socket& socket,
-                                     message_callback callback,
+                                     network_error_callback errorCallback,
+                                     message_dispatcher& dispatcher,
                                      uint32_t maxSize);
             
         private:
             static void after_read_message_type(boost::asio::io_service& ioService,
                                                 boost::asio::ip::tcp::socket& socket,
-                                                message_context ctx,
+                                                message_context_ptr ctx,
                                                 uint16_t messageType,
                                                 const boost::system::error_code& error);
             
             static void after_read_message_size(boost::asio::io_service& ioService,
                                                 boost::asio::ip::tcp::socket& socket,
-                                                message_context ctx,
+                                                message_context_ptr ctx,
                                                 uint32_t messageSize,
                                                 const boost::system::error_code& error);
             
             static void after_read_message_content(boost::asio::io_service& ioService,
                                                    boost::asio::ip::tcp::socket& socket,
-                                                   message_context ctx,
+                                                   message_context_ptr ctx,
                                                    const boost::system::error_code& error,
                                                    std::size_t bytes_transferred);
-        };
-        
-        
-        
-        ///
-        /// Context for read_message
-        ///
-        struct message_context
-        {
-            messageutil::message_callback callback;
-            uint32_t max_message_size;
-            sopmq::messages::message_type type;
-            uint32_t message_size;
-            boost::shared_array<char> message_buffer;
+            
+            ///
+            /// Decodes the message and then dispatches it
+            ///
+            static void switch_dispatch(message_context_ptr ctx);
+            
+            ///
+            /// After the message type is decoded, we do the rest of the work here
+            ///
+            template <typename T>
+            static void template_dispatch(message_context_ptr ctx, T message)
+            {
+                if (! message->ParseFromArray(ctx->message_buffer.get(), ctx->message_size))
+                {
+                    //error
+                    ctx->error_callback(sopmq::error::network_error("Unable to construct new message of type "
+                                                                    + boost::lexical_cast<std::string>(ctx->type)
+                                                                    + " message corrupted?"));
+                }
+                else
+                {
+                    //dispatch
+                    ctx->dispatcher.dispatch(message);
+                }
+            }
         };
         
     }

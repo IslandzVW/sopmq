@@ -17,24 +17,30 @@
 
 #include "messageutil.h"
 
+#include <boost/make_shared.hpp>
+
 #include "logging.h"
 #include "netutil.h"
+
+#include "GetChallengeMessage.pb.h"
 
 using sopmq::error::network_error;
 
 using namespace std::placeholders;
+using namespace sopmq::util;
 
 namespace sopmq {
-    namespace util {
+    namespace message {
         
         void messageutil::read_message(boost::asio::io_service& ioService,
                                        boost::asio::ip::tcp::socket& socket,
-                                        message_callback callback,
+                                       network_error_callback errorCallback,
+                                       message_dispatcher& dispatcher,
                                        uint32_t maxSize)
         {
-            message_context ctx;
-            ctx.callback = callback;
-            ctx.max_message_size = maxSize;
+            message_context_ptr ctx(new message_context(dispatcher));
+            ctx->error_callback = errorCallback;
+            ctx->max_message_size = maxSize;
             
             //read the message type
             netutil::read_u16(ioService, socket, std::bind(&messageutil::after_read_message_type,
@@ -45,24 +51,24 @@ namespace sopmq {
         
         void messageutil::after_read_message_type(boost::asio::io_service& ioService,
                                                   boost::asio::ip::tcp::socket& socket,
-                                                  message_context ctx,
+                                                  message_context_ptr ctx,
                                                   uint16_t messageType,
                                                   const boost::system::error_code& error)
         {
             if (error)
             {
-                ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
+                ctx->error_callback(network_error(error.message()));
                 return;
             }
             
             //validate the message
-            if (messageType <= sopmq::messages::MT_INVALID || messageType >= sopmq::messages::MT_INVALID_OUT_OF_RANGE)
+            if (messageType <= sopmq::message::MT_INVALID || messageType >= sopmq::message::MT_INVALID_OUT_OF_RANGE)
             {
-                ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error("Message type was invalid"));
+                ctx->error_callback(network_error("Message type was invalid"));
                 return;
             }
             
-            ctx.type = (sopmq::messages::message_type)messageType;
+            ctx->type = (sopmq::message::message_type)messageType;
             
             //read the message size
             netutil::read_u32(ioService, socket, std::bind(&messageutil::after_read_message_size,
@@ -73,27 +79,27 @@ namespace sopmq {
         
         void messageutil::after_read_message_size(boost::asio::io_service& ioService,
                                                   boost::asio::ip::tcp::socket& socket,
-                                                  message_context ctx,
+                                                  message_context_ptr ctx,
                                                   uint32_t messageSize,
                                                   const boost::system::error_code& error)
         {
             if (error)
             {
-                ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
+                ctx->error_callback(network_error(error.message()));
                 return;
             }
             
             //sanity check the size
-            if (messageSize > ctx.max_message_size)
+            if (messageSize > ctx->max_message_size)
             {
                 LOG_SRC(error) << "message is too large (" << messageSize / 1024 << " MB)";
-                ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error("Message was too large"));
+                ctx->error_callback(network_error("Message was too large"));
                 return;
             }
             
             //alloc
             boost::shared_array<char> buffer(new char[messageSize]);
-            ctx.message_buffer = buffer;
+            ctx->message_buffer = buffer;
             
             boost::asio::async_read(socket,
                                     boost::asio::buffer(buffer.get(), messageSize),
@@ -107,18 +113,34 @@ namespace sopmq {
         
         void messageutil::after_read_message_content(boost::asio::io_service& ioService,
                                                      boost::asio::ip::tcp::socket& socket,
-                                                     message_context ctx,
+                                                     message_context_ptr ctx,
                                                      const boost::system::error_code& error,
                                                      std::size_t bytes_transferred)
         {
             if (error)
             {
-                ctx.callback(nullptr, sopmq::messages::MT_INVALID, network_error(error.message()));
+                ctx->error_callback(network_error(error.message()));
                 return;
             }
             
-            //we have a message, decode it
+            BOOST_ASSERT(bytes_transferred == ctx->message_size);
             
+            //we have a message, decode it
+            messageutil::switch_dispatch(ctx);
+        }
+        
+        void messageutil::switch_dispatch(message_context_ptr ctx)
+        {
+            switch (ctx->type)
+            {
+                case MT_GET_CHALLENGE:
+                    messageutil::template_dispatch(ctx, boost::make_shared<GetChallengeMessage>());
+                    break;
+                    
+                default:
+                    throw std::runtime_error("messageutil::switch_dispatch() unhandled message type"
+                                             + boost::lexical_cast<std::string>(ctx->type));
+            }
         }
     }
 }

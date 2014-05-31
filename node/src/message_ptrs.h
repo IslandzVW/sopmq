@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-namespace sopmq {
-    namespace message {
-        
-        ///
-        /// SOPMQ message types
-        ///
-        enum message_type
-        {
-            MT_INVALID = 0,
-            
-            MT_GET_CHALLENGE,
-            MT_CHALLENGE,
-            MT_ANSWER_CHALLENGE,
-            
-            MT_INVALID_OUT_OF_RANGE
-        };
-        
-    }
-}
+///
+/// Pointers for all message types
+///
+
+#ifndef Project_message_ptrs_h
+#define Project_message_ptrs_h
+
+#include <boost/shared_ptr.hpp>
+#include <google/protobuf/message.h>
+
+typedef boost::shared_ptr<::google::protobuf::Message> Message_ptr;
+
+class GetChallengeMessage;
+typedef boost::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
+
+#endif
