@@ -38,7 +38,7 @@ namespace sopmq {
                                        message_dispatcher& dispatcher,
                                        uint32_t maxSize)
         {
-            message_context_ptr ctx(new message_context(dispatcher));
+            message_context_ptr ctx(boost::make_shared<message_context>());
             ctx->error_callback = errorCallback;
             ctx->max_message_size = maxSize;
             

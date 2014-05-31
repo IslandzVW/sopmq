@@ -21,6 +21,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/make_shared.hpp>
 
 namespace ba = boost::asio;
 
@@ -41,7 +42,7 @@ namespace sopmq {
         
         void server::accept_new()
         {
-            connection::connection::ptr conn(new connection::connection(_ioService));
+            connection::connection::ptr conn(boost::make_shared<connection::connection>(_ioService));
             
             _acceptor.async_accept(conn->get_socket(),
                                    boost::bind(&server::handle_accept, this, conn,
