@@ -130,7 +130,7 @@ namespace sopmq {
                 if (! message->ParseFromArray(ctx->message_buffer.get(), ctx->message_size))
                 {
                     //error
-                    ctx->error_callback(sopmq::error::network_error("Unable to construct new message of type "
+                    ctx->error_callback(sopmq::error::network_error("Unable to parse new message of type "
                                                                     + boost::lexical_cast<std::string>(ctx->type)
                                                                     + " message corrupted?"));
                 }
