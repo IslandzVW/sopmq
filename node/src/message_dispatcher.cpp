@@ -34,14 +34,7 @@ namespace sopmq {
         
         void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
         {
-            if (_getChallengeHandler)
-            {
-                _getChallengeHandler(getChallengeMessage);
-            }
-            else
-            {
-                _unhandledHandler(boost::static_pointer_cast<::google::protobuf::Message>(getChallengeMessage));
-            }
+            do_dispatch(_getChallengeHandler, getChallengeMessage);
         }
         
         void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)

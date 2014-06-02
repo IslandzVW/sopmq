@@ -48,6 +48,24 @@ namespace sopmq {
             ///
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             
+        private:
+            ///
+            /// Template function to execute the given handler if it is available, or
+            /// the unhandled handler if it is not
+            ///
+            template <typename handler, typename message>
+            void do_dispatch(handler h, message m)
+            {
+                if (h)
+                {
+                    h(m);
+                }
+                else
+                {
+                    _unhandledHandler(boost::static_pointer_cast<::google::protobuf::Message>(m));
+                }
+            }
+            
         };
         
     }
