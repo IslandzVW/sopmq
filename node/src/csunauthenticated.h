@@ -20,6 +20,11 @@
 
 #include "iconnection_state.h"
 #include "connection.h"
+#include "message_dispatcher.h"
+#include "message_ptrs.h"
+#include "network_error.h"
+
+#include <boost/asio.hpp>
 
 namespace sopmq {
     namespace node {
@@ -31,10 +36,18 @@ namespace sopmq {
             class csunauthenticated : public iconnection_state
             {
             private:
+                boost::asio::io_service& _ioService;
                 connection::wptr _conn;
+                sopmq::message::message_dispatcher _dispatcher;
+                
+                void unhandled_message(Message_ptr message);
+                
+                void handle_get_challenge_message(GetChallengeMessage_ptr message);
+                
+                void handle_network_error(const sopmq::error::network_error& error);
                 
             public:
-                csunauthenticated(connection::wptr conn);
+                csunauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
                 virtual ~csunauthenticated();
                 
 

@@ -52,7 +52,7 @@ namespace sopmq {
                     //remote_endpoint can throw if the socket is disconnected
                 }
                 
-                _state.reset(new csunauthenticated(shared_from_this()));
+                _state.reset(new csunauthenticated(_ioService, shared_from_this()));
             }
         }
     }

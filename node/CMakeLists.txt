@@ -40,6 +40,7 @@ set(LIBS ${LIBS} ${CRYPTOPP_LIBRARIES})
 
 find_package(Protobuf REQUIRED)
 set(INCLUDES ${INCLUDES} ${PROTOBUF_INCLUDE_DIR})
+set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 
 add_definitions(${DEFS})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)

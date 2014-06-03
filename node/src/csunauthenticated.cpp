@@ -17,14 +17,25 @@
 
 #include "csunauthenticated.h"
 
+#include <functional>
+
+#include "messageutil.h"
+#include "settings.h"
+
+using namespace std::placeholders;
+using sopmq::message::messageutil;
+using sopmq::node::settings;
+
+namespace ba = boost::asio;
+
 namespace sopmq {
     namespace node {
         namespace connection {
             
-            csunauthenticated::csunauthenticated(connection::wptr conn)
-            : _conn(conn)
+            csunauthenticated::csunauthenticated(ba::io_service& ioService, connection::wptr conn)
+            : _ioService(ioService), _conn(conn), _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1))
             {
-                
+                _dispatcher.set_handler(std::bind(&csunauthenticated::handle_get_challenge_message, this, _1));
             }
             
             csunauthenticated::~csunauthenticated()
@@ -32,9 +43,34 @@ namespace sopmq {
                 
             }
             
-            void csunauthenticated::start()
+            void csunauthenticated::unhandled_message(Message_ptr message)
             {
                 
+            }
+            
+            void csunauthenticated::handle_get_challenge_message(GetChallengeMessage_ptr message)
+            {
+                
+            }
+            
+            void csunauthenticated::handle_network_error(const sopmq::error::network_error& error)
+            {
+                
+            }
+            
+            void csunauthenticated::start()
+            {
+                if (auto connptr = _conn.lock())
+                {
+                    //read a message from the network
+                    messageutil::read_message(_ioService, connptr->get_socket(),
+                                              std::bind(&csunauthenticated::handle_network_error, this, _1),
+                                              _dispatcher, settings::instance().maxMessageSize);
+                }
+                else
+                {
+                    //connection died
+                }
             }
             
             std::string csunauthenticated::get_description() const
