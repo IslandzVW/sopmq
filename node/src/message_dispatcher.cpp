@@ -23,6 +23,7 @@ namespace sopmq {
     namespace message {
         
         message_dispatcher::message_dispatcher(std::function<void(Message_ptr)> unhandledHandler)
+        : _unhandledHandler(unhandledHandler)
         {
             
         }
