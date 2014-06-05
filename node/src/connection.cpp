@@ -22,7 +22,10 @@
 #include "csunauthenticated.h"
 #include "server.h"
 
+#include <string>
+
 namespace ba = boost::asio;
+using sopmq::error::network_error;
 
 namespace sopmq {
     namespace node {
@@ -48,8 +51,9 @@ namespace sopmq {
                     _ep = _conn.remote_endpoint();
                     LOG_SRC(debug) << "new connection from " << _ep.address().to_string();
                     
-                } catch (...) {
+                } catch (const boost::system::system_error& e) {
                     //remote_endpoint can throw if the socket is disconnected
+                    throw network_error(std::string("connection startup error") + e.what());
                 }
                 
                 _state.reset(new csunauthenticated(_ioService, shared_from_this()));

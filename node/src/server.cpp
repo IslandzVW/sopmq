@@ -23,7 +23,11 @@
 #include <boost/log/trivial.hpp>
 #include <boost/make_shared.hpp>
 
+#include "network_error.h"
+#include "logging.h"
+
 namespace ba = boost::asio;
+using sopmq::error::network_error;
 
 namespace sopmq {
     namespace node {
@@ -53,12 +57,17 @@ namespace sopmq {
         {
             if (! error)
             {
-                conn->start(this);
+                try {
+                    conn->start(this);
+                } catch (const network_error& e) {
+                    LOG_SRC(error) << "exception thrown when trying to start connection: " << e.what();
+                }
+                
                 this->accept_new();
             }
             else
             {
-                BOOST_LOG_TRIVIAL(error) << "error during accept(): " << error.message();
+                LOG_SRC(error) << "error during accept(): " << error.message();
                 this->accept_new();
             }
         }
