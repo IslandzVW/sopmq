@@ -27,6 +27,12 @@
 #include "iconnection_state.h"
 
 namespace sopmq {
+    namespace error {
+        class network_error;
+    }
+}
+
+namespace sopmq {
     namespace node {
         
         class server;
@@ -62,6 +68,16 @@ namespace sopmq {
                 /// Starts this connection and informs our server we're alive
                 ///
                 void start(server* server);
+                
+                ///
+                /// Handles an error from a child state. Disconnects the user
+                ///
+                void handle_error(const sopmq::error::network_error& e);
+                
+                ///
+                /// Closes this connection and tells our server it has been closed
+                ///
+                void close();
             };
         
         

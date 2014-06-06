@@ -25,6 +25,7 @@
 using namespace std::placeholders;
 using sopmq::message::messageutil;
 using sopmq::node::settings;
+using sopmq::error::network_error;
 
 namespace ba = boost::asio;
 
@@ -45,7 +46,10 @@ namespace sopmq {
             
             void csunauthenticated::unhandled_message(Message_ptr message)
             {
-                
+                if (auto connptr = _conn.lock())
+                {
+                    connptr->handle_error(network_error("Unexpected message received during authentication"));
+                }
             }
             
             void csunauthenticated::handle_get_challenge_message(GetChallengeMessage_ptr message)
@@ -53,9 +57,12 @@ namespace sopmq {
                 
             }
             
-            void csunauthenticated::handle_network_error(const sopmq::error::network_error& error)
+            void csunauthenticated::handle_network_error(const network_error& error)
             {
-                
+                if (auto connptr = _conn.lock())
+                {
+                    connptr->handle_error(error);
+                }
             }
             
             void csunauthenticated::start()
@@ -66,10 +73,6 @@ namespace sopmq {
                     messageutil::read_message(_ioService, connptr->get_socket(),
                                               std::bind(&csunauthenticated::handle_network_error, this, _1),
                                               _dispatcher, settings::instance().maxMessageSize);
-                }
-                else
-                {
-                    //connection died
                 }
             }
             

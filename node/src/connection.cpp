@@ -52,11 +52,28 @@ namespace sopmq {
                     LOG_SRC(debug) << "new connection from " << _ep.address().to_string();
                     
                 } catch (const boost::system::system_error& e) {
-                    //remote_endpoint can throw if the socket is disconnected
+                    //remote_endpoint() can throw if the socket is disconnected
                     throw network_error(std::string("connection startup error") + e.what());
                 }
                 
                 _state.reset(new csunauthenticated(_ioService, shared_from_this()));
+                _state->start();
+            }
+            
+            void connection::handle_error(const network_error& e)
+            {
+                LOG_SRC(error) << "network error: " << e.what() << ". closing connection";
+                
+                this->close();
+            }
+            
+            void connection::close()
+            {
+                //we really don't care about errors here
+                boost::system::error_code ec;
+                _conn.close(ec);
+                
+                _server->connection_terminated(shared_from_this());
             }
         }
     }
