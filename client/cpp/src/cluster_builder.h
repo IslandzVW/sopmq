@@ -17,6 +17,8 @@
 
 #include <vector>
 
+#include "endpoint.h"
+
 namespace sopmq {
     namespace client {
         
@@ -29,10 +31,15 @@ namespace sopmq {
             cluster_builder();
             virtual ~cluster_builder();
             
+            ///
+            /// Adds a new endpoint to this cluster
+            ///
+            void add_endpoint(const shared::net::endpoint& ep);
+            
             
             
         private:
-            std::vector<
+            std::vector<shared::net::endpoint> _endpoints;
         };
         
     }

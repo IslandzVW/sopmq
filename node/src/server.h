@@ -18,10 +18,11 @@
 #ifndef __Project__server__
 #define __Project__server__
 
-#include <boost/asio.hpp>
-#include <set>
-
 #include "connection.h"
+
+#include <boost/asio.hpp>
+#include <boost/noncopyable.hpp>
+#include <set>
 
 namespace sopmq {
     namespace node {
@@ -29,7 +30,7 @@ namespace sopmq {
         ///
         /// Server that listens for and manages connections
         ///
-        class server
+        class server : public boost::noncopyable
         {
         public:
             server(boost::asio::io_service& ioService, unsigned short port);

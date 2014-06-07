@@ -43,6 +43,9 @@ file(GLOB LIB_SRCS src/*.h src/*.cpp)
 
 file(GLOB MESSAGE_SRCS ../../messages/cpp/*.h ../../messages/cpp/*.cc ../../messages/cpp/*.cpp)
 
+set(INCLUDES ${INCLUDES} ${SHARED_DIR}/src)
+set(LIBS ${LIBS} sopmq-shared)
+
 set(INCLUDES ${INCLUDES} ../../messages/cpp)
 include_directories(${INCLUDES})
 

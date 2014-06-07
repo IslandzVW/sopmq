@@ -25,6 +25,7 @@
 #include "network_error.h"
 
 #include <boost/asio.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace sopmq {
     namespace node {
@@ -33,7 +34,8 @@ namespace sopmq {
             ///
             /// State before a connection has been authenticated
             ///
-            class csunauthenticated : public iconnection_state
+            class csunauthenticated :   public iconnection_state,
+                                        public boost::noncopyable
             {
             public:
                 csunauthenticated(boost::asio::io_service& ioService, connection::wptr conn);

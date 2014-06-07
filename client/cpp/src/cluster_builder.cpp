@@ -14,3 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "cluster_builder.h"
+
+namespace sopmq {
+    namespace client {
+        
+        cluster_builder::cluster_builder()
+        {
+            
+        }
+        
+        cluster_builder::~cluster_builder()
+        {
+            
+        }
+        
+        void cluster_builder::add_endpoint(const shared::net::endpoint &ep)
+        {
+            _endpoints.push_back(ep);
+        }
+        
+    }
+}
