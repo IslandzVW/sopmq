@@ -23,7 +23,7 @@ namespace bmp = boost::multiprecision;
 namespace sopmq {
     namespace node {
         
-        node::node(bmp::uint128_t rangeStart, net::endpoint endPoint)
+        node::node(bmp::uint128_t rangeStart, shared::net::endpoint endPoint)
         : _rangeStart(rangeStart), _endpoint(endPoint)
         {
             
@@ -39,7 +39,7 @@ namespace sopmq {
             return _rangeStart;
         }
         
-        net::endpoint node::endpoint() const
+        shared::net::endpoint node::endpoint() const
         {
             return _endpoint;
         }

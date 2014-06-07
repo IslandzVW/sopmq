@@ -5,6 +5,7 @@ set(INCLUDES ${INCLUDES} ${PROTOBUF_INCLUDE_DIR})
 set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 
 set(INCLUDES ${INCLUDES} ../messages/cpp)
+set(INCLUDES ${INCLUDES} ${SHARED_DIR}/src)
 
 include_directories (${NODE_DIR}/src
                      ${Boost_INCLUDE_DIRS}

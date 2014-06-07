@@ -37,7 +37,7 @@ namespace sopmq {
         class node : public boost::noncopyable
         {
         public:
-            node(boost::multiprecision::uint128_t rangeStart, net::endpoint endPoint);
+            node(boost::multiprecision::uint128_t rangeStart, shared::net::endpoint endPoint);
             virtual ~node();
             
             ///
@@ -48,7 +48,7 @@ namespace sopmq {
             ///
             /// Returns the endpoint to reach this node
             ///
-            net::endpoint endpoint() const;
+            shared::net::endpoint endpoint() const;
             
             ///
             /// Whether or not this node is known to be up
@@ -77,7 +77,7 @@ namespace sopmq {
             ///
             /// The endpoint to contact this node at
             ///
-            net::endpoint _endpoint;
+            shared::net::endpoint _endpoint;
             
             ///
             /// The last time we got a heartbeat from this node

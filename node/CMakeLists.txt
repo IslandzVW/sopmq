@@ -51,6 +51,10 @@ list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/node-main.cpp)
 file(GLOB MESSAGE_SRCS ../messages/cpp/*.h ../messages/cpp/*.cc ../messages/cpp/*.cpp)
 
 set(INCLUDES ${INCLUDES} ../messages/cpp)
+
+set(INCLUDES ${INCLUDES} ../shared/src)
+set(LIBS ${LIBS} sopmq-shared)
+
 include_directories(${INCLUDES})
 
 add_library(sopmq-nodelib ${LIB_SRCS} ${MESSAGE_SRCS})

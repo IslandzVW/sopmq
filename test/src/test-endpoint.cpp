@@ -19,7 +19,7 @@
 
 #include "endpoint.h"
 
-using namespace sopmq::node::net;
+using namespace sopmq::shared::net;
 
 TEST(EndPointTest, EndPointParserIsSane)
 {

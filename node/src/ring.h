@@ -64,7 +64,7 @@ namespace sopmq {
             ///
             /// Map to the nodes of the ring by their endpoints
             ///
-            std::map<net::endpoint, node_ptr> _ringByEndpoint;
+            std::map<shared::net::endpoint, node_ptr> _ringByEndpoint;
             
             ///
             /// Finds the location of the secondary node on the ring

@@ -13,18 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+PROJECT( sopmq-shared )
 cmake_minimum_required(VERSION 2.8)
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
-set(SHARED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shared)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_RUNTIME OFF)
+#set(Boost_DEBUG 1)
 
-add_subdirectory(messages)
-add_subdirectory(shared)
-add_subdirectory(node)
-add_subdirectory(client/cpp)
-add_subdirectory(gtest-1.7.0)
-add_subdirectory(test)
+set(DEFS ${DEFS} -DBOOST_ALL_DYN_LINK)
 
-enable_testing ()
-add_test (NAME NodeTest COMMAND Test)
+find_package(Boost COMPONENTS system program_options log thread chrono REQUIRED)
+set(INCLUDES ${INCLUDES} ${Boost_INCLUDE_DIR})
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
+
+find_package(OpenSSL REQUIRED)
+set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
+
+add_definitions(${DEFS})
+file(GLOB LIB_SRCS src/*.h src/*.cpp)
+
+include_directories(${INCLUDES})
+
+add_library(sopmq-shared ${LIB_SRCS})
+target_link_libraries(sopmq-shared ${LIBS})

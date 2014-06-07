@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <vector>
+
 namespace sopmq {
     namespace client {
         
@@ -27,8 +29,10 @@ namespace sopmq {
             cluster_builder();
             virtual ~cluster_builder();
             
-        private:
             
+            
+        private:
+            std::vector<
         };
         
     }

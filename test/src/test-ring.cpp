@@ -23,7 +23,7 @@
 #include <boost/multiprecision/random.hpp>
 
 using namespace sopmq::node;
-using namespace sopmq::node::net;
+using namespace sopmq::shared::net;
 using namespace boost::multiprecision;
 using namespace boost::random;
 
