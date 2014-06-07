@@ -48,13 +48,6 @@ namespace sopmq {
             public:
                 typedef std::shared_ptr<connection> ptr;
                 typedef std::weak_ptr<connection> wptr;
-            
-            private:
-                boost::asio::io_service& _ioService;
-                boost::asio::ip::tcp::socket _conn;
-                server* _server;
-                boost::asio::ip::tcp::endpoint _ep;
-                iconnection_state::ptr _state;
                 
             public:
                 connection(boost::asio::io_service& ioService);
@@ -78,6 +71,13 @@ namespace sopmq {
                 /// Closes this connection and tells our server it has been closed
                 ///
                 void close();
+                
+            private:
+                boost::asio::io_service& _ioService;
+                boost::asio::ip::tcp::socket _conn;
+                server* _server;
+                boost::asio::ip::tcp::endpoint _ep;
+                iconnection_state::ptr _state;
             };
         
         

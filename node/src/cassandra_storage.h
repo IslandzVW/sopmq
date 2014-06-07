@@ -34,6 +34,14 @@ namespace sopmq {
             ///
             class cassandra_storage : public boost::noncopyable
             {
+            public:
+                static cassandra_storage& instance();
+                
+                ///
+                /// Opens a new session with the cassandra cluster
+                ///
+                boost::shared_ptr<cql::cql_session_t> new_session();
+                
             private:
                 ///
                 /// The name of our keyspace
@@ -44,14 +52,6 @@ namespace sopmq {
                 
                 cassandra_storage();
                 ~cassandra_storage();
-                
-            public:
-                static cassandra_storage& instance();
-                
-                ///
-                /// Opens a new session with the cassandra cluster
-                ///
-                boost::shared_ptr<cql::cql_session_t> new_session();
             };
             
         }

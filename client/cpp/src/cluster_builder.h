@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-#include <memory>
-#include <boost/noncopyable.hpp>
-
 namespace sopmq {
     namespace client {
         
         ///
-        /// A SOPMQ client class that can interact with a server
+        /// Given a number of node endpoints, builds a SOPMQ cluster
         ///
-        class client : public boost::noncopyable
+        class cluster_builder
         {
         public:
-            typedef std::shared_ptr<client> ptr;
+            cluster_builder();
+            virtual ~cluster_builder();
             
-        public:
-            client();
-            virtual ~client();
+        private:
+            
         };
         
     }

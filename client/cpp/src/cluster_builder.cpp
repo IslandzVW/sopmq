@@ -14,25 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include <memory>
-#include <boost/noncopyable.hpp>
-
-namespace sopmq {
-    namespace client {
-        
-        ///
-        /// A SOPMQ client class that can interact with a server
-        ///
-        class client : public boost::noncopyable
-        {
-        public:
-            typedef std::shared_ptr<client> ptr;
-            
-        public:
-            client();
-            virtual ~client();
-        };
-        
-    }
-}

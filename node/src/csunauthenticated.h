@@ -35,17 +35,6 @@ namespace sopmq {
             ///
             class csunauthenticated : public iconnection_state
             {
-            private:
-                boost::asio::io_service& _ioService;
-                connection::wptr _conn;
-                sopmq::message::message_dispatcher _dispatcher;
-                
-                void unhandled_message(Message_ptr message);
-                
-                void handle_get_challenge_message(GetChallengeMessage_ptr message);
-                
-                void handle_network_error(const sopmq::error::network_error& error);
-                
             public:
                 csunauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
                 virtual ~csunauthenticated();
@@ -56,7 +45,16 @@ namespace sopmq {
                 virtual std::string get_description() const;
                 // iconnection_state
                 
+            private:
+                boost::asio::io_service& _ioService;
+                connection::wptr _conn;
+                sopmq::message::message_dispatcher _dispatcher;
                 
+                void unhandled_message(Message_ptr message);
+                
+                void handle_get_challenge_message(GetChallengeMessage_ptr message);
+                
+                void handle_network_error(const sopmq::error::network_error& error);
             };
         }
     }

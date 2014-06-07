@@ -29,10 +29,6 @@ namespace sopmq {
         ///
         class message_dispatcher
         {
-        private:
-            std::function<void(Message_ptr)> _unhandledHandler;
-            std::function<void(GetChallengeMessage_ptr)>  _getChallengeHandler;
-            
         public:
             message_dispatcher(std::function<void(Message_ptr)> unhandledHandler);
             virtual ~message_dispatcher();
@@ -49,6 +45,9 @@ namespace sopmq {
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             
         private:
+            std::function<void(Message_ptr)> _unhandledHandler;
+            std::function<void(GetChallengeMessage_ptr)>  _getChallengeHandler;
+            
             ///
             /// Template function to execute the given handler if it is available, or
             /// the unhandled handler if it is not
@@ -65,7 +64,6 @@ namespace sopmq {
                     _unhandledHandler(std::static_pointer_cast<::google::protobuf::Message>(m));
                 }
             }
-            
         };
         
     }

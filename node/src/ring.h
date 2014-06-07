@@ -34,6 +34,25 @@ namespace sopmq {
         ///
         class ring : public boost::noncopyable
         {
+        public:
+            ring();
+            virtual ~ring();
+            
+            ///
+            /// Adds a new node to the ring
+            ///
+            void add_node(node_ptr node);
+            
+            ///
+            /// Finds the node that we believe to be primary for the given key
+            ///
+            node_ptr find_primary_node_for_key(boost::multiprecision::uint128_t key) const;
+            
+            ///
+            /// Finds the primary and secondary nodes for the given key
+            ///
+            std::array<node_ptr, 2> find_nodes_for_key(boost::multiprecision::uint128_t key) const;
+            
         private:
             typedef std::map<boost::multiprecision::uint128_t, node_ptr>::const_iterator const_ring_iterator;
             
@@ -56,25 +75,6 @@ namespace sopmq {
             /// Finds the location of the primary node on the ring
             ///
             const_ring_iterator find_primary_node(const_ring_iterator secondaryIter) const;
-            
-        public:
-            ring();
-            virtual ~ring();
-            
-            ///
-            /// Adds a new node to the ring
-            ///
-            void add_node(node_ptr node);
-            
-            ///
-            /// Finds the node that we believe to be primary for the given key
-            ///
-            node_ptr find_primary_node_for_key(boost::multiprecision::uint128_t key) const;
-            
-            ///
-            /// Finds the primary and secondary nodes for the given key
-            ///
-            std::array<node_ptr, 2> find_nodes_for_key(boost::multiprecision::uint128_t key) const;
         };
         
     }

@@ -36,6 +36,26 @@ namespace sopmq {
         ///
         class node : public boost::noncopyable
         {
+        public:
+            node(boost::multiprecision::uint128_t rangeStart, net::endpoint endPoint);
+            virtual ~node();
+            
+            ///
+            /// Returns the beginning of the range we handle
+            ///
+            boost::multiprecision::uint128_t range_start() const;
+            
+            ///
+            /// Returns the endpoint to reach this node
+            ///
+            net::endpoint endpoint() const;
+            
+            ///
+            /// Whether or not this node is known to be up
+            ///
+            bool is_alive() const;
+            
+            
         private:
             ///
             /// Number of seconds between heartbeats
@@ -63,26 +83,6 @@ namespace sopmq {
             /// The last time we got a heartbeat from this node
             ///
             boost::chrono::time_point<boost::chrono::steady_clock> _lastHeartbeat;
-            
-            
-        public:
-            node(boost::multiprecision::uint128_t rangeStart, net::endpoint endPoint);
-            virtual ~node();
-            
-            ///
-            /// Returns the beginning of the range we handle
-            ///
-            boost::multiprecision::uint128_t range_start() const;
-            
-            ///
-            /// Returns the endpoint to reach this node
-            ///
-            net::endpoint endpoint() const;
-            
-            ///
-            /// Whether or not this node is known to be up
-            ///
-            bool is_alive() const;
         };
         
         typedef std::shared_ptr<node> node_ptr;

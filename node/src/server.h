@@ -31,18 +31,6 @@ namespace sopmq {
         ///
         class server
         {
-        private:
-            boost::asio::io_service& _ioService;
-            unsigned short _port;
-            boost::asio::ip::tcp::endpoint _endpoint;
-            boost::asio::ip::tcp::acceptor _acceptor;
-            std::set<connection::connection::ptr> _connections;
-            
-            
-            void accept_new();
-            void handle_accept(connection::connection::ptr conn, const boost::system::error_code& error);
-            
-            
         public:
             server(boost::asio::io_service& ioService, unsigned short port);
             
@@ -60,6 +48,17 @@ namespace sopmq {
             /// Called when a connection has been terminated either locally or remotely
             ///
             void connection_terminated(connection::connection::ptr conn);
+            
+        private:
+            boost::asio::io_service& _ioService;
+            unsigned short _port;
+            boost::asio::ip::tcp::endpoint _endpoint;
+            boost::asio::ip::tcp::acceptor _acceptor;
+            std::set<connection::connection::ptr> _connections;
+            
+            
+            void accept_new();
+            void handle_accept(connection::connection::ptr conn, const boost::system::error_code& error);
         };
         
     }

@@ -39,28 +39,6 @@ namespace sopmq {
                     SOPMQv1
                 };
                 
-            private:
-                std::string _hostname;
-                unsigned short _port;
-                endpoint_proto _proto;
-                
-                std::string _stringUri;
-                
-                ///
-                /// Internal function to parse an input URI
-                ///
-                void parse_uri(const std::string& uri);
-                
-                ///
-                /// Returns the tcp/ip port that is the default for the given protocol
-                ///
-                unsigned short get_default_port_for_proto(endpoint_proto proto) const;
-                
-                ///
-                /// Returns the protocol that is assciated with the given scheme name
-                ///
-                endpoint_proto scheme_name_to_protocol(const std::string& scheme) const;
-                
             public:
                 ///
                 /// Constructs an endpoint by parsing a uri
@@ -92,6 +70,28 @@ namespace sopmq {
                 /// Returns a string/URI representation of this endpoint
                 ///
                 const std::string& str() const;
+                
+            private:
+                std::string _hostname;
+                unsigned short _port;
+                endpoint_proto _proto;
+                
+                std::string _stringUri;
+                
+                ///
+                /// Internal function to parse an input URI
+                ///
+                void parse_uri(const std::string& uri);
+                
+                ///
+                /// Returns the tcp/ip port that is the default for the given protocol
+                ///
+                unsigned short get_default_port_for_proto(endpoint_proto proto) const;
+                
+                ///
+                /// Returns the protocol that is assciated with the given scheme name
+                ///
+                endpoint_proto scheme_name_to_protocol(const std::string& scheme) const;
             };
             
             ///
