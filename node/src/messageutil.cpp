@@ -38,7 +38,7 @@ namespace sopmq {
                                        message_dispatcher& dispatcher,
                                        uint32_t maxSize)
         {
-            message_context_ptr ctx(boost::make_shared<message_context>(dispatcher));
+            message_context_ptr ctx(std::make_shared<message_context>(dispatcher));
             ctx->error_callback = errorCallback;
             ctx->max_message_size = maxSize;
             
@@ -134,7 +134,7 @@ namespace sopmq {
             switch (ctx->type)
             {
                 case MT_GET_CHALLENGE:
-                    messageutil::template_dispatch(ctx, boost::make_shared<GetChallengeMessage>());
+                    messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
                     break;
                     
                 default:

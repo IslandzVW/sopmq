@@ -46,7 +46,7 @@ namespace sopmq {
         
         void server::accept_new()
         {
-            connection::connection::ptr conn(boost::make_shared<connection::connection>(_ioService));
+            connection::connection::ptr conn(std::make_shared<connection::connection>(_ioService));
             
             _acceptor.async_accept(conn->get_socket(),
                                    boost::bind(&server::handle_accept, this, conn,
@@ -59,8 +59,10 @@ namespace sopmq {
             {
                 try {
                     conn->start(this);
+                    
                 } catch (const network_error& e) {
                     LOG_SRC(error) << "exception thrown when trying to start connection: " << e.what();
+                    
                 }
                 
                 this->accept_new();

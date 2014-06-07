@@ -30,7 +30,6 @@
 #include <string>
 
 using namespace cql;
-using namespace boost;
 using std::string;
 
 namespace sopmq {
@@ -45,7 +44,7 @@ namespace sopmq {
                 cql_initialize();
                 
                 //construct our cluster from global settings
-                shared_ptr<cql::cql_builder_t> builder = cql::cql_cluster_t::builder();
+                boost::shared_ptr<cql::cql_builder_t> builder = cql::cql_cluster_t::builder();
                 
                 for (string endpoint : settings::instance().cassandraSeeds)
                 {
@@ -67,7 +66,7 @@ namespace sopmq {
                 return instance;
             }
             
-            shared_ptr<cql_session_t> cassandra_storage::new_session()
+            boost::shared_ptr<cql_session_t> cassandra_storage::new_session()
             {
                 return _cluster->connect(KEYSPACE_NAME);
             }

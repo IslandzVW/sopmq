@@ -20,7 +20,7 @@
 #include "message_dispatcher.h"
 #include "GetChallengeMessage.pb.h"
 
-#include <boost/make_shared.hpp>
+#include <memory>
 
 using namespace sopmq::message;
 
@@ -30,7 +30,7 @@ TEST(MessageDispatcherTest, TestUnhandledHandler)
     
     message_dispatcher md([&](Message_ptr msg) { called = true; });
     
-    GetChallengeMessage_ptr gcm = boost::make_shared<GetChallengeMessage>();
+    GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
     
     md.dispatch(gcm);
     
@@ -45,7 +45,7 @@ TEST(MessageDispatcherTest, TestRegisteredHandler)
     message_dispatcher md([&](Message_ptr msg) { unhandled = true; });
     md.set_handler([&](GetChallengeMessage_ptr msg) { unhandled = false; called = true; });
     
-    GetChallengeMessage_ptr gcm = boost::make_shared<GetChallengeMessage>();
+    GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
     
     md.dispatch(gcm);
     

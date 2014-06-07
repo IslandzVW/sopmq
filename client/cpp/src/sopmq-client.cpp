@@ -15,19 +15,3 @@
  * limitations under the License.
  */
 
-///
-/// Pointers for all message types
-///
-
-#ifndef Project_message_ptrs_h
-#define Project_message_ptrs_h
-
-#include <memory>
-#include <google/protobuf/message.h>
-
-typedef std::shared_ptr<::google::protobuf::Message> Message_ptr;
-
-class GetChallengeMessage;
-typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
-
-#endif

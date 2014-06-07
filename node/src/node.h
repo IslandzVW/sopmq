@@ -18,7 +18,7 @@
 #ifndef __Project__node__
 #define __Project__node__
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/chrono.hpp>
@@ -85,7 +85,7 @@ namespace sopmq {
             bool is_alive() const;
         };
         
-        typedef boost::shared_ptr<node> node_ptr;
+        typedef std::shared_ptr<node> node_ptr;
     }
 }
 

@@ -62,7 +62,7 @@ namespace sopmq {
                 }
                 else
                 {
-                    _unhandledHandler(boost::static_pointer_cast<::google::protobuf::Message>(m));
+                    _unhandledHandler(std::static_pointer_cast<::google::protobuf::Message>(m));
                 }
             }
             

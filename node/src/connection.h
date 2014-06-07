@@ -18,7 +18,7 @@
 #ifndef __Project__connection__
 #define __Project__connection__
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/weak_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -43,11 +43,11 @@ namespace sopmq {
             /// Connections from clients or other servers to this server
             ///
             class connection :  public boost::noncopyable,
-                                public boost::enable_shared_from_this<connection>
+                                public std::enable_shared_from_this<connection>
             {
             public:
-                typedef boost::shared_ptr<connection> ptr;
-                typedef boost::weak_ptr<connection> wptr;
+                typedef std::shared_ptr<connection> ptr;
+                typedef std::weak_ptr<connection> wptr;
             
             private:
                 boost::asio::io_service& _ioService;

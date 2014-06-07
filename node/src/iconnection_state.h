@@ -19,7 +19,7 @@
 #define Project_iconnection_state_h
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace sopmq {
     namespace node {
@@ -31,7 +31,7 @@ namespace sopmq {
             class iconnection_state
             {
             public:
-                typedef boost::shared_ptr<iconnection_state> ptr;
+                typedef std::shared_ptr<iconnection_state> ptr;
                 
             public:
                 virtual ~iconnection_state();

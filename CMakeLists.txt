@@ -19,6 +19,7 @@ set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
 
 add_subdirectory(messages)
 add_subdirectory(node)
+add_subdirectory(client/cpp)
 add_subdirectory(gtest-1.7.0)
 add_subdirectory(test)
 

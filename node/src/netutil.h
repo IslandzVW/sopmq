@@ -20,7 +20,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/pool/poolfwd.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/shared_array.hpp>
 #include <cstdint>
 #include <functional>

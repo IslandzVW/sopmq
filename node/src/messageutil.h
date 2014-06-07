@@ -21,7 +21,7 @@
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
 #include <boost/shared_array.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -80,7 +80,7 @@ namespace sopmq {
             }
         };
         
-        typedef boost::shared_ptr<message_context> message_context_ptr;
+        typedef std::shared_ptr<message_context> message_context_ptr;
         
         ///
         /// Utility functions that deal with network messages
