@@ -175,3 +175,71 @@ TEST(RingTest, TestFindPrimaryAndSecondaryWith4Nodes)
     ASSERT_EQ(nodes[0], node4);
     ASSERT_EQ(nodes[1], node1);
 }
+
+TEST(RingTest, TestFindPrimarySecondaryAndTertiaryWith4Nodes)
+{
+    ring r;
+    
+    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
+    node_ptr node3(new sopmq::node::node(30, endpoint("sopmq1://localhost:3")));
+    node_ptr node4(new sopmq::node::node(40, endpoint("sopmq1://localhost:4")));
+    r.add_node(node1);
+    r.add_node(node2);
+    r.add_node(node3);
+    r.add_node(node4);
+    
+    auto nodes = r.find_nodes_for_key(10);
+    
+    ASSERT_EQ(nodes[0], node1);
+    ASSERT_EQ(nodes[1], node2);
+    ASSERT_EQ(nodes[2], node3);
+    
+    nodes = r.find_nodes_for_key(20);
+    
+    ASSERT_EQ(nodes[0], node2);
+    ASSERT_EQ(nodes[1], node3);
+    ASSERT_EQ(nodes[2], node4);
+    
+    nodes = r.find_nodes_for_key(30);
+    
+    ASSERT_EQ(nodes[0], node3);
+    ASSERT_EQ(nodes[1], node4);
+    ASSERT_EQ(nodes[2], node1);
+    
+    nodes = r.find_nodes_for_key(40);
+    
+    ASSERT_EQ(nodes[0], node4);
+    ASSERT_EQ(nodes[1], node1);
+    ASSERT_EQ(nodes[2], node2);
+    
+    nodes = r.find_nodes_for_key(1);
+    
+    ASSERT_EQ(nodes[0], node4);
+    ASSERT_EQ(nodes[1], node1);
+    ASSERT_EQ(nodes[2], node2);
+    
+    nodes = r.find_nodes_for_key(11);
+    
+    ASSERT_EQ(nodes[0], node1);
+    ASSERT_EQ(nodes[1], node2);
+    ASSERT_EQ(nodes[2], node3);
+    
+    nodes = r.find_nodes_for_key(21);
+    
+    ASSERT_EQ(nodes[0], node2);
+    ASSERT_EQ(nodes[1], node3);
+    ASSERT_EQ(nodes[2], node4);
+    
+    nodes = r.find_nodes_for_key(31);
+    
+    ASSERT_EQ(nodes[0], node3);
+    ASSERT_EQ(nodes[1], node4);
+    ASSERT_EQ(nodes[2], node1);
+    
+    nodes = r.find_nodes_for_key(41);
+    
+    ASSERT_EQ(nodes[0], node4);
+    ASSERT_EQ(nodes[1], node1);
+    ASSERT_EQ(nodes[2], node2);
+}

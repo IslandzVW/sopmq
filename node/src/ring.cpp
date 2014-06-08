@@ -57,24 +57,26 @@ namespace sopmq {
             return primaryIter->second;
         }
         
-        std::array<node_ptr, 2> ring::find_nodes_for_key(boost::multiprecision::uint128_t key) const
+        std::array<node_ptr, 3> ring::find_nodes_for_key(boost::multiprecision::uint128_t key) const
         {
             if (_ringByRange.empty())
             {
-                return std::array<node_ptr, 2>{ {nullptr, nullptr} };
+                return std::array<node_ptr, 3>{ {nullptr, nullptr, nullptr} };
             }
             
             const_ring_iterator secondaryIter = this->find_secondary_node(key);
             const_ring_iterator primaryIter = this->find_primary_node(secondaryIter);
+            const_ring_iterator tertiaryIter = this->find_tertiary_node(secondaryIter);
             
             BOOST_ASSERT(primaryIter != _ringByRange.end());
+            BOOST_ASSERT(secondaryIter != _ringByRange.end());
+            BOOST_ASSERT(tertiaryIter != _ringByRange.end());
             
-            auto ret = std::array<node_ptr, 2>{
+            auto ret = std::array<node_ptr, 3>{
                 {
                     primaryIter->second,
-                    
-                    //if secondary==end, we only have 1 node
-                    secondaryIter != _ringByRange.end() ? secondaryIter->second : nullptr
+                    secondaryIter->second,
+                    tertiaryIter->second
                 } };
             
             return ret;
@@ -100,6 +102,19 @@ namespace sopmq {
             }
             
             secondaryIter--; //find the primary
+            
+            return secondaryIter;
+        }
+        
+        ring::const_ring_iterator ring::find_tertiary_node(const_ring_iterator secondaryIter) const
+        {
+            secondaryIter++; //find the tertiary
+            
+            if (secondaryIter == _ringByRange.end())
+            {
+                //wrap around
+                secondaryIter = _ringByRange.begin();
+            }
             
             return secondaryIter;
         }

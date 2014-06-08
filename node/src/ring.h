@@ -51,7 +51,7 @@ namespace sopmq {
             ///
             /// Finds the primary and secondary nodes for the given key
             ///
-            std::array<node_ptr, 2> find_nodes_for_key(boost::multiprecision::uint128_t key) const;
+            std::array<node_ptr, 3> find_nodes_for_key(boost::multiprecision::uint128_t key) const;
             
         private:
             typedef std::map<boost::multiprecision::uint128_t, node_ptr>::const_iterator const_ring_iterator;
@@ -75,6 +75,11 @@ namespace sopmq {
             /// Finds the location of the primary node on the ring
             ///
             const_ring_iterator find_primary_node(const_ring_iterator secondaryIter) const;
+            
+            ///
+            /// Finds the location of the tertiary node on the ring given the iter to the secondary
+            ///
+            const_ring_iterator find_tertiary_node(const_ring_iterator secondaryIter) const;
         };
         
     }
