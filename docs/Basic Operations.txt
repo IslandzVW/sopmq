@@ -4,6 +4,8 @@ Client to server messages
 All messages are prefixed with the type and length of the message as so:
 [type: 2 bytes][length: 4 bytes][message: variable]
 
+All messages contain a message id that can be used to map async, out of order 
+responses back to the request
 
 Authentication
 ——————————--------------------------------------------
@@ -87,6 +89,7 @@ Parameters:
 Returns:
 	MessagePiped,
 	MessageStored,
+	Dropped,
 	NotAuth,
 	Unavailable
 		- The range is unavailable. The client must retry later 

@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "endpoint.h"
+#include "cluster.h"
 
 namespace sopmq {
     namespace client {
@@ -36,6 +37,10 @@ namespace sopmq {
             ///
             void add_endpoint(const shared::net::endpoint& ep);
             
+            ///
+            /// Builds a new cluster from the endpoints given
+            ///
+            cluster::ptr build() const;
             
             
         private:

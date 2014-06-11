@@ -15,46 +15,29 @@
  * limitations under the License.
  */
 
-#include "endpoint.h"
+#ifndef __Project__session__
+#define __Project__session__
 
 #include <boost/noncopyable.hpp>
 #include <memory>
-#include <vector>
 
 namespace sopmq {
     namespace client {
         
-        ///
-        /// A cluster is a collection of endpoints that is managed to provide
-        /// fault tolerance in the face of errors
-        ///
-        class cluster : public boost::noncopyable
+        class session : public boost::noncopyable
         {
         public:
-            typedef std::shared_ptr<cluster> ptr;
-            
+            typedef std::shared_ptr<session> ptr;
+        
         public:
-            template <typename ColType>
-            cluster(ColType epCol)
-            {
-                for (auto ep : epCol)
-                {
-                    _endpoints.push_back(ep);
-                }
-                
-                shuffle_endpoints();
-            }
-            
-            virtual ~cluster();
+            session();
+            virtual ~session();
             
         private:
-            ///
-            /// Shuffles the endpoints we have in our collection
-            ///
-            void shuffle_endpoints();
             
-            std::vector<shared::net::endpoint> _endpoints;
         };
         
     }
 }
+
+#endif /* defined(__Project__session__) */

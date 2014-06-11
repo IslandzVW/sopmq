@@ -35,5 +35,10 @@ namespace sopmq {
             _endpoints.push_back(ep);
         }
         
+        cluster::ptr cluster_builder::build() const
+        {
+            return std::make_shared<cluster>(_endpoints);
+        }
+        
     }
 }

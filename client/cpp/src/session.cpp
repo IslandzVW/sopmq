@@ -15,22 +15,4 @@
  * limitations under the License.
  */
 
-#include "cluster.h"
-
-#include <algorithm>
-
-namespace sopmq {
-    namespace client {
-        
-        cluster::~cluster()
-        {
-            
-        }
-        
-        void cluster::shuffle_endpoints()
-        {
-            std::random_shuffle(_endpoints.begin(), _endpoints.end());
-        }
-        
-    }
-}
+#include "session.h"
