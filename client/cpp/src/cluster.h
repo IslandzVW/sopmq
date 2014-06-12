@@ -16,8 +16,12 @@
  */
 
 #include "endpoint.h"
+#include "connection_error.h"
+#include "session.h"
 
 #include <boost/noncopyable.hpp>
+#include <boost/asio.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -33,6 +37,8 @@ namespace sopmq {
         public:
             typedef std::shared_ptr<cluster> ptr;
             
+            typedef std::function<void(session::ptr, sopmq::error::node_error_list)> connect_handler;
+            
         public:
             template <typename ColType>
             cluster(ColType epCol)
@@ -47,6 +53,11 @@ namespace sopmq {
             
             virtual ~cluster();
             
+            ///
+            /// Connects to the cluster and calls the handler on completion or error
+            ///
+            void connect(boost::asio::io_service& ioService, connect_handler handler);
+            
         private:
             ///
             /// Shuffles the endpoints we have in our collection
@@ -54,6 +65,8 @@ namespace sopmq {
             void shuffle_endpoints();
             
             std::vector<shared::net::endpoint> _endpoints;
+                         
+            
         };
         
     }

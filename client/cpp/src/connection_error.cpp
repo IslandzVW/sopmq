@@ -15,26 +15,36 @@
  * limitations under the License.
  */
 
-#include "cluster.h"
-
-#include <algorithm>
+#include "connection_error.h"
 
 namespace sopmq {
-    namespace client {
+    namespace error {
         
-        cluster::~cluster()
+        connection_error::connection_error(const std::string& what)
+        : std::runtime_error(what)
         {
             
         }
         
-        void cluster::shuffle_endpoints()
-        {
-            std::random_shuffle(_endpoints.begin(), _endpoints.end());
-        }
-        
-        void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
+        connection_error::connection_error(const boost::system::error_code& error)
+        : std::runtime_error(error.message()), _network_error(error)
         {
             
+        }
+        
+        connection_error::~connection_error()
+        {
+            
+        }
+        
+        bool connection_error::was_network_error() const
+        {
+            return _network_error.value() != 0;
+        }
+        
+        const boost::system::error_code& connection_error::get_network_error() const
+        {
+            return _network_error;
         }
         
     }
