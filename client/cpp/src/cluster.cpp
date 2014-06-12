@@ -16,8 +16,12 @@
  */
 
 #include "cluster.h"
+#include "endpoint.h"
 
 #include <algorithm>
+
+namespace ba = boost::asio;
+using sopmq::shared::net::endpoint;
 
 namespace sopmq {
     namespace client {
@@ -29,12 +33,13 @@ namespace sopmq {
         
         void cluster::shuffle_endpoints()
         {
-            std::random_shuffle(_endpoints.begin(), _endpoints.end());
+            std::random_shuffle(_liveEndpoints.begin(), _liveEndpoints.end());
         }
         
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
-            
+            //connect to whatever endpoint is now at the top of the vector
+            ba::ip::tcp::resolver resolver(ioService);
         }
         
     }

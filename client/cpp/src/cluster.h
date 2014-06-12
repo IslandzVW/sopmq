@@ -45,7 +45,7 @@ namespace sopmq {
             {
                 for (auto ep : epCol)
                 {
-                    _endpoints.push_back(ep);
+                    _liveEndpoints.push_back(ep);
                 }
                 
                 shuffle_endpoints();
@@ -64,9 +64,15 @@ namespace sopmq {
             ///
             void shuffle_endpoints();
             
-            std::vector<shared::net::endpoint> _endpoints;
-                         
+            ///
+            /// Endpoints that we either know to be good, or haven't tried to connect to yet
+            ///
+            std::vector<shared::net::endpoint> _liveEndpoints;
             
+            ///
+            /// Endpoints that died on us
+            ///
+            std::vector<shared::net::endpoint> _deadEndpoints;
         };
         
     }
