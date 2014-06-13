@@ -21,7 +21,9 @@
 #include <algorithm>
 
 namespace ba = boost::asio;
+
 using sopmq::shared::net::endpoint;
+using namespace std::placeholders;
 
 namespace sopmq {
     namespace client {
@@ -38,8 +40,27 @@ namespace sopmq {
         
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
+            if (_liveEndpoints.size() == 0)
+            {
+                handler(nullptr, sopmq::error::node_error_list(), "no endpoints available");
+                return;
+            }
+            
             //connect to whatever endpoint is now at the top of the vector
-            ba::ip::tcp::resolver resolver(ioService);
+            endpoint ep = _liveEndpoints[0];
+            
+            auto resolver = std::unique_ptr<ba::ip::tcp::resolver>(new ba::ip::tcp::resolver(ioService));
+            
+            auto query = std::unique_ptr<ba::ip::tcp::resolver::query>(new ba::ip::tcp::resolver::query(ep.host_name(), ""));
+            
+            resolver->async_resolve(*query,
+                                    std::bind(&cluster::after_resolve, this,
+                                              _1, _2));
+        }
+        
+        void cluster::after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
+        {
+            
         }
         
     }

@@ -29,6 +29,17 @@ namespace sopmq {
     namespace client {
         
         ///
+        /// Context used when attempting to connect to a new cluster
+        ///
+        class connect_context
+        {
+            shared::net::endpoint endpoint;
+            std::unique_ptr<boost::asio::ip::tcp::resolver> resolver;
+            std::unique_ptr<boost::asio::ip::tcp::resolver::query> query;
+            
+        };
+        
+        ///
         /// A cluster is a collection of endpoints that is managed to provide
         /// fault tolerance in the face of errors
         ///
@@ -37,7 +48,7 @@ namespace sopmq {
         public:
             typedef std::shared_ptr<cluster> ptr;
             
-            typedef std::function<void(session::ptr, sopmq::error::node_error_list)> connect_handler;
+            typedef std::function<void(session::ptr, sopmq::error::node_error_list, const std::string& errorMsg)> connect_handler;
             
         public:
             template <typename ColType>
@@ -63,6 +74,12 @@ namespace sopmq {
             /// Shuffles the endpoints we have in our collection
             ///
             void shuffle_endpoints();
+            
+            ///
+            ///
+            ///
+            void after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
+            
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet
