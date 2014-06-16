@@ -40,6 +40,8 @@ namespace sopmq {
                 };
                 
             public:
+                endpoint() = default;
+                
                 ///
                 /// Constructs an endpoint by parsing a uri
                 ///

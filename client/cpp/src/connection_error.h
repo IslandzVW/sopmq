@@ -30,6 +30,13 @@
 namespace sopmq {
     namespace error {
         
+        class connection_error;
+        
+        ///
+        /// A list of all the nodes we failed to connect to
+        ///
+        typedef std::vector<std::tuple<sopmq::shared::net::endpoint, connection_error>> node_error_list;
+        
         ///
         /// Used to indicate an error occurred when connecting to a resource
         ///
@@ -41,6 +48,11 @@ namespace sopmq {
             virtual ~connection_error();
             
             ///
+            /// Does this exception contain errors from one or more nodes
+            ///
+            bool was_node_error() const;
+            
+            ///
             /// Was the connection error caused by a network condition
             ///
             bool was_network_error() const;
@@ -50,14 +62,19 @@ namespace sopmq {
             ///
             const boost::system::error_code& get_network_error() const;
             
+            ///
+            /// Returns the node errors that were encountered when trying to make
+            /// a connection
+            ///
+            const node_error_list& get_node_errors() const;
+            
+            
         private:
-            boost::system::error_code _network_error;
+            boost::system::error_code _singleError;
+            node_error_list _nodeErrors;
         };
         
-        ///
-        /// A list of all the nodes we failed to connect to
-        ///
-        typedef std::vector<std::tuple<sopmq::shared::net::endpoint, connection_error>> node_error_list;
+        
         
     }
 }

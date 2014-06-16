@@ -24,6 +24,7 @@ namespace ba = boost::asio;
 
 using sopmq::shared::net::endpoint;
 using namespace std::placeholders;
+using sopmq::error::connection_error;
 
 namespace sopmq {
     namespace client {
@@ -40,27 +41,36 @@ namespace sopmq {
         
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
+            check_for_expired_deaths();
+            
             if (_liveEndpoints.size() == 0)
             {
-                handler(nullptr, sopmq::error::node_error_list(), "no endpoints available");
+                handler(nullptr, connection_error("no nodes available"));
                 return;
             }
             
             //connect to whatever endpoint is now at the top of the vector
             endpoint ep = _liveEndpoints[0];
             
-            auto resolver = std::unique_ptr<ba::ip::tcp::resolver>(new ba::ip::tcp::resolver(ioService));
+            auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
             
-            auto query = std::unique_ptr<ba::ip::tcp::resolver::query>(new ba::ip::tcp::resolver::query(ep.host_name(), ""));
+            auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep.host_name(), "");
+            
+            connect_context ctx { handler, ep, resolver, query };
             
             resolver->async_resolve(*query,
                                     std::bind(&cluster::after_resolve, this,
-                                              _1, _2));
+                                              _1, _2, ctx));
         }
         
-        void cluster::after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator)
+        void cluster::after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                                    connect_context ctx)
         {
             
+        }
+        
+        void cluster::check_for_expired_deaths()
+        {
         }
         
     }

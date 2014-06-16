@@ -15,47 +15,47 @@
  * limitations under the License.
  */
 
-#include "connection_error.h"
+#include "cluster_endpoint.h"
+
+namespace bc = boost::chrono;
 
 namespace sopmq {
-    namespace error {
+    namespace client {
         
-        connection_error::connection_error(const std::string& what)
-        : std::runtime_error(what)
+        cluster_endpoint::cluster_endpoint(const shared::net::endpoint& ep)
+        : _endpoint(ep), _isFailed(false)
         {
             
         }
         
-        connection_error::connection_error(const boost::system::error_code& error)
-        : std::runtime_error(error.message()), _singleError(error)
+        cluster_endpoint::~cluster_endpoint()
         {
             
         }
         
-        connection_error::~connection_error()
+        bool cluster_endpoint::ready_for_retry() const
         {
+            auto duration = bc::steady_clock::now() - _lastFailure;
+            auto diffSecs = bc::duration_cast<bc::seconds>(duration);
             
+            return diffSecs.count() >= _currentBackoff;
         }
         
-        bool connection_error::was_node_error() const
+        void cluster_endpoint::mark_failed()
         {
-            return _nodeErrors.size() > 0;
+            _lastFailure = bc::steady_clock::now();
+            _isFailed = true;
         }
         
-        
-        bool connection_error::was_network_error() const
+        void cluster_endpoint::mark_up()
         {
-            return _singleError.value() != 0;
+            _isFailed = false;
+            _currentBackoff = MINIMUM_BACKOFF_SECS;
         }
         
-        const boost::system::error_code& connection_error::get_network_error() const
+        const shared::net::endpoint& cluster_endpoint::network_endpoint() const
         {
-            return _singleError;
-        }
-        
-        const node_error_list& connection_error::get_node_errors() const
-        {
-            return _nodeErrors;
+            return _endpoint;
         }
         
     }

@@ -29,17 +29,6 @@ namespace sopmq {
     namespace client {
         
         ///
-        /// Context used when attempting to connect to a new cluster
-        ///
-        class connect_context
-        {
-            shared::net::endpoint endpoint;
-            std::unique_ptr<boost::asio::ip::tcp::resolver> resolver;
-            std::unique_ptr<boost::asio::ip::tcp::resolver::query> query;
-            
-        };
-        
-        ///
         /// A cluster is a collection of endpoints that is managed to provide
         /// fault tolerance in the face of errors
         ///
@@ -48,7 +37,7 @@ namespace sopmq {
         public:
             typedef std::shared_ptr<cluster> ptr;
             
-            typedef std::function<void(session::ptr, sopmq::error::node_error_list, const std::string& errorMsg)> connect_handler;
+            typedef std::function<void(session::ptr, sopmq::error::connection_error)> connect_handler;
             
         public:
             template <typename ColType>
@@ -71,6 +60,17 @@ namespace sopmq {
             
         private:
             ///
+            /// Context used when attempting to connect to a new cluster
+            ///
+            struct connect_context
+            {
+                connect_handler handler;
+                shared::net::endpoint endpoint;
+                std::shared_ptr<boost::asio::ip::tcp::resolver> resolver;
+                std::shared_ptr<boost::asio::ip::tcp::resolver::query> query;
+            };
+            
+            ///
             /// Shuffles the endpoints we have in our collection
             ///
             void shuffle_endpoints();
@@ -78,7 +78,14 @@ namespace sopmq {
             ///
             ///
             ///
-            void after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
+            void after_resolve(const boost::system::error_code& err,
+                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                               connect_context ctx);
+            
+            ///
+            /// Checks the cluster for dead nodes who have
+            ///
+            void check_for_expired_deaths();
             
             
             ///
