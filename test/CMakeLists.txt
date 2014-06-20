@@ -6,9 +6,10 @@ set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 
 set(INCLUDES ${INCLUDES} ../messages/cpp)
 set(INCLUDES ${INCLUDES} ${SHARED_DIR}/src)
+set(INCLUDES ${INCLUDES} ${NODE_DIR}/src)
+set(INCLUDES ${INCLUDES} ${CLIENT_DIR}/src)
 
-include_directories (${NODE_DIR}/src
-                     ${Boost_INCLUDE_DIRS}
+include_directories (${Boost_INCLUDE_DIRS}
                      ${gtest_SOURCE_DIR}/include
                      ${INCLUDES}
                      )
@@ -21,6 +22,7 @@ file(GLOB TEST_SRCS src/*.h src/*.cpp)
 add_executable (Test ${TEST_SRCS})
 target_link_libraries (Test
                        sopmq-nodelib
+                       sopmq-client
                        ${Boost_FILESYSTEM_LIBRARY}
                        ${Boost_SYSTEM_LIBRARY}
                        ${LIBS}

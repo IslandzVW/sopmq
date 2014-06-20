@@ -35,9 +35,24 @@ namespace sopmq {
             virtual ~cluster_endpoint();
             
             ///
+            /// Whether or not this endpoint is currently considered failed
+            ///
+            bool is_failed() const;
+            
+            ///
             /// Whether or not we're ready for a retry on this endpoint
             ///
             bool ready_for_retry() const;
+            
+            ///
+            /// The number of seconds since the last time we failed
+            ///
+            boost::chrono::seconds secs_since_last_try() const;
+            
+            ///
+            /// The number of seconds remaining until we should retry the connection
+            ///
+            boost::chrono::seconds secs_remining_before_retry() const;
             
             ///
             /// Marks this endpoint as failed
@@ -69,6 +84,12 @@ namespace sopmq {
             
             
             ///
+            /// Sets the backoff to MINIMUM_BACKOFF_SECS if it is currently 0
+            /// or doubles it if not up to MAXIMUM_BACKOFF_SECS
+            ///
+            void increase_backoff();
+            
+            ///
             /// The network endpoint
             ///
             shared::net::endpoint _endpoint;
@@ -81,7 +102,7 @@ namespace sopmq {
             ///
             /// The current backoff in seconds
             ///
-            int _currentBackoff;
+            boost::chrono::seconds _currentBackoff;
             
             ///
             /// Is this endpoint failed?

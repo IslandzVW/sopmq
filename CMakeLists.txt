@@ -18,6 +18,7 @@ SET(CMAKE_CXX_FLAGS "-std=c++0x")
 
 set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
 set(SHARED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shared)
+set(CLIENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/client/cpp)
 
 add_subdirectory(messages)
 add_subdirectory(shared)
