@@ -17,6 +17,7 @@
 
 #include "cluster.h"
 #include "endpoint.h"
+#include "random_selector.h"
 
 #include <algorithm>
 
@@ -25,6 +26,7 @@ namespace ba = boost::asio;
 
 using namespace std::placeholders;
 using sopmq::error::connection_error;
+using sopmq::shared::random_selector;
 
 namespace sopmq {
     namespace client {
@@ -100,6 +102,13 @@ namespace sopmq {
                 _deadEndpoints.erase(ep);
                 _liveEndpoints.push_back(ep);
             });
+        }
+        
+        cluster_endpoint::ptr cluster::random_endpoint()
+        {
+            sopmq::shared::random_selector<> selector{};
+            
+            return selector(_liveEndpoints);
         }
         
     }
