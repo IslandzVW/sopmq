@@ -49,8 +49,6 @@ namespace sopmq {
                 {
                     _liveEndpoints.push_back(std::make_shared<cluster_endpoint>(ep));
                 }
-                
-                shuffle_endpoints();
             }
             
             virtual ~cluster();
@@ -73,11 +71,6 @@ namespace sopmq {
             };
             
             ///
-            /// Shuffles the endpoints we have in our collection
-            ///
-            void shuffle_endpoints();
-            
-            ///
             ///
             ///
             void after_resolve(const boost::system::error_code& err,
@@ -89,6 +82,10 @@ namespace sopmq {
             ///
             void check_for_expired_deaths();
             
+            ///
+            /// Returns a random endpoint from the live endpoints collection
+            ///
+            cluster_endpoint::ptr random_endpoint();
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet

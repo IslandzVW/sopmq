@@ -20,6 +20,7 @@
 
 #include <algorithm>
 
+
 namespace ba = boost::asio;
 
 using namespace std::placeholders;
@@ -33,11 +34,6 @@ namespace sopmq {
             
         }
         
-        void cluster::shuffle_endpoints()
-        {
-            std::random_shuffle(_liveEndpoints.begin(), _liveEndpoints.end());
-        }
-        
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
             check_for_expired_deaths();
@@ -48,8 +44,8 @@ namespace sopmq {
                 return;
             }
             
-            //connect to whatever endpoint is now at the top of the vector
-            cluster_endpoint::ptr ep = _liveEndpoints[0];
+            //connect to whatever endpoint is now at the top of the list
+            cluster_endpoint::ptr ep = this->random_endpoint();
             
             auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
             
@@ -66,7 +62,24 @@ namespace sopmq {
                                     boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
                                     connect_context ctx)
         {
-            
+            if (!err)
+            {
+                //we have an endpoint, let's try a connect
+            }
+            else
+            {
+                if (_deadEndpoints.find(ctx.endpoint) == _deadEndpoints.end())
+                {
+                    //endpoint is still marked up, kill it
+                    ctx.endpoint->mark_failed();
+                    _deadEndpoints.insert(ctx.endpoint);
+                    
+                    _liveEndpoints.erase(std::remove(_liveEndpoints.begin(), _liveEndpoints.end(), ctx.endpoint));
+                }
+                
+                //any more endpoints left?
+                //try resolving the next endpoint
+            }
         }
         
         void cluster::check_for_expired_deaths()
@@ -82,7 +95,11 @@ namespace sopmq {
             }
             
             std::for_each(retryEps.begin(), retryEps.end(),
-                          [&](cluster_endpoint::ptr ep){ _deadEndpoints.erase(ep); });
+                          [&](cluster_endpoint::ptr ep)
+            {
+                _deadEndpoints.erase(ep);
+                _liveEndpoints.push_back(ep);
+            });
         }
         
     }
