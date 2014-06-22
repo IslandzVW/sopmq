@@ -22,7 +22,6 @@
 
 namespace ba = boost::asio;
 
-using sopmq::shared::net::endpoint;
 using namespace std::placeholders;
 using sopmq::error::connection_error;
 
@@ -50,11 +49,11 @@ namespace sopmq {
             }
             
             //connect to whatever endpoint is now at the top of the vector
-            endpoint ep = _liveEndpoints[0];
+            cluster_endpoint::ptr ep = _liveEndpoints[0];
             
             auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
             
-            auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep.host_name(), "");
+            auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep->network_endpoint().host_name(), "");
             
             connect_context ctx { handler, ep, resolver, query };
             
@@ -63,7 +62,8 @@ namespace sopmq {
                                               _1, _2, ctx));
         }
         
-        void cluster::after_resolve(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+        void cluster::after_resolve(const boost::system::error_code& err,
+                                    boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
                                     connect_context ctx)
         {
             
@@ -71,6 +71,18 @@ namespace sopmq {
         
         void cluster::check_for_expired_deaths()
         {
+            std::vector<cluster_endpoint::ptr> retryEps;
+            for (cluster_endpoint::ptr ep : _deadEndpoints)
+            {
+                if (ep->ready_for_retry())
+                {
+                    ep->mark_up();
+                    retryEps.push_back(ep);
+                }
+            }
+            
+            std::for_each(retryEps.begin(), retryEps.end(),
+                          [&](cluster_endpoint::ptr ep){ _deadEndpoints.erase(ep); });
         }
         
     }

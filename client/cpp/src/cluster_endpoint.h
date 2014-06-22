@@ -31,6 +31,9 @@ namespace sopmq {
         class cluster_endpoint
         {
         public:
+            typedef std::shared_ptr<cluster_endpoint> ptr;
+            
+        public:
             cluster_endpoint(const shared::net::endpoint& ep);
             virtual ~cluster_endpoint();
             

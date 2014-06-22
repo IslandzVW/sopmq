@@ -16,6 +16,7 @@
  */
 
 #include "endpoint.h"
+#include "cluster_endpoint.h"
 #include "connection_error.h"
 #include "session.h"
 
@@ -24,6 +25,7 @@
 
 #include <memory>
 #include <vector>
+#include <set>
 
 namespace sopmq {
     namespace client {
@@ -45,7 +47,7 @@ namespace sopmq {
             {
                 for (auto ep : epCol)
                 {
-                    _liveEndpoints.push_back(ep);
+                    _liveEndpoints.push_back(std::make_shared<cluster_endpoint>(ep));
                 }
                 
                 shuffle_endpoints();
@@ -65,7 +67,7 @@ namespace sopmq {
             struct connect_context
             {
                 connect_handler handler;
-                shared::net::endpoint endpoint;
+                cluster_endpoint::ptr endpoint;
                 std::shared_ptr<boost::asio::ip::tcp::resolver> resolver;
                 std::shared_ptr<boost::asio::ip::tcp::resolver::query> query;
             };
@@ -91,12 +93,12 @@ namespace sopmq {
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet
             ///
-            std::vector<shared::net::endpoint> _liveEndpoints;
+            std::vector<cluster_endpoint::ptr> _liveEndpoints;
             
             ///
             /// Endpoints that died on us
             ///
-            std::vector<shared::net::endpoint> _deadEndpoints;
+            std::set<cluster_endpoint::ptr> _deadEndpoints;
         };
         
     }
