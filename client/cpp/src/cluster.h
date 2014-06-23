@@ -78,9 +78,20 @@ namespace sopmq {
                                connect_context ctx);
             
             ///
+            /// Marks the endpoint dead, removes it from the live list,
+            /// and inserts it into the dead list
+            ///
+            void kill_endpoint(cluster_endpoint::ptr ep);
+            
+            ///
             /// Checks the cluster for dead nodes who have
             ///
             void check_for_expired_deaths();
+            
+            ///
+            /// Tries to resolve an endpoint after
+            ///
+            void try_resolve_next_endpoint(std::shared_ptr<boost::asio::ip::tcp::resolver> resolver, connect_handler handler);
             
             ///
             /// Returns a random endpoint from the live endpoints collection

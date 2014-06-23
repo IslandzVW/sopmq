@@ -38,8 +38,16 @@ namespace sopmq {
         
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
+            auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
+            
+            try_resolve_next_endpoint(resolver, handler);
+        }
+        
+        void cluster::try_resolve_next_endpoint(std::shared_ptr<boost::asio::ip::tcp::resolver> resolver, connect_handler handler)
+        {
             check_for_expired_deaths();
             
+            //any more endpoints left?
             if (_liveEndpoints.size() == 0)
             {
                 handler(nullptr, connection_error("no nodes available"));
@@ -48,8 +56,6 @@ namespace sopmq {
             
             //connect to whatever endpoint is now at the top of the list
             cluster_endpoint::ptr ep = this->random_endpoint();
-            
-            auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
             
             auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep->network_endpoint().host_name(), "");
             
@@ -67,20 +73,26 @@ namespace sopmq {
             if (!err)
             {
                 //we have an endpoint, let's try a connect
+                
             }
             else
             {
-                if (_deadEndpoints.find(ctx.endpoint) == _deadEndpoints.end())
-                {
-                    //endpoint is still marked up, kill it
-                    ctx.endpoint->mark_failed();
-                    _deadEndpoints.insert(ctx.endpoint);
-                    
-                    _liveEndpoints.erase(std::remove(_liveEndpoints.begin(), _liveEndpoints.end(), ctx.endpoint));
-                }
+                this->kill_endpoint(ctx.endpoint);
                 
-                //any more endpoints left?
                 //try resolving the next endpoint
+                this->try_resolve_next_endpoint(ctx.resolver, ctx.handler);
+            }
+        }
+        
+        void cluster::kill_endpoint(cluster_endpoint::ptr ep)
+        {
+            if (_deadEndpoints.find(ep) == _deadEndpoints.end())
+            {
+                //endpoint is still marked up, kill it
+                ep->mark_failed();
+                _deadEndpoints.insert(ep);
+                
+                _liveEndpoints.erase(std::remove(_liveEndpoints.begin(), _liveEndpoints.end(), ep));
             }
         }
         
