@@ -18,6 +18,32 @@
 #ifndef __Project__cluster_connection__
 #define __Project__cluster_connection__
 
+#include "cluster_endpoint.h"
+#include <boost/asio.hpp>
+
+namespace sopmq {
+    namespace client {
+        
+        ///
+        /// An open connection to a coordinator node in the sopmq cluster
+        ///
+        class cluster_connection
+        {
+        public:
+            cluster_connection(cluster_endpoint::ptr ep,
+                               boost::asio::io_service& ioService);
+            virtual ~cluster_connection();
+            
+            void connect();
+            
+            
+        private:
+            cluster_endpoint::ptr _endpoint;
+            boost::asio::io_service& _ioService;
+        };
+        
+    }
+}
 
 
 #endif /* defined(__Project__cluster_connection__) */

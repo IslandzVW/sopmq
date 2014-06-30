@@ -16,3 +16,28 @@
  */
 
 #include "cluster_connection.h"
+
+namespace ba = boost::asio;
+
+namespace sopmq {
+    namespace client {
+        
+        cluster_connection::cluster_connection(cluster_endpoint::ptr ep,
+                                               ba::io_service& ioService)
+        : _endpoint(ep), _ioService(ioService)
+        {
+            
+        }
+        
+        cluster_connection::~cluster_connection()
+        {
+            
+        }
+        
+        void cluster_connection::connect()
+        {
+            
+        }
+        
+    }
+}

@@ -1,0 +1,71 @@
+Sample session for unhandled PostMessage
+-----------------------------------------
+
+Ring:
+			1
+		4		2
+			3
+
+Producer connects to coordinator node 4.
+Producer posts a message to range handled by nodes 1, 2, and 3
+	With:
+		- StoreIfCantPipe: False
+		- TTL: 5 seconds
+		
+Message written to a quorum and is queued on nodes 1, 2
+
+-- 5 seconds passes --
+
+Message is dropped
+Handling nodes 1 and 2 delete message from queues and remove the queues if they're empty
+Coordinator node 4 notes that the TTL is expired and returns Dropped status to Producer
+
+
+
+Sample session for piped PostMessage
+---------------------------------------
+
+Ring:
+			1
+		4		2
+			3
+
+Consumer connects to nodes 1 and 2 and subscribes to range 			
+Producer connects to coordinator node 4.
+Producer posts a message to range handled by nodes 1, 2, and 3
+	With:
+		- StoreIfCantPipe: False
+		- TTL: 5 seconds
+
+Message written to a quorum and is queued on nodes 1, and 3
+Message is piped to consumer on node 1 and piped status is returned to coordinator node 4
+Coordinator node 4 writes MessagePiped status to Producer
+
+
+
+Sample session for piped PostMessage when consumer coordinator dies
+---------------------------------------
+
+Ring:
+			1
+		4		2
+			3
+
+Consumer connects to coordinator node 4
+Consumer coordinator connects to nodes 1 and 2 and subscribes to range 			
+Producer connects to coordinator node 3.
+Producer posts a message to range handled by nodes 1, 2, and 3
+	With:
+		- StoreIfCantPipe: False
+		- TTL: 5 seconds
+
+Coordinator node 4 dies
+Message written to a quorum and is queued on nodes 1, and 3
+
+-- 1 second passes --
+
+Consumer connects to node 2 for new coordinator
+Consumer coordinator connects to nodes 1 and 3 and subscribes to range
+
+Message is piped to consumer on node 1 and piped status is returned to coordinator node 2
+Coordinator node 2 writes MessagePiped status to Producer

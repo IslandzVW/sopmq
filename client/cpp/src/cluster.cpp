@@ -54,7 +54,6 @@ namespace sopmq {
                 return;
             }
             
-            //connect to whatever endpoint is now at the top of the list
             cluster_endpoint::ptr ep = this->random_endpoint();
             
             auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep->network_endpoint().host_name(), "");
