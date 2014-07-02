@@ -20,6 +20,8 @@
 
 #include "cluster_endpoint.h"
 #include <boost/asio.hpp>
+#include <functional>
+#include <memory>
 
 namespace sopmq {
     namespace client {
@@ -30,16 +32,26 @@ namespace sopmq {
         class cluster_connection
         {
         public:
+            typedef std::shared_ptr<cluster_connection> ptr;
+            
+            typedef std::function<void(bool, boost::system::error_code)> connect_callback;
+            
+        public:
             cluster_connection(cluster_endpoint::ptr ep,
                                boost::asio::io_service& ioService);
             virtual ~cluster_connection();
             
-            void connect();
+            void connect(connect_callback ccb);
             
             
         private:
+            void after_resolve(const boost::system::error_code& err,
+                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator, connect_callback ccb);
+            
             cluster_endpoint::ptr _endpoint;
             boost::asio::io_service& _ioService;
+            boost::asio::ip::tcp::resolver _resolver;
+            boost::asio::ip::tcp::resolver::query _query;
         };
         
     }

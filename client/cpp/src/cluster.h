@@ -19,6 +19,7 @@
 #include "cluster_endpoint.h"
 #include "connection_error.h"
 #include "session.h"
+#include "cluster_connection.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -66,16 +67,8 @@ namespace sopmq {
             {
                 connect_handler handler;
                 cluster_endpoint::ptr endpoint;
-                std::shared_ptr<boost::asio::ip::tcp::resolver> resolver;
-                std::shared_ptr<boost::asio::ip::tcp::resolver::query> query;
+                cluster_connection::ptr connection;
             };
-            
-            ///
-            ///
-            ///
-            void after_resolve(const boost::system::error_code& err,
-                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
-                               connect_context ctx);
             
             ///
             /// Marks the endpoint dead, removes it from the live list,
@@ -89,14 +82,20 @@ namespace sopmq {
             void check_for_expired_deaths();
             
             ///
-            /// Tries to resolve an endpoint after
+            /// Tries to connect to a random endpoint
             ///
-            void try_resolve_next_endpoint(std::shared_ptr<boost::asio::ip::tcp::resolver> resolver, connect_handler handler);
+            void try_connect_next_endpoint(connect_handler handler,
+                                           boost::asio::io_service &ioService);
             
             ///
             /// Returns a random endpoint from the live endpoints collection
             ///
             cluster_endpoint::ptr random_endpoint();
+            
+            ///
+            /// Called when a connection has been made or failed
+            ///
+            void connection_result(bool success, boost::system::error_code err);
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet

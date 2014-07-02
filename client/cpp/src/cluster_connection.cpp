@@ -18,13 +18,15 @@
 #include "cluster_connection.h"
 
 namespace ba = boost::asio;
+using namespace std::placeholders;
 
 namespace sopmq {
     namespace client {
         
         cluster_connection::cluster_connection(cluster_endpoint::ptr ep,
                                                ba::io_service& ioService)
-        : _endpoint(ep), _ioService(ioService)
+        : _endpoint(ep), _ioService(ioService), _resolver(ioService),
+        _query(ep->network_endpoint().host_name(), "")
         {
             
         }
@@ -34,9 +36,27 @@ namespace sopmq {
             
         }
         
-        void cluster_connection::connect()
+        void cluster_connection::connect(connect_callback ccb)
         {
-            
+            _resolver.async_resolve(_query,
+                                    std::bind(&cluster_connection::after_resolve,
+                                              this, _1, _2, ccb));
+        }
+        
+        void cluster_connection::after_resolve(const boost::system::error_code& err,
+                                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                                               connect_callback ccb)
+        {
+            if (!err)
+            {
+                //we have an endpoint, let's try a connect
+                
+            }
+            else
+            {
+                //resolution failed
+                ccb(false, err);
+            }
         }
         
     }

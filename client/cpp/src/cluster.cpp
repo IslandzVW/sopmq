@@ -38,12 +38,11 @@ namespace sopmq {
         
         void cluster::connect(boost::asio::io_service &ioService, connect_handler handler)
         {
-            auto resolver = std::make_shared<ba::ip::tcp::resolver>(ioService);
-            
-            try_resolve_next_endpoint(resolver, handler);
+            try_connect_next_endpoint(handler, ioService);
         }
         
-        void cluster::try_resolve_next_endpoint(std::shared_ptr<boost::asio::ip::tcp::resolver> resolver, connect_handler handler)
+        void cluster::try_connect_next_endpoint(connect_handler handler,
+                                                boost::asio::io_service &ioService)
         {
             check_for_expired_deaths();
             
@@ -55,32 +54,21 @@ namespace sopmq {
             }
             
             cluster_endpoint::ptr ep = this->random_endpoint();
+            cluster_connection::ptr conn = std::make_shared<cluster_connection>(ep, ioService);
             
-            auto query = std::make_shared<ba::ip::tcp::resolver::query>(ep->network_endpoint().host_name(), "");
+            connect_context ctx =
+                {
+                    handler,
+                    ep,
+                    conn
+                };
             
-            connect_context ctx { handler, ep, resolver, query };
-            
-            resolver->async_resolve(*query,
-                                    std::bind(&cluster::after_resolve, this,
-                                              _1, _2, ctx));
+            conn->connect(std::bind(&cluster::connection_result, this, _1, _2));
         }
         
-        void cluster::after_resolve(const boost::system::error_code& err,
-                                    boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
-                                    connect_context ctx)
+        void cluster::connection_result(bool success, boost::system::error_code err)
         {
-            if (!err)
-            {
-                //we have an endpoint, let's try a connect
-                
-            }
-            else
-            {
-                this->kill_endpoint(ctx.endpoint);
-                
-                //try resolving the next endpoint
-                this->try_resolve_next_endpoint(ctx.resolver, ctx.handler);
-            }
+            
         }
         
         void cluster::kill_endpoint(cluster_endpoint::ptr ep)
