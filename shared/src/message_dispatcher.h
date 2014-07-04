@@ -20,6 +20,7 @@
 
 #include "message_ptrs.h"
 #include <functional>
+#include <memory>
 
 namespace sopmq {
     namespace message {
@@ -30,6 +31,10 @@ namespace sopmq {
         class message_dispatcher
         {
         public:
+            typedef std::shared_ptr<message_dispatcher> ptr;
+            typedef std::weak_ptr<message_dispatcher> wptr;
+            
+        public:
             message_dispatcher(std::function<void(Message_ptr)> unhandledHandler);
             virtual ~message_dispatcher();
             
@@ -38,15 +43,27 @@ namespace sopmq {
             ///
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
             
+            ///
+            /// Dispatches the ChallengeResponse message to the correct handler
+            ///
+            void dispatch(ChallengeResponseMessage_ptr challengeResponseMessage);
+            
         public:
             ///
             /// Sets the handler function for a GetChallenge message
             ///
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             
+            ///
+            /// Sets the handler function for a GetChallenge message
+            ///
+            void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
+            
         private:
             std::function<void(Message_ptr)> _unhandledHandler;
             std::function<void(GetChallengeMessage_ptr)>  _getChallengeHandler;
+            std::function<void(ChallengeResponseMessage_ptr)>  _challengeResponseHandler;
+            
             
             ///
             /// Template function to execute the given handler if it is available, or

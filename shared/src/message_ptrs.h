@@ -30,4 +30,7 @@ typedef std::shared_ptr<::google::protobuf::Message> Message_ptr;
 class GetChallengeMessage;
 typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 
+class ChallengeResponseMessage;
+typedef std::shared_ptr<ChallengeResponseMessage> ChallengeResponseMessage_ptr;
+
 #endif

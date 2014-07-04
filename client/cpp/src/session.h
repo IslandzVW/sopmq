@@ -19,6 +19,8 @@
 #define __Project__session__
 
 #include "cluster_connection.h"
+#include "message_dispatcher.h"
+#include "message_ptrs.h"
 
 #include <boost/noncopyable.hpp>
 #include <memory>
@@ -58,10 +60,17 @@ namespace sopmq {
                               authenticate_callback authCallback);
             
         private:
+            void on_unhandled_message(Message_ptr message);
+            
+            void on_challenge_response(ChallengeResponseMessage_ptr response);
+            
+            
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
             
-            std::uint32_t _nextId;
+            std::uint32_t _next_id;
+            
+            sopmq::message::message_dispatcher::ptr _dispatcher;
         };
         
     }

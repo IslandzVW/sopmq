@@ -18,6 +18,7 @@
 #include "message_dispatcher.h"
 
 #include "GetChallengeMessage.pb.h"
+#include "ChallengeResponseMessage.pb.h"
 
 namespace sopmq {
     namespace message {
@@ -38,9 +39,19 @@ namespace sopmq {
             do_dispatch(_getChallengeHandler, getChallengeMessage);
         }
         
+        void message_dispatcher::dispatch(ChallengeResponseMessage_ptr challengeResponseMessage)
+        {
+            do_dispatch(_challengeResponseHandler, challengeResponseMessage);
+        }
+        
         void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
         {
             _getChallengeHandler = handler;
+        }
+        
+        void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler)
+        {
+            _challengeResponseHandler = handler;
         }
     }
 }

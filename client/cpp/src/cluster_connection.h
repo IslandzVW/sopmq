@@ -19,6 +19,7 @@
 #define __Project__cluster_connection__
 
 #include "cluster_endpoint.h"
+#include "message_dispatcher.h"
 
 #include <boost/asio.hpp>
 #include <functional>
@@ -43,8 +44,19 @@ namespace sopmq {
                                boost::asio::io_service& ioService);
             virtual ~cluster_connection();
             
+            ///
+            /// Begins an async connect to the enpoint provided in the ctor
+            ///
             void connect(connect_callback ccb);
             
+            ///
+            /// Sets the message dispatcher for this connection
+            ///
+            void set_dispatcher(sopmq::message::message_dispatcher* dispatcher);
+            
+            ///
+            /// Sends a message through this connection
+            ///
             void send_message(google::protobuf::Message& message);
             
             
@@ -60,6 +72,8 @@ namespace sopmq {
             boost::asio::ip::tcp::resolver _resolver;
             boost::asio::ip::tcp::resolver::query _query;
             boost::asio::ip::tcp::socket _socket;
+            
+            sopmq::message::message_dispatcher* _dispatcher;
         };
         
     }

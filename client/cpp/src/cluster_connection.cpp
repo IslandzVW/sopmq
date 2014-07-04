@@ -19,6 +19,7 @@
 
 namespace ba = boost::asio;
 using namespace std::placeholders;
+using sopmq::message::message_dispatcher;
 
 namespace sopmq {
     namespace client {
@@ -80,6 +81,11 @@ namespace sopmq {
         void cluster_connection::send_message(google::protobuf::Message& message)
         {
             
+        }
+        
+        void cluster_connection::set_dispatcher(sopmq::message::message_dispatcher* dispatcher)
+        {
+            _dispatcher = dispatcher;
         }
         
     }
