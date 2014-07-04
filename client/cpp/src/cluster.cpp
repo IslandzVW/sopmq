@@ -63,12 +63,20 @@ namespace sopmq {
                     conn
                 };
             
-            conn->connect(std::bind(&cluster::connection_result, this, _1, _2));
+            conn->connect(std::bind(&cluster::connection_result, this, _1, _2, ctx));
         }
         
-        void cluster::connection_result(bool success, boost::system::error_code err)
+        void cluster::connection_result(bool success, boost::system::error_code err,
+                                        connect_context ctx)
         {
-            
+            if (success)
+            {
+                
+            }
+            else
+            {
+                ctx.handler(nullptr, connection_error(err.message()));
+            }
         }
         
         void cluster::kill_endpoint(cluster_endpoint::ptr ep)

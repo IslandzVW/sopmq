@@ -18,23 +18,42 @@
 #ifndef __Project__session__
 #define __Project__session__
 
+#include "cluster_connection.h"
+
 #include <boost/noncopyable.hpp>
 #include <memory>
+#include <string>
 
 namespace sopmq {
     namespace client {
         
+        class cluster;
+        
+        
+        ///
+        /// A session with a sopmq cluster.
+        ///
         class session : public boost::noncopyable
         {
         public:
             typedef std::shared_ptr<session> ptr;
         
         public:
-            session();
+            ///
+            /// Constructs a new session with the given initial connection
+            ///
+            session(std::weak_ptr<cluster> cluster,
+                    cluster_connection::ptr initialConnection);
             virtual ~session();
             
-        private:
+            ///
+            /// Authenticates to the cluster as a client
+            ///
+            void authenticate(const std::string& username, const std::string& password);
             
+        private:
+            std::weak_ptr<cluster> _cluster;
+            cluster_connection::ptr _connection;
         };
         
     }

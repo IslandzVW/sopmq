@@ -39,6 +39,7 @@ namespace sopmq {
         {
         public:
             typedef std::shared_ptr<cluster> ptr;
+            typedef std::weak_ptr<cluster> wptr;
             
             typedef std::function<void(session::ptr, sopmq::error::connection_error)> connect_handler;
             
@@ -95,7 +96,7 @@ namespace sopmq {
             ///
             /// Called when a connection has been made or failed
             ///
-            void connection_result(bool success, boost::system::error_code err);
+            void connection_result(bool success, boost::system::error_code err, connect_context ctx);
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet

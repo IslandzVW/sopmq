@@ -26,7 +26,8 @@ namespace sopmq {
         cluster_connection::cluster_connection(cluster_endpoint::ptr ep,
                                                ba::io_service& ioService)
         : _endpoint(ep), _ioService(ioService), _resolver(ioService),
-        _query(ep->network_endpoint().host_name(), "")
+        _query(ep->network_endpoint().host_name(), ""),
+        _socket(ioService)
         {
             
         }
@@ -44,17 +45,34 @@ namespace sopmq {
         }
         
         void cluster_connection::after_resolve(const boost::system::error_code& err,
-                                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                                               ba::ip::tcp::resolver::iterator endpoint_iterator,
                                                connect_callback ccb)
         {
             if (!err)
             {
                 //we have an endpoint, let's try a connect
-                
+                _socket.async_connect(*endpoint_iterator,
+                                      std::bind(&cluster_connection::after_connect,
+                                                this, _1, ccb));
             }
             else
             {
                 //resolution failed
+                ccb(false, err);
+            }
+        }
+        
+        void cluster_connection::after_connect(const boost::system::error_code& err,
+                                               connect_callback ccb)
+        {
+            if (!err)
+            {
+                //connection is good, tell our callback
+                ccb(true, err);
+            }
+            else
+            {
+                //connection failed
                 ccb(false, err);
             }
         }

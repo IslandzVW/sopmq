@@ -48,10 +48,14 @@ namespace sopmq {
             void after_resolve(const boost::system::error_code& err,
                                boost::asio::ip::tcp::resolver::iterator endpoint_iterator, connect_callback ccb);
             
+            void after_connect(const boost::system::error_code& err,
+                               connect_callback ccb);
+            
             cluster_endpoint::ptr _endpoint;
             boost::asio::io_service& _ioService;
             boost::asio::ip::tcp::resolver _resolver;
             boost::asio::ip::tcp::resolver::query _query;
+            boost::asio::ip::tcp::socket _socket;
         };
         
     }

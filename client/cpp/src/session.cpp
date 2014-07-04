@@ -16,3 +16,27 @@
  */
 
 #include "session.h"
+
+#include "cluster.h"
+
+namespace sopmq {
+    namespace client {
+        
+        session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
+        : _cluster(cluster), _connection(initialConnection)
+        {
+            
+        }
+        
+        session::~session()
+        {
+            
+        }
+        
+        void session::authenticate(const std::string &username, const std::string &password)
+        {
+            
+        }
+        
+    }
+}
