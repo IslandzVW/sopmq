@@ -41,7 +41,7 @@ set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 add_definitions(${DEFS})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
 
-file(GLOB MESSAGE_SRCS ../../messages/cpp/*.h ../../messages/cpp/*.cc ../../messages/cpp/*.cpp)
+#file(GLOB MESSAGE_SRCS ../../messages/cpp/*.h ../../messages/cpp/*.cc ../../messages/cpp/*.cpp)
 
 set(INCLUDES ${INCLUDES} ${SHARED_DIR}/src)
 set(LIBS ${LIBS} sopmq-shared)

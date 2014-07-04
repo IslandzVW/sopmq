@@ -1,0 +1,6 @@
+message ChallengeResponseMessage {
+	required uint32 id = 1;
+	required uint32 in_reply_to = 2;
+
+	required string challenge = 3;
+}

@@ -34,7 +34,8 @@ namespace sopmq {
             
         }
         
-        void session::authenticate(const std::string& username, const std::string& password)
+        void session::authenticate(const std::string& username, const std::string& password,
+                                   authenticate_callback authCallback)
         {
             //send a request to the server to get an auth challenge
             GetChallengeMessage gcm;

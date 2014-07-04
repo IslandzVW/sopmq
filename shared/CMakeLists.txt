@@ -27,13 +27,21 @@ find_package(Boost COMPONENTS system program_options log thread chrono REQUIRED)
 set(INCLUDES ${INCLUDES} ${Boost_INCLUDE_DIR})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
+find_package(Protobuf REQUIRED)
+set(INCLUDES ${INCLUDES} ${PROTOBUF_INCLUDE_DIR})
+set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
+
 find_package(OpenSSL REQUIRED)
 set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
+
+file(GLOB MESSAGE_SRCS ../messages/cpp/*.h ../messages/cpp/*.cc ../messages/cpp/*.cpp)
+
+set(INCLUDES ${INCLUDES} ../messages/cpp)
 
 add_definitions(${DEFS})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
 
 include_directories(${INCLUDES})
 
-add_library(sopmq-shared ${LIB_SRCS})
+add_library(sopmq-shared ${LIB_SRCS} ${MESSAGE_SRCS})
 target_link_libraries(sopmq-shared ${LIBS})

@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 #include <cstdint>
+#include <functional>
 
 namespace sopmq {
     namespace client {
@@ -38,6 +39,9 @@ namespace sopmq {
         {
         public:
             typedef std::shared_ptr<session> ptr;
+            
+            typedef std::function<void(bool)> authenticate_callback;
+            
         
         public:
             ///
@@ -50,7 +54,8 @@ namespace sopmq {
             ///
             /// Authenticates to the cluster as a client
             ///
-            void authenticate(const std::string& username, const std::string& password);
+            void authenticate(const std::string& username, const std::string& password,
+                              authenticate_callback authCallback);
             
         private:
             std::weak_ptr<cluster> _cluster;
