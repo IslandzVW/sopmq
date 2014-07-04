@@ -18,12 +18,13 @@
 #include "session.h"
 
 #include "cluster.h"
+#include "GetChallengeMessage.pb.h"
 
 namespace sopmq {
     namespace client {
         
         session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
-        : _cluster(cluster), _connection(initialConnection)
+        : _cluster(cluster), _connection(initialConnection), _nextId(0)
         {
             
         }
@@ -33,9 +34,14 @@ namespace sopmq {
             
         }
         
-        void session::authenticate(const std::string &username, const std::string &password)
+        void session::authenticate(const std::string& username, const std::string& password)
         {
+            //send a request to the server to get an auth challenge
+            GetChallengeMessage gcm;
+            gcm.set_type(GetChallengeMessage::CLIENT);
+            gcm.set_id(++_nextId);
             
+            _connection->send_message(gcm);
         }
         
     }

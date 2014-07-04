@@ -23,6 +23,7 @@
 #include <boost/noncopyable.hpp>
 #include <memory>
 #include <string>
+#include <cstdint>
 
 namespace sopmq {
     namespace client {
@@ -54,6 +55,8 @@ namespace sopmq {
         private:
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
+            
+            std::uint32_t _nextId;
         };
         
     }

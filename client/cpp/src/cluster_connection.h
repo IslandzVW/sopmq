@@ -19,9 +19,11 @@
 #define __Project__cluster_connection__
 
 #include "cluster_endpoint.h"
+
 #include <boost/asio.hpp>
 #include <functional>
 #include <memory>
+#include <google/protobuf/message.h>
 
 namespace sopmq {
     namespace client {
@@ -42,6 +44,8 @@ namespace sopmq {
             virtual ~cluster_connection();
             
             void connect(connect_callback ccb);
+            
+            void send_message(google::protobuf::Message& message);
             
             
         private:

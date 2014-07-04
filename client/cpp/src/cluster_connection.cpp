@@ -77,5 +77,10 @@ namespace sopmq {
             }
         }
         
+        void cluster_connection::send_message(google::protobuf::Message& message)
+        {
+            
+        }
+        
     }
 }
