@@ -19,7 +19,7 @@ Parameters:
 		- Indicates if this is a server or a client connection
 
 Returns:
-	A random challenge string of 1024 characters
+	ChallengeResponse with A random challenge string of 1024 characters
 
 
 AnswerChallenge

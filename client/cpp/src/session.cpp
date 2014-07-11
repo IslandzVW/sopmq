@@ -19,24 +19,21 @@
 
 #include "cluster.h"
 #include "GetChallengeMessage.pb.h"
+#include "logging.h"
+#include "authentication_state.h"
 
 using sopmq::message::message_dispatcher;
 using namespace std::placeholders;
+
+using namespace sopmq::client::impl;
 
 namespace sopmq {
     namespace client {
         
         session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
         : _cluster(cluster), _connection(initialConnection),
-        _next_id(0)
+        _next_id(0), _session_state(new authentication_state(initialConnection))
         {
-            _dispatcher =
-                std::make_shared<message_dispatcher>(std::bind(&session::on_unhandled_message,
-                                                              this, _1));
-            
-            _dispatcher->set_handler(std::bind(&session::on_challenge_response, this, _1));
-            
-            _connection->set_dispatcher(_dispatcher.get());
         }
         
         session::~session()
@@ -44,13 +41,7 @@ namespace sopmq {
             
         }
         
-        void session::on_unhandled_message(Message_ptr message)
-        {
-            
-        }
-        
-        void session::authenticate(const std::string& username, const std::string& password,
-                                   authenticate_callback authCallback)
+        void session::authenticate(const std::string& username, const std::string& password, authenticate_callback authCallback)
         {
             //send a request to the server to get an auth challenge
             GetChallengeMessage gcm;
@@ -58,11 +49,6 @@ namespace sopmq {
             gcm.set_id(++_next_id);
             
             _connection->send_message(gcm);
-        }
-        
-        void session::on_challenge_response(ChallengeResponseMessage_ptr response)
-        {
-            
         }
     }
 }

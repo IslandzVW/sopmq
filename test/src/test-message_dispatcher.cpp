@@ -28,7 +28,7 @@ TEST(MessageDispatcherTest, TestUnhandledHandler)
 {
     bool called = false;
     
-    message_dispatcher md([&](Message_ptr msg) { called = true; });
+    message_dispatcher md([&](Message_ptr msg, const std::string&) { called = true; });
     
     GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
     
@@ -42,7 +42,7 @@ TEST(MessageDispatcherTest, TestRegisteredHandler)
     bool unhandled = true;
     bool called = false;
     
-    message_dispatcher md([&](Message_ptr msg) { unhandled = true; });
+    message_dispatcher md([&](Message_ptr msg, const std::string&) { unhandled = true; });
     md.set_handler([&](GetChallengeMessage_ptr msg) { unhandled = false; called = true; });
     
     GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();

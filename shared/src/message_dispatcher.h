@@ -35,7 +35,7 @@ namespace sopmq {
             typedef std::weak_ptr<message_dispatcher> wptr;
             
         public:
-            message_dispatcher(std::function<void(Message_ptr)> unhandledHandler);
+            message_dispatcher(std::function<void(Message_ptr, const std::string&)> unhandledHandler);
             virtual ~message_dispatcher();
             
             ///
@@ -60,7 +60,7 @@ namespace sopmq {
             void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
             
         private:
-            std::function<void(Message_ptr)> _unhandledHandler;
+            std::function<void(Message_ptr, const std::string&)> _unhandledHandler;
             std::function<void(GetChallengeMessage_ptr)>  _getChallengeHandler;
             std::function<void(ChallengeResponseMessage_ptr)>  _challengeResponseHandler;
             
@@ -78,7 +78,7 @@ namespace sopmq {
                 }
                 else
                 {
-                    _unhandledHandler(std::static_pointer_cast<::google::protobuf::Message>(m));
+                    _unhandledHandler(std::static_pointer_cast<::google::protobuf::Message>(m), typeid(m).name());
                 }
             }
         };
