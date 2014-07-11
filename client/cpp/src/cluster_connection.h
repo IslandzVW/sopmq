@@ -20,6 +20,7 @@
 
 #include "cluster_endpoint.h"
 #include "message_dispatcher.h"
+#include "endpoint.h"
 
 #include <boost/asio.hpp>
 #include <functional>
@@ -58,6 +59,16 @@ namespace sopmq {
             /// Sends a message through this connection
             ///
             void send_message(google::protobuf::Message& message);
+            
+            ///
+            /// Closes this connection. No further messages can be sent or received from it
+            ///
+            void close();
+            
+            ///
+            /// Returns the endpoint that this connection is established with
+            ///
+            const shared::net::endpoint& network_endpoint() const;
             
             
         private:

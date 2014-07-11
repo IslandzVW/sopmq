@@ -60,10 +60,17 @@ namespace sopmq {
             void authenticate(const std::string& username, const std::string& password,
                               authenticate_callback authCallback);
             
+            ///
+            /// Indicates a protocol violation happened. Disconnects the connection
+            ///
+            void protocol_violation();
+            
         private:
+            void invalidate();
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
+            bool _valid;
             
             std::uint32_t _next_id;
             impl::isession_state::uptr _session_state;

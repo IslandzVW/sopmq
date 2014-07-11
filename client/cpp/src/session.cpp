@@ -31,9 +31,9 @@ namespace sopmq {
     namespace client {
         
         session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
-        : _cluster(cluster), _connection(initialConnection),
-        _next_id(0), _session_state(new authentication_state(initialConnection))
+        : _cluster(cluster), _connection(initialConnection), _valid(true), _next_id(0)
         {
+            _session_state.reset(new authentication_state(initialConnection, *this));
         }
         
         session::~session()
@@ -41,7 +41,8 @@ namespace sopmq {
             
         }
         
-        void session::authenticate(const std::string& username, const std::string& password, authenticate_callback authCallback)
+        void session::authenticate(const std::string& username, const std::string& password,
+                                   authenticate_callback authCallback)
         {
             //send a request to the server to get an auth challenge
             GetChallengeMessage gcm;
@@ -49,6 +50,17 @@ namespace sopmq {
             gcm.set_id(++_next_id);
             
             _connection->send_message(gcm);
+        }
+        
+        void session::protocol_violation()
+        {
+            this->invalidate();
+        }
+        
+        void session::invalidate()
+        {
+            _valid = false;
+            _connection->close();
         }
     }
 }

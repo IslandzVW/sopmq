@@ -88,5 +88,16 @@ namespace sopmq {
             _dispatcher = dispatcher;
         }
         
+        void cluster_connection::close()
+        {
+            _socket.shutdown(ba::socket_base::shutdown_type::shutdown_both);
+            _socket.close();
+        }
+        
+        const shared::net::endpoint& cluster_connection::network_endpoint() const
+        {
+            return _endpoint->network_endpoint();
+        }
+        
     }
 }

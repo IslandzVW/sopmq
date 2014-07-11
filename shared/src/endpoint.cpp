@@ -173,6 +173,11 @@ namespace sopmq {
                 return lhs.str() < rhs.str();
             }
             
+            std::ostream& operator<< (std::ostream& stream, const endpoint& ep)
+            {
+                return stream << ep.str();
+            }
+            
         }
     }
 }

@@ -20,6 +20,7 @@
 
 #include <string>
 #include <exception>
+#include <ostream>
 
 namespace sopmq {
     namespace shared {
@@ -100,6 +101,11 @@ namespace sopmq {
             /// Comparison to allow EPs to be used in ordered collections
             ///
             bool operator < (const endpoint& lhs, const endpoint& rhs);
+            
+            ///
+            /// For logging
+            ///
+            std::ostream& operator<< (std::ostream&, const endpoint&);
             
             ///
             /// Error thrown when the URI fed to the endpoint constructor is invalid

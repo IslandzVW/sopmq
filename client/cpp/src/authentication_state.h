@@ -24,6 +24,9 @@
 
 namespace sopmq {
     namespace client {
+        
+        class session; //fwd
+        
         namespace impl {
             
             ///
@@ -33,7 +36,7 @@ namespace sopmq {
             class authentication_state : public isession_state
             {
             public:
-                authentication_state(cluster_connection::ptr conn);
+                authentication_state(cluster_connection::ptr conn, session& session);
                 virtual ~authentication_state();
                 
             private:
@@ -42,6 +45,7 @@ namespace sopmq {
                 void on_challenge_response(ChallengeResponseMessage_ptr response);
                 
                 cluster_connection::ptr _connection;
+                session& _session;
                 sopmq::message::message_dispatcher::ptr _dispatcher;
             };
             
