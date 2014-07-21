@@ -33,7 +33,7 @@ namespace sopmq {
         session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
         : _cluster(cluster), _connection(initialConnection), _valid(true), _next_id(0)
         {
-            _session_state.reset(new authentication_state(initialConnection, *this));
+            
         }
         
         session::~session()
@@ -44,10 +44,12 @@ namespace sopmq {
         void session::authenticate(const std::string& username, const std::string& password,
                                    authenticate_callback authCallback)
         {
+            _session_state.reset(new authentication_state(_connection, *this, username, password));
+            
             //send a request to the server to get an auth challenge
-            GetChallengeMessage gcm;
-            gcm.set_type(GetChallengeMessage::CLIENT);
-            gcm.set_id(++_next_id);
+            GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
+            gcm->set_type(GetChallengeMessage::CLIENT);
+            gcm->set_id(++_next_id);
             
             _connection->send_message(gcm);
         }

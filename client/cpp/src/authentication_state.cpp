@@ -19,9 +19,11 @@
 #include "session.h"
 #include "logging.h"
 #include "ChallengeResponseMessage.pb.h"
+#include "AnswerChallengeMessage.pb.h"
 
 #include <functional>
 #include <boost/assert.hpp>
+#include <cryptopp/sha.h>
 
 using sopmq::message::message_dispatcher;
 using namespace std::placeholders;
@@ -30,8 +32,9 @@ namespace sopmq {
     namespace client {
         namespace impl {
             
-            authentication_state::authentication_state(cluster_connection::ptr conn, session& session)
-            : _connection(conn), _session(session)
+            authentication_state::authentication_state(cluster_connection::ptr conn, session& session,
+                                                       const std::string& username, const std::string& password)
+            : _connection(conn), _session(session), _username(username), _password(password)
             {
                 _dispatcher =
                     std::make_shared<message_dispatcher>(std::bind(&authentication_state::on_unhandled_message,
@@ -52,7 +55,6 @@ namespace sopmq {
                 LOG_SRC(error) << _connection->network_endpoint()
                     << " protocol violation: unexpected message: " << typeName;
                 
-                
                 _session.protocol_violation();
             }
             
@@ -62,7 +64,18 @@ namespace sopmq {
                 
                 const std::string& challenge = response->challenge();
                 
+                //respond to the challenge with:
+                //sha256([username]) + " " + sha256(sha256([password])[challenge])
+                unsigned char result[(CryptoPP::SHA256::DIGESTSIZE * 2) + 1];
                 
+                CryptoPP::SHA256().CalculateDigest(&result[0], (unsigned char*)_username.c_str(), _username.length());
+                result[CryptoPP::SHA256::DIGESTSIZE] = ' ';
+                CryptoPP::SHA256().CalculateDigest(&result[CryptoPP::SHA256::DIGESTSIZE + 1], (unsigned char*)_password.c_str(),
+                                                   _password.length());
+                
+                AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
+                acm->set_response(std::string((char*)result));
+                _connection->send_message(acm);
             }
             
         }

@@ -36,7 +36,8 @@ namespace sopmq {
             class authentication_state : public isession_state
             {
             public:
-                authentication_state(cluster_connection::ptr conn, session& session);
+                authentication_state(cluster_connection::ptr conn, session& session,
+                                     const std::string& username, const std::string& password);
                 virtual ~authentication_state();
                 
             private:
@@ -46,6 +47,8 @@ namespace sopmq {
                 
                 cluster_connection::ptr _connection;
                 session& _session;
+                std::string _username;
+                std::string _password;
                 sopmq::message::message_dispatcher::ptr _dispatcher;
             };
             

@@ -33,4 +33,7 @@ typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 class ChallengeResponseMessage;
 typedef std::shared_ptr<ChallengeResponseMessage> ChallengeResponseMessage_ptr;
 
+class AnswerChallengeMessage;
+typedef std::shared_ptr<AnswerChallengeMessage> AnswerChallengeMessage_ptr;
+
 #endif
