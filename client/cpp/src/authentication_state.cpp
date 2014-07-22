@@ -20,6 +20,7 @@
 #include "logging.h"
 #include "ChallengeResponseMessage.pb.h"
 #include "AnswerChallengeMessage.pb.h"
+#include "util.h"
 
 #include <functional>
 #include <boost/assert.hpp>
@@ -27,6 +28,7 @@
 
 using sopmq::message::message_dispatcher;
 using namespace std::placeholders;
+using sopmq::shared::util;
 
 namespace sopmq {
     namespace client {
@@ -66,15 +68,23 @@ namespace sopmq {
                 
                 //respond to the challenge with:
                 //sha256([username]) + " " + sha256(sha256([password])[challenge])
-                unsigned char result[(CryptoPP::SHA256::DIGESTSIZE * 2) + 1];
+                unsigned char hashResult[CryptoPP::SHA256::DIGESTSIZE];
                 
-                CryptoPP::SHA256().CalculateDigest(&result[0], (unsigned char*)_username.c_str(), _username.length());
-                result[CryptoPP::SHA256::DIGESTSIZE] = ' ';
-                CryptoPP::SHA256().CalculateDigest(&result[CryptoPP::SHA256::DIGESTSIZE + 1], (unsigned char*)_password.c_str(),
-                                                   _password.length());
+                CryptoPP::SHA256 sha;
+                
+                sha.CalculateDigest(&hashResult[0], (unsigned char*)_username.c_str(), _username.length());
+                std::string result = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+                
+                result += " ";
+                
+                std::string pwAndChallenge(_password);
+                pwAndChallenge += challenge;
+                
+                sha.CalculateDigest(&hashResult[0], (unsigned char*)pwAndChallenge.c_str(), pwAndChallenge.length());
+                result += util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
                 
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
-                acm->set_response(std::string((char*)result));
+                acm->set_response(result);
                 _connection->send_message(acm);
             }
             
