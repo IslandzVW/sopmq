@@ -72,7 +72,6 @@ namespace sopmq {
             cluster_connection::ptr _connection;
             bool _valid;
             
-            std::uint32_t _next_id;
             impl::isession_state::uptr _session_state;
         };
         

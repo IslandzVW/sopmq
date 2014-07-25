@@ -26,6 +26,7 @@
 #include <boost/asio.hpp>
 #include <functional>
 #include <memory>
+#include <cstdint>
 #include <google/protobuf/message.h>
 
 namespace sopmq {
@@ -71,6 +72,10 @@ namespace sopmq {
             ///
             const shared::net::endpoint& network_endpoint() const;
             
+            ///
+            /// Returns the next message identifier for this connection
+            ///
+            std::uint32_t get_next_id();
             
         private:
             void after_resolve(const boost::system::error_code& err,
@@ -86,6 +91,8 @@ namespace sopmq {
             boost::asio::ip::tcp::socket _socket;
             
             sopmq::message::message_dispatcher* _dispatcher;
+            
+            std::uint32_t _next_id;
         };
         
     }

@@ -33,6 +33,9 @@ Parameters:
 	Server Answer
 		- The result of sha256(sha256([ringKey])[challenge])
 
+Returns:
+	AuthAck with a true or false response
+
 
 
 Functionality

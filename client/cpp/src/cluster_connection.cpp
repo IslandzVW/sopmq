@@ -28,7 +28,7 @@ namespace sopmq {
                                                ba::io_service& ioService)
         : _endpoint(ep), _ioService(ioService), _resolver(ioService),
         _query(ep->network_endpoint().host_name(), ""),
-        _socket(ioService)
+        _socket(ioService), _dispatcher(0), _next_id(0)
         {
             
         }
@@ -97,6 +97,11 @@ namespace sopmq {
         const shared::net::endpoint& cluster_connection::network_endpoint() const
         {
             return _endpoint->network_endpoint();
+        }
+        
+        std::uint32_t cluster_connection::get_next_id()
+        {
+            return ++_next_id;
         }
         
     }

@@ -21,8 +21,10 @@
 #include "GetChallengeMessage.pb.h"
 #include "logging.h"
 #include "authentication_state.h"
+#include "messageutil.h"
 
 using sopmq::message::message_dispatcher;
+using sopmq::message::messageutil;
 using namespace std::placeholders;
 
 using namespace sopmq::client::impl;
@@ -31,7 +33,7 @@ namespace sopmq {
     namespace client {
         
         session::session(cluster::wptr cluster, cluster_connection::ptr initialConnection)
-        : _cluster(cluster), _connection(initialConnection), _valid(true), _next_id(0)
+        : _cluster(cluster), _connection(initialConnection), _valid(true)
         {
             
         }
@@ -49,7 +51,7 @@ namespace sopmq {
             //send a request to the server to get an auth challenge
             GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
             gcm->set_type(GetChallengeMessage::CLIENT);
-            gcm->set_id(++_next_id);
+            gcm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), 0));
             
             _connection->send_message(gcm);
         }

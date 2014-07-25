@@ -142,5 +142,14 @@ namespace sopmq {
                                              + boost::lexical_cast<std::string>(ctx->type));
             }
         }
+        
+        Identifier* messageutil::build_id(std::uint32_t id, std::uint32_t inReplyTo)
+        {
+            auto newId = new Identifier();
+            newId->set_id(id);
+            newId->set_in_reply_to(inReplyTo);
+            
+            return newId;
+        }
     }
 }

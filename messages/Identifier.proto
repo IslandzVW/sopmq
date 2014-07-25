@@ -1,0 +1,4 @@
+message Identifier {
+	required uint32 id = 1;
+	required uint32 in_reply_to = 2;
+}

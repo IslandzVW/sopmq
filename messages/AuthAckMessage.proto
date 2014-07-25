@@ -1,7 +1,7 @@
 import "Identifier.proto";
 
-message AnswerChallengeMessage {
+message AuthAckMessage {
 	required Identifier identity = 1;
 
-	required string response = 2;
+	required bool authorized = 2;
 }

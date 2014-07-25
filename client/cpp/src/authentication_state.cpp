@@ -21,6 +21,7 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "AnswerChallengeMessage.pb.h"
 #include "util.h"
+#include "messageutil.h"
 
 #include <functional>
 #include <boost/assert.hpp>
@@ -29,6 +30,7 @@
 using sopmq::message::message_dispatcher;
 using namespace std::placeholders;
 using sopmq::shared::util;
+using sopmq::message::messageutil;
 
 namespace sopmq {
     namespace client {
@@ -83,7 +85,12 @@ namespace sopmq {
                 sha.CalculateDigest(&hashResult[0], (unsigned char*)pwAndChallenge.c_str(), pwAndChallenge.length());
                 result += util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
                 
+                //clear the handler for the challenge response since we're not looking for that anymore
+                _dispatcher->set_handler(std::function<void(ChallengeResponseMessage_ptr)>());
+                //set the handler for the 
+                
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
+                acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));
                 acm->set_response(result);
                 _connection->send_message(acm);
             }

@@ -27,10 +27,12 @@
 
 #include <functional>
 #include <map>
+#include <cstdint>
 
 #include "message_types.h"
 #include "network_error.h"
 #include "message_dispatcher.h"
+#include "Identifier.pb.h"
 
 namespace sopmq {
     namespace message {
@@ -96,6 +98,12 @@ namespace sopmq {
                                      network_error_callback errorCallback,
                                      message_dispatcher& dispatcher,
                                      uint32_t maxSize);
+            
+            ///
+            /// Builds a new identifier to tack onto a message
+            ///
+            static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
+            
             
         private:
             static void after_read_message_type(boost::asio::io_service& ioService,
