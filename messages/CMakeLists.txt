@@ -19,3 +19,10 @@ file(GLOB PROTO_FILES *.proto)
 
 execute_process(COMMAND protoc -I=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=cpp ${PROTO_FILES} 
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+#use cog to generate the message pointer types
+execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_ptrs.h)
+
+#also generate code for the message dispatcher
+execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.h)
+execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.cpp)

@@ -17,8 +17,35 @@
 
 #include "message_dispatcher.h"
 
-#include "GetChallengeMessage.pb.h"
+//
+// ATTENTION: This file uses cog (http://nedbatchelder.com/code/cog/) for code
+// generation. Do not edit the generated chunks between cog and end tags
+//
+
+
+/*[[[cog
+ import cog
+ import glob
+ import os
+ 
+ ast = '*'
+ 
+ first_lower = lambda s: s[:1].lower() + s[1:] if s else ''
+ fnames = glob.glob("../messages/" + ast + ".proto")
+ ]]]*/
+//[[[end]]]
+
+/*[[[cog
+ for fn in fnames:
+   rawname = os.path.splitext(os.path.basename(fn))[0]
+   cog.outl("#include \"%s.pb.h\"" % rawname)
+ ]]]*/
+#include "AnswerChallengeMessage.pb.h"
+#include "AuthAckMessage.pb.h"
 #include "ChallengeResponseMessage.pb.h"
+#include "GetChallengeMessage.pb.h"
+#include "Identifier.pb.h"
+//[[[end]]]
 
 namespace sopmq {
     namespace message {
@@ -34,25 +61,89 @@ namespace sopmq {
             
         }
         
-        void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
+        /*[[[cog
+         for fn in fnames:
+           rawname = os.path.splitext(os.path.basename(fn))[0]
+           cog.outl("")
+           cog.outl("void message_dispatcher::dispatch(%s_ptr %s)" % (rawname,first_lower(rawname)))
+           cog.outl("{")
+           cog.outl("    do_dispatch(_%sHandler, %s);" % (first_lower(rawname), first_lower(rawname)))
+           cog.outl("}")
+           cog.outl("")
+         ]]]*/
+
+        void message_dispatcher::dispatch(AnswerChallengeMessage_ptr answerChallengeMessage)
         {
-            do_dispatch(_getChallengeHandler, getChallengeMessage);
+            do_dispatch(_answerChallengeMessageHandler, answerChallengeMessage);
         }
-        
+
+
+        void message_dispatcher::dispatch(AuthAckMessage_ptr authAckMessage)
+        {
+            do_dispatch(_authAckMessageHandler, authAckMessage);
+        }
+
+
         void message_dispatcher::dispatch(ChallengeResponseMessage_ptr challengeResponseMessage)
         {
-            do_dispatch(_challengeResponseHandler, challengeResponseMessage);
+            do_dispatch(_challengeResponseMessageHandler, challengeResponseMessage);
         }
-        
-        void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
+
+
+        void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
         {
-            _getChallengeHandler = handler;
+            do_dispatch(_getChallengeMessageHandler, getChallengeMessage);
         }
+
+
+        void message_dispatcher::dispatch(Identifier_ptr identifier)
+        {
+            do_dispatch(_identifierHandler, identifier);
+        }
+
+        //[[[end]]]
         
+        /*[[[cog
+         for fn in fnames:
+           rawname = os.path.splitext(os.path.basename(fn))[0]
+           cog.outl("")
+           cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler)" % rawname)
+           cog.outl("{")
+           cog.outl("    _%sHandler = handler;" % first_lower(rawname))
+           cog.outl("}")
+           cog.outl("")
+         ]]]*/
+
+        void message_dispatcher::set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler)
+        {
+            _answerChallengeMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(AuthAckMessage_ptr)> handler)
+        {
+            _authAckMessageHandler = handler;
+        }
+
+
         void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler)
         {
-            _challengeResponseHandler = handler;
+            _challengeResponseMessageHandler = handler;
         }
+
+
+        void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
+        {
+            _getChallengeMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(Identifier_ptr)> handler)
+        {
+            _identifierHandler = handler;
+        }
+
+        //[[[end]]]
     }
 }
 

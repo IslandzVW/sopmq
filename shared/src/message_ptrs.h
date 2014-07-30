@@ -27,13 +27,41 @@
 
 typedef std::shared_ptr<::google::protobuf::Message> Message_ptr;
 
-class GetChallengeMessage;
-typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
+/*[[[cog
+ 
+import cog
+import glob
+import os
+ 
+ast = '*'
+cog.outl("")
+
+fnames = glob.glob("../messages/" + ast + ".proto")
+for fn in fnames:
+  rawname = os.path.splitext(os.path.basename(fn))[0]
+  cog.outl("class %s;" % rawname)
+  cog.outl("typedef std::shared_ptr<%s> %s_ptr;" % (rawname,rawname))
+  cog.outl("");
+ 
+cog.outl("");
+]]]*/
+
+class AnswerChallengeMessage;
+typedef std::shared_ptr<AnswerChallengeMessage> AnswerChallengeMessage_ptr;
+
+class AuthAckMessage;
+typedef std::shared_ptr<AuthAckMessage> AuthAckMessage_ptr;
 
 class ChallengeResponseMessage;
 typedef std::shared_ptr<ChallengeResponseMessage> ChallengeResponseMessage_ptr;
 
-class AnswerChallengeMessage;
-typedef std::shared_ptr<AnswerChallengeMessage> AnswerChallengeMessage_ptr;
+class GetChallengeMessage;
+typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
+
+class Identifier;
+typedef std::shared_ptr<Identifier> Identifier_ptr;
+
+
+//[[[end]]]
 
 #endif

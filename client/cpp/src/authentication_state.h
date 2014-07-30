@@ -45,6 +45,8 @@ namespace sopmq {
                 
                 void on_challenge_response(ChallengeResponseMessage_ptr response);
                 
+                void on_auth_ack(AuthAckMessage_ptr response);
+                
                 cluster_connection::ptr _connection;
                 session& _session;
                 std::string _username;

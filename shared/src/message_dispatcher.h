@@ -22,6 +22,24 @@
 #include <functional>
 #include <memory>
 
+//
+// ATTENTION: This file uses cog (http://nedbatchelder.com/code/cog/) for code
+// generation. Do not edit the generated chunks between cog and end tags
+//
+
+
+/*[[[cog
+import cog
+import glob
+import os
+
+ast = '*'
+
+first_lower = lambda s: s[:1].lower() + s[1:] if s else ''
+fnames = glob.glob("../messages/" + ast + ".proto")
+]]]*/
+//[[[end]]]
+
 namespace sopmq {
     namespace message {
         
@@ -38,32 +56,45 @@ namespace sopmq {
             message_dispatcher(std::function<void(Message_ptr, const std::string&)> unhandledHandler);
             virtual ~message_dispatcher();
             
-            ///
-            /// Dispatches the GetChallenge message to the correct handler
-            ///
-            void dispatch(GetChallengeMessage_ptr getChallengeMessage);
-            
-            ///
-            /// Dispatches the ChallengeResponse message to the correct handler
-            ///
+            /*[[[cog
+             for fn in fnames:
+               rawname = os.path.splitext(os.path.basename(fn))[0]
+               cog.outl("void dispatch(%s_ptr %s);" % (rawname,first_lower(rawname)))
+             ]]]*/
+            void dispatch(AnswerChallengeMessage_ptr answerChallengeMessage);
+            void dispatch(AuthAckMessage_ptr authAckMessage);
             void dispatch(ChallengeResponseMessage_ptr challengeResponseMessage);
+            void dispatch(GetChallengeMessage_ptr getChallengeMessage);
+            void dispatch(Identifier_ptr identifier);
+            //[[[end]]]
             
         public:
-            ///
-            /// Sets the handler function for a GetChallenge message
-            ///
-            void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
-            
-            ///
-            /// Sets the handler function for a GetChallenge message
-            ///
+            /*[[[cog
+             for fn in fnames:
+               rawname = os.path.splitext(os.path.basename(fn))[0]
+               cog.outl("void set_handler(std::function<void(%s_ptr)> handler);" % rawname)
+             ]]]*/
+            void set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler);
+            void set_handler(std::function<void(AuthAckMessage_ptr)> handler);
             void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
+            void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
+            void set_handler(std::function<void(Identifier_ptr)> handler);
+            //[[[end]]]
             
         private:
             std::function<void(Message_ptr, const std::string&)> _unhandledHandler;
-            std::function<void(GetChallengeMessage_ptr)>  _getChallengeHandler;
-            std::function<void(ChallengeResponseMessage_ptr)>  _challengeResponseHandler;
             
+            /*[[[cog
+             for fn in fnames:
+               rawname = os.path.splitext(os.path.basename(fn))[0]
+               cog.outl("std::function<void(%s_ptr)> _%sHandler;" % (rawname,first_lower(rawname)))
+             ]]]*/
+            std::function<void(AnswerChallengeMessage_ptr)> _answerChallengeMessageHandler;
+            std::function<void(AuthAckMessage_ptr)> _authAckMessageHandler;
+            std::function<void(ChallengeResponseMessage_ptr)> _challengeResponseMessageHandler;
+            std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
+            std::function<void(Identifier_ptr)> _identifierHandler;
+            //[[[end]]]
             
             ///
             /// Template function to execute the given handler if it is available, or
