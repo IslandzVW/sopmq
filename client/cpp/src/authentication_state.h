@@ -37,7 +37,8 @@ namespace sopmq {
             {
             public:
                 authentication_state(cluster_connection::ptr conn, session& session,
-                                     const std::string& username, const std::string& password);
+                                     const std::string& username, const std::string& password,
+                                     std::function<void(bool)> authCallback);
                 virtual ~authentication_state();
                 
             private:
@@ -51,6 +52,7 @@ namespace sopmq {
                 session& _session;
                 std::string _username;
                 std::string _password;
+                std::function<void(bool)> _authCallback;
                 sopmq::message::message_dispatcher::ptr _dispatcher;
             };
             

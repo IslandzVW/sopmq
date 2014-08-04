@@ -16,10 +16,14 @@
  */
 
 #include "cluster_connection.h"
+#include "settings.h"
 
 namespace ba = boost::asio;
 using namespace std::placeholders;
 using sopmq::message::message_dispatcher;
+using sopmq::message::network_error_callback;
+using sopmq::message::messageutil;
+using sopmq::message::message_type;
 
 namespace sopmq {
     namespace client {
@@ -78,9 +82,16 @@ namespace sopmq {
             }
         }
         
-        void cluster_connection::send_message(Message_ptr message)
+        void cluster_connection::send_message(message_type type, Message_ptr message,
+                                              network_error_callback errorCb)
         {
-            
+            messageutil::write_message(type, message, _ioService, _socket, errorCb);
+        }
+        
+        void cluster_connection::get_next_message(network_error_callback errorCb)
+        {
+            messageutil::read_message(_ioService, _socket, errorCb, *_dispatcher,
+                                      settings::instance().maxMessageSize);
         }
         
         void cluster_connection::set_dispatcher(sopmq::message::message_dispatcher* dispatcher)
@@ -103,6 +114,8 @@ namespace sopmq {
         {
             return ++_next_id;
         }
+        
+        
         
     }
 }

@@ -20,6 +20,7 @@
 #include "logging.h"
 #include "ChallengeResponseMessage.pb.h"
 #include "AnswerChallengeMessage.pb.h"
+#include "AuthAckMessage.pb.h"
 #include "util.h"
 #include "messageutil.h"
 
@@ -37,8 +38,9 @@ namespace sopmq {
         namespace impl {
             
             authentication_state::authentication_state(cluster_connection::ptr conn, session& session,
-                                                       const std::string& username, const std::string& password)
-            : _connection(conn), _session(session), _username(username), _password(password)
+                                                       const std::string& username, const std::string& password,
+                                                       std::function<void(bool)> authCallback)
+            : _connection(conn), _session(session), _username(username), _password(password), _authCallback(authCallback)
             {
                 _dispatcher =
                     std::make_shared<message_dispatcher>(std::bind(&authentication_state::on_unhandled_message,
@@ -93,12 +95,22 @@ namespace sopmq {
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
                 acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));
                 acm->set_response(result);
-                _connection->send_message(acm);
+                //_connection->send_message(acm);
             }
             
             void authentication_state::on_auth_ack(AuthAckMessage_ptr response)
             {
-                
+                if (response->has_authorized() && response->authorized())
+                {
+                    _authCallback(true);
+                }
+                else
+                {
+                    //auth failed
+                    LOG_SRC(error) << _connection->network_endpoint()
+                        << " session authorization failed";
+                    _authCallback(false);
+                }
             }
         }
     }

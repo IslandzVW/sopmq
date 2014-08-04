@@ -151,5 +151,13 @@ namespace sopmq {
             
             return newId;
         }
+        
+        void messageutil::write_message(sopmq::message::message_type type, Message_ptr message,
+                                        boost::asio::io_service &ioService,
+                                        boost::asio::ip::tcp::socket &socket,
+                                        network_error_callback errorCallback)
+        {
+            //boost::asio::async_write
+        }
     }
 }

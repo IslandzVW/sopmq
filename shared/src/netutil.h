@@ -21,7 +21,6 @@
 #include <boost/asio.hpp>
 #include <boost/pool/poolfwd.hpp>
 #include <memory>
-#include <boost/shared_array.hpp>
 #include <cstdint>
 #include <functional>
 
@@ -54,12 +53,12 @@ namespace sopmq {
         private:
             static boost::pool<> s_mem_pool;
             
-            static void after_u32_read(boost::shared_array<char> buffer,
+            static void after_u32_read(std::shared_ptr<char> buffer,
                                        std::function<void(uint32_t, const boost::system::error_code& error)> callback,
                                        const boost::system::error_code& error,
                                        std::size_t bytes_transferred);
             
-            static void after_u16_read(boost::shared_array<char> buffer,
+            static void after_u16_read(std::shared_ptr<char> buffer,
                                        std::function<void(uint16_t, const boost::system::error_code& error)> callback,
                                        const boost::system::error_code& error,
                                        std::size_t bytes_transferred);

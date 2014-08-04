@@ -15,28 +15,28 @@
  * limitations under the License.
  */
 
-#ifndef SHARED_MESSAGE_TYPES_H
-#define SHARED_MESSAGE_TYPES_H
+#include "settings.h"
 
 namespace sopmq {
-    namespace message {
+    namespace client {
         
-        ///
-        /// SOPMQ message types
-        ///
-        enum message_type
+        settings::settings()
         {
-            MT_INVALID = 0,
+            maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE;
+        }
+        
+        settings::~settings()
+        {
             
-            MT_GET_CHALLENGE,
-            MT_CHALLENGE_RESPONSE,
-            MT_ANSWER_CHALLENGE,
-            MT_AUTH_ACK,
-            
-            MT_INVALID_OUT_OF_RANGE
-        };
+        }
+        
+        settings& settings::instance()
+        {
+            static settings inst;
+            return inst;
+        }
         
     }
 }
 
-#endif
+

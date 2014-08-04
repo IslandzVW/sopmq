@@ -22,6 +22,8 @@
 #include "message_dispatcher.h"
 #include "endpoint.h"
 #include "message_ptrs.h"
+#include "message_types.h"
+#include "messageutil.h"
 
 #include <boost/asio.hpp>
 #include <functional>
@@ -60,7 +62,8 @@ namespace sopmq {
             ///
             /// Sends a message through this connection
             ///
-            void send_message(Message_ptr message);
+            void send_message(sopmq::message::message_type type, Message_ptr message,
+                              sopmq::message::network_error_callback errorCb);
             
             ///
             /// Closes this connection. No further messages can be sent or received from it
@@ -76,6 +79,11 @@ namespace sopmq {
             /// Returns the next message identifier for this connection
             ///
             std::uint32_t get_next_id();
+            
+            ///
+            /// Listens for the next message from the wire and dispatches it to the assigned dispatcher
+            ///
+            void get_next_message(sopmq::message::network_error_callback errorCb);
             
         private:
             void after_resolve(const boost::system::error_code& err,

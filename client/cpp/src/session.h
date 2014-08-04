@@ -67,12 +67,17 @@ namespace sopmq {
             
         private:
             void invalidate();
+            void auth_callback(bool authSuccess);
+            void on_network_error(const sopmq::error::network_error& error);
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
             bool _valid;
             
             impl::isession_state::uptr _session_state;
+            
+            std::string _username;
+            std::string _password;
         };
         
     }

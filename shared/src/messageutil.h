@@ -104,6 +104,15 @@ namespace sopmq {
             ///
             static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
             
+            ///
+            /// Writes a message to the wire
+            ///
+            static void write_message(message_type type,
+                                      Message_ptr message,
+                                      boost::asio::io_service& ioService,
+                                      boost::asio::ip::tcp::socket& socket,
+                                      network_error_callback errorCallback);
+            
             
         private:
             static void after_read_message_type(boost::asio::io_service& ioService,

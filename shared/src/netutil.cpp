@@ -41,7 +41,7 @@ namespace sopmq {
                                boost::asio::ip::tcp::socket& socket,
                                std::function<void(uint32_t, const boost::system::error_code& error)> callback)
         {
-            boost::shared_array<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
+            std::shared_ptr<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
             boost::asio::async_read(socket,
                                     boost::asio::buffer(buffer.get(), 4),
                                     std::bind(&netutil::after_u32_read,
@@ -57,7 +57,7 @@ namespace sopmq {
                                boost::asio::ip::tcp::socket& socket,
                                std::function<void(uint16_t, const boost::system::error_code& error)> callback)
         {
-            boost::shared_array<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
+            std::shared_ptr<char> buffer((char*)s_mem_pool.malloc(), &netutil::free_mem);
             boost::asio::async_read(socket,
                                     boost::asio::buffer(buffer.get(), 2),
                                     std::bind(&netutil::after_u16_read,
@@ -67,7 +67,7 @@ namespace sopmq {
                                               _2));
         }
         
-        void netutil::after_u32_read(boost::shared_array<char> buffer,
+        void netutil::after_u32_read(std::shared_ptr<char> buffer,
                                      std::function<void(uint32_t, const boost::system::error_code& error)> callback,
                                      const boost::system::error_code& error,
                                      std::size_t bytes_transferred)
@@ -82,7 +82,7 @@ namespace sopmq {
             callback(hl, error);
         }
         
-        void netutil::after_u16_read(boost::shared_array<char> buffer,
+        void netutil::after_u16_read(std::shared_ptr<char> buffer,
                                      std::function<void(uint16_t, const boost::system::error_code& error)> callback,
                                      const boost::system::error_code& error,
                                      std::size_t bytes_transferred)
