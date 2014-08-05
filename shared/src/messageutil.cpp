@@ -17,20 +17,25 @@
 
 #include "messageutil.h"
 
-#include <boost/make_shared.hpp>
-
 #include "logging.h"
 #include "netutil.h"
 
 #include "GetChallengeMessage.pb.h"
 
+#include <boost/make_shared.hpp>
+#include <array>
+
+
 using sopmq::error::network_error;
 
 using namespace std::placeholders;
 using namespace sopmq::util;
+namespace ba = boost::asio;
 
 namespace sopmq {
     namespace message {
+        
+        boost::pool<> messageutil::s_mem_pool(messageutil::HEADER_SIZE);
         
         void messageutil::read_message(boost::asio::io_service& ioService,
                                        boost::asio::ip::tcp::socket& socket,
@@ -157,7 +162,43 @@ namespace sopmq {
                                         boost::asio::ip::tcp::socket &socket,
                                         network_error_callback errorCallback)
         {
-            //boost::asio::async_write
+            send_context_ptr ctx(new send_context
+                                 {
+                                     std::unique_ptr<char[], void(*)(char*)>(static_cast<char*>(s_mem_pool.malloc()), &messageutil::free_mem),
+                                     std::string(),
+                                     errorCallback
+                                 });
+            
+            message->SerializeToString(&ctx->messageBuf);
+            
+            std::array<ba::const_buffer, 2> bufs = {
+                {
+                ba::buffer(ctx->headerBuf.get(), HEADER_SIZE),
+                ba::buffer(ctx->messageBuf)
+                }
+            };
+            
+            ba::async_write(socket, bufs, std::bind(&messageutil::after_write_message,
+                                                    ctx, _1, _2));
+        }
+        
+        void messageutil::after_write_message(send_context_ptr ctx,
+                                              const boost::system::error_code& error,
+                                              size_t bytesTransferred)
+        {
+            if (error)
+            {
+                ctx->errorCallback(sopmq::error::network_error(error));
+            }
+            else
+            {
+                
+            }
+        }
+        
+        void messageutil::free_mem(char *mem)
+        {
+            s_mem_pool.free(mem);
         }
     }
 }

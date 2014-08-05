@@ -18,21 +18,22 @@
 #ifndef __Project__messageutil__
 #define __Project__messageutil__
 
+#include "message_types.h"
+#include "network_error.h"
+#include "message_dispatcher.h"
+#include "Identifier.pb.h"
+
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
 #include <boost/shared_array.hpp>
 #include <memory>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/pool/pool.hpp>
 
 #include <functional>
 #include <map>
 #include <cstdint>
-
-#include "message_types.h"
-#include "network_error.h"
-#include "message_dispatcher.h"
-#include "Identifier.pb.h"
 
 namespace sopmq {
     namespace message {
@@ -84,6 +85,22 @@ namespace sopmq {
         
         typedef std::shared_ptr<message_context> message_context_ptr;
         
+        
+        ///
+        /// Context when writing a message
+        ///
+        struct send_context
+        {
+            send_context(const send_context&) = delete;
+            
+            std::unique_ptr<char[], void(*)(char*)> headerBuf;
+            std::string messageBuf;
+            network_error_callback errorCallback;
+        };
+        
+        typedef std::shared_ptr<send_context> send_context_ptr
+        ;
+        
         ///
         /// Utility functions that deal with network messages
         ///
@@ -115,6 +132,12 @@ namespace sopmq {
             
             
         private:
+            static const int HEADER_SIZE = sizeof(uint16_t) + sizeof(uint32_t);
+            
+            static boost::pool<> s_mem_pool;
+            static void free_mem(char* mem);
+            
+            
             static void after_read_message_type(boost::asio::io_service& ioService,
                                                 boost::asio::ip::tcp::socket& socket,
                                                 message_context_ptr ctx,
@@ -132,6 +155,9 @@ namespace sopmq {
                                                    message_context_ptr ctx,
                                                    const boost::system::error_code& error,
                                                    std::size_t bytes_transferred);
+            
+            static void after_write_message(send_context_ptr ctx, const boost::system::error_code& error,
+                                            size_t bytesTransferred);
             
             ///
             /// Decodes the message and then dispatches it

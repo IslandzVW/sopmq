@@ -19,6 +19,7 @@
 #define __Project__network_error__
 
 #include <stdexcept>
+#include <boost/system/error_code.hpp>
 
 namespace sopmq {
     namespace error {
@@ -27,6 +28,7 @@ namespace sopmq {
         {
         public:
             explicit network_error(const std::string& what);
+            explicit network_error(const boost::system::error_code& e);
             virtual ~network_error();
         };
         
