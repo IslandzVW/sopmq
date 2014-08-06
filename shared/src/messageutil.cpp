@@ -15,12 +15,39 @@
  * limitations under the License.
  */
 
+
+//
+// ATTENTION: This file uses cog (http://nedbatchelder.com/code/cog/) for code
+// generation. Do not edit the generated chunks between cog and end tags
+//
+
+
 #include "messageutil.h"
 
 #include "logging.h"
 #include "netutil.h"
 
+/*[[[cog
+ import cog
+ import glob
+ import os
+ 
+ ast = '*'
+ 
+ first_lower = lambda s: s[:1].lower() + s[1:] if s else ''
+ fnames = glob.glob("../messages/" + ast + ".proto")
+ 
+ for fn in fnames:
+    rawname = os.path.splitext(os.path.basename(fn))[0]
+    cog.outl('#include "%s.pb.h"' % rawname)
+ ]]]*/
+#include "AnswerChallengeMessage.pb.h"
+#include "AuthAckMessage.pb.h"
+#include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
+#include "Identifier.pb.h"
+//[[[end]]]
+
 
 #include <boost/make_shared.hpp>
 #include <array>
@@ -138,9 +165,45 @@ namespace sopmq {
         {
             switch (ctx->type)
             {
+                /*[[[cog
+                 def underscore(name):
+                    import re
+                    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+                    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).upper()
+                 
+                 for fn in fnames:
+                    rawname = os.path.splitext(os.path.basename(fn))[0]
+                    enumName = rawname
+                    if enumName.endswith('Message'):
+                        enumName = enumName[:-7]
+                    else:
+                        continue
+                 
+                 
+                    enumName = underscore(enumName)
+                 
+                    cog.outl("case MT_%s:" % enumName)
+                    cog.outl("    messageutil::template_dispatch(ctx, std::make_shared<%s>());" % rawname)
+                    cog.outl("    break;");
+                    cog.outl("");
+                 ]]]*/
+                case MT_ANSWER_CHALLENGE:
+                    messageutil::template_dispatch(ctx, std::make_shared<AnswerChallengeMessage>());
+                    break;
+
+                case MT_AUTH_ACK:
+                    messageutil::template_dispatch(ctx, std::make_shared<AuthAckMessage>());
+                    break;
+
+                case MT_CHALLENGE_RESPONSE:
+                    messageutil::template_dispatch(ctx, std::make_shared<ChallengeResponseMessage>());
+                    break;
+
                 case MT_GET_CHALLENGE:
                     messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
                     break;
+
+                //[[[end]]]
                     
                 default:
                     throw std::runtime_error("messageutil::switch_dispatch() unhandled message type"

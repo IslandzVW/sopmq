@@ -26,3 +26,6 @@ execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/mess
 #also generate code for the message dispatcher
 execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.h)
 execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.cpp)
+
+#and messageutil
+execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/messageutil.cpp)
