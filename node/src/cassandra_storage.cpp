@@ -20,16 +20,9 @@
 
 #include <boost/asio.hpp>
 
-#include <cql/cql.hpp>
-#include <cql/cql_connection.hpp>
-#include <cql/cql_session.hpp>
-#include <cql/cql_cluster.hpp>
-#include <cql/cql_builder.hpp>
-#include <cql/cql_result.hpp>
-
 #include <string>
+#include <sstream>
 
-using namespace cql;
 using std::string;
 
 namespace sopmq {
@@ -40,24 +33,28 @@ namespace sopmq {
             
             cassandra_storage::cassandra_storage()
             {
-                // initialize cql
-                cql_initialize();
-                
-                //construct our cluster from global settings
-                boost::shared_ptr<cql::cql_builder_t> builder = cql::cql_cluster_t::builder();
-                
-                for (string endpoint : settings::instance().cassandraSeeds)
-                {
-                    builder->add_contact_point(boost::asio::ip::address::from_string(endpoint));
-                }
-                
-                //build the cluster
-                _cluster = builder->build();
+				CassError rc = CASS_OK;
+				_cluster = cass_cluster_new();
+				CassFuture* session_future = NULL;
+
+				std::stringstream ipList;
+				bool first = true;
+				for (string ip : settings::instance().cassandraSeeds)
+				{
+					if (! first) ipList << ",";
+					ipList << ip;
+
+					first = false;
+				}
+
+				CassString contact_points = cass_string_init(ipList.str().c_str());
+
+				cass_cluster_set_contact_points(_cluster, contact_points);
             }
             
             cassandra_storage::~cassandra_storage()
             {
-                
+				cass_cluster_free(_cluster);
             }
             
             cassandra_storage& cassandra_storage::instance()
@@ -66,10 +63,6 @@ namespace sopmq {
                 return instance;
             }
             
-            boost::shared_ptr<cql_session_t> cassandra_storage::new_session()
-            {
-                return _cluster->connect(KEYSPACE_NAME);
-            }
         }
     }
 }

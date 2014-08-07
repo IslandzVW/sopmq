@@ -33,7 +33,7 @@ namespace sopmq {
         }
         
         network_error::network_error(const boost::system::error_code& e)
-        : network_error(e.message())
+        : std::runtime_error(e.message())
         {
             
         }

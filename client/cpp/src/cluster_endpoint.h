@@ -21,6 +21,8 @@
 #include <boost/chrono/system_clocks.hpp>
 #include "endpoint.h"
 
+#include <memory>
+
 namespace sopmq {
     namespace client {
         

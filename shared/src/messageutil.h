@@ -100,12 +100,20 @@ namespace sopmq {
         /// Context when writing a message
         ///
         struct send_context
-        {
-            send_context(const send_context&) = delete;
-            
-            std::unique_ptr<char[], void(*)(char*)> headerBuf;
+		{
+			typedef std::unique_ptr<char[], void(*)(char*)> header_buf_ptr;
+
+			send_context(header_buf_ptr headerbuf, const std::string& messagebuf, network_status_callback status)
+				: headerBuf(std::move(headerbuf)), messageBuf(messagebuf), statusCallback(status)
+			{
+			}
+
+			header_buf_ptr headerBuf;
             std::string messageBuf;
             network_status_callback statusCallback;
+
+		private: 
+			send_context(const send_context&);
         };
         
         typedef std::shared_ptr<send_context> send_context_ptr

@@ -46,7 +46,8 @@ namespace sopmq {
                     std::make_shared<message_dispatcher>(std::bind(&authentication_state::on_unhandled_message,
                                                                    this, _1, _2));
                 
-                _dispatcher->set_handler(std::bind(&authentication_state::on_challenge_response, this, _1));
+				std::function<void(ChallengeResponseMessage_ptr)> func = std::bind(&authentication_state::on_challenge_response, this, _1);
+                _dispatcher->set_handler(func);
                 
                 _connection->set_dispatcher(_dispatcher.get());
             }
@@ -89,8 +90,10 @@ namespace sopmq {
                 
                 //clear the handler for the challenge response since we're not looking for that anymore
                 _dispatcher->set_handler(std::function<void(ChallengeResponseMessage_ptr)>());
+
                 //set the handler for the AuthAck
-                _dispatcher->set_handler(std::bind(&authentication_state::on_auth_ack, this, _1));
+				std::function<void(AuthAckMessage_ptr)> func = std::bind(&authentication_state::on_auth_ack, this, _1);
+                _dispatcher->set_handler(func);
                 
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
                 acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));

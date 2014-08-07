@@ -61,7 +61,7 @@ namespace sopmq {
         {
             if (_ringByRange.empty())
             {
-                return std::array<node_ptr, 3>{ {nullptr, nullptr, nullptr} };
+                return std::array<node_ptr, 3>();
             }
             
             const_ring_iterator secondaryIter = this->find_secondary_node(key);
@@ -72,13 +72,12 @@ namespace sopmq {
             BOOST_ASSERT(secondaryIter != _ringByRange.end());
             BOOST_ASSERT(tertiaryIter != _ringByRange.end());
             
-            auto ret = std::array<node_ptr, 3>{
-                {
-                    primaryIter->second,
-                    secondaryIter->second,
-                    tertiaryIter->second
-                } };
+            auto ret = std::array<node_ptr, 3>();
             
+			ret[0] = primaryIter->second;
+			ret[1] = secondaryIter->second;
+			ret[2] = tertiaryIter->second;
+
             return ret;
         }
         

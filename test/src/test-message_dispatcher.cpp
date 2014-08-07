@@ -43,7 +43,9 @@ TEST(MessageDispatcherTest, TestRegisteredHandler)
     bool called = false;
     
     message_dispatcher md([&](Message_ptr msg, const std::string&) { unhandled = true; });
-    md.set_handler([&](GetChallengeMessage_ptr msg) { unhandled = false; called = true; });
+
+	std::function<void(GetChallengeMessage_ptr)> func = [&](GetChallengeMessage_ptr msg) { unhandled = false; called = true; };
+    md.set_handler(func);
     
     GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
     

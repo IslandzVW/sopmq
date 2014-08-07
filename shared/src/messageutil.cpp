@@ -225,12 +225,11 @@ namespace sopmq {
                                         boost::asio::ip::tcp::socket &socket,
                                         network_status_callback statusCallback)
         {
-            send_context_ptr ctx(new send_context
-                                 {
-                                     std::unique_ptr<char[], void(*)(char*)>(static_cast<char*>(s_mem_pool.malloc()), &messageutil::free_mem),
-                                     std::string(),
-                                     statusCallback
-                                 });
+            send_context_ptr ctx(
+				new send_context(std::unique_ptr<char[], void(*)(char*)>(static_cast<char*>(s_mem_pool.malloc()), &messageutil::free_mem),
+                                 std::string(),
+                                 statusCallback
+                                 ));
             
             message->SerializeToString(&ctx->messageBuf);
             

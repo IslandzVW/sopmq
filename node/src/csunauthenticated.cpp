@@ -36,7 +36,8 @@ namespace sopmq {
             csunauthenticated::csunauthenticated(ba::io_service& ioService, connection::wptr conn)
             : _ioService(ioService), _conn(conn), _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1))
             {
-                _dispatcher.set_handler(std::bind(&csunauthenticated::handle_get_challenge_message, this, _1));
+				std::function<void(GetChallengeMessage_ptr)> func = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1);
+                _dispatcher.set_handler(func);
             }
             
             csunauthenticated::~csunauthenticated()

@@ -15,7 +15,6 @@
 
 PROJECT( sopmq-client )
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -30,11 +29,8 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)
 set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
-find_package(CryptoPP REQUIRED)
 set(INCLUDES ${INCLUDES} ${CRYPTOPP_INCLUDE_DIR})
 set(LIBS ${LIBS} ${CRYPTOPP_LIBRARIES})
-
-message(${CRYPTOPP_INCLUDE_DIR})
 
 find_package(Protobuf REQUIRED)
 set(INCLUDES ${INCLUDES} ${PROTOBUF_INCLUDE_DIR})

@@ -113,7 +113,7 @@ namespace sopmq {
         
         cluster_endpoint::ptr cluster::random_endpoint()
         {
-            sopmq::shared::random_selector<> selector{};
+            sopmq::shared::random_selector<> selector;
             
             return selector(_liveEndpoints);
         }

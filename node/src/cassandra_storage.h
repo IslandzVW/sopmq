@@ -18,11 +18,10 @@
 #ifndef __Project__cassandra_storage__
 #define __Project__cassandra_storage__
 
+#include <cassandra.h>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <cql/cql_session.hpp>
-#include <cql/cql_cluster.hpp>
-
 #include <string>
 
 namespace sopmq {
@@ -37,18 +36,14 @@ namespace sopmq {
             public:
                 static cassandra_storage& instance();
                 
-                ///
-                /// Opens a new session with the cassandra cluster
-                ///
-                boost::shared_ptr<cql::cql_session_t> new_session();
                 
             private:
+				CassCluster* _cluster;
+
                 ///
                 /// The name of our keyspace
                 ///
                 static const std::string& KEYSPACE_NAME;
-                
-                boost::shared_ptr<cql::cql_cluster_t> _cluster;
                 
                 cassandra_storage();
                 ~cassandra_storage();

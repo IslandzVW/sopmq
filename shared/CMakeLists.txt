@@ -34,6 +34,9 @@ set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 find_package(OpenSSL REQUIRED)
 set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
+set(INCLUDES ${INCLUDES} ${CRYPTOPP_INCLUDE_DIR})
+set(LIBS ${LIBS} ${CRYPTOPP_LIBRARIES})
+
 file(GLOB MESSAGE_SRCS ../messages/cpp/*.h ../messages/cpp/*.cc ../messages/cpp/*.cpp)
 
 set(INCLUDES ${INCLUDES} ../messages/cpp)

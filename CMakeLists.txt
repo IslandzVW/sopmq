@@ -14,11 +14,33 @@
 # limitations under the License.
 
 cmake_minimum_required(VERSION 2.8)
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
+
+project( sopmq )
+
+if (WIN32)
+	SET(gtest_force_shared_crt ON CACHE BOOL
+  		"Use shared (DLL) run-time lib even when Google Test is built as static lib.")
+
+	ADD_DEFINITIONS(-DWIN32 -D_WIN32 -D_WINDOWS)
+	ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
+	ADD_DEFINITIONS(-D_WIN32_WINNT=0x0601)
+	ADD_DEFINITIONS(-D_VARIADIC_MAX=10)
+	if ( HAS_64_BIT )
+		ADD_DEFINITIONS(-DWIN64 -D_WIN64)
+	endif ( HAS_64_BIT )
+
+	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+else (WIN32)
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif (WIN32)
 
 set(NODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/node)
 set(SHARED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shared)
 set(CLIENT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/client/cpp)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(CryptoPP REQUIRED)
 
 add_subdirectory(messages)
 add_subdirectory(shared)
