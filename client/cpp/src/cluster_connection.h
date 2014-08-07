@@ -63,7 +63,7 @@ namespace sopmq {
             /// Sends a message through this connection
             ///
             void send_message(sopmq::message::message_type type, Message_ptr message,
-                              sopmq::message::network_status_callback errorCb);
+                              sopmq::message::network_status_callback statusCb);
             
             ///
             /// Closes this connection. No further messages can be sent or received from it

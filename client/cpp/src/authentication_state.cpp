@@ -95,7 +95,8 @@ namespace sopmq {
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
                 acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));
                 acm->set_response(result);
-                //_connection->send_message(acm);
+                _connection->send_message(message::MT_ANSWER_CHALLENGE, acm,
+                                          std::bind(&authentication_state::on_answer_challenge_sent, this, _1, _2));
             }
             
             void authentication_state::on_auth_ack(AuthAckMessage_ptr response)
@@ -107,11 +108,21 @@ namespace sopmq {
                 else
                 {
                     //auth failed
-                    LOG_SRC(error) << _connection->network_endpoint()
-                        << " session authorization failed";
+                    LOG_SRC(error) << _connection->network_endpoint() << " session authorization failed";
                     _authCallback(false);
                 }
             }
+            
+            void authentication_state::on_answer_challenge_sent(bool success, const sopmq::error::network_error& error)
+            {
+                if (!success)
+                {
+                    //auth failed
+                    LOG_SRC(error) << _connection->network_endpoint() << " network error during session authorization";
+                    _authCallback(false);
+                }
+            }
+            
         }
     }
 }

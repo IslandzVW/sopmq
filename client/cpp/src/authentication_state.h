@@ -21,6 +21,7 @@
 #include "message_dispatcher.h"
 #include "cluster_connection.h"
 #include "isession_state.h"
+#include "network_error.h"
 
 namespace sopmq {
     namespace client {
@@ -47,6 +48,8 @@ namespace sopmq {
                 void on_challenge_response(ChallengeResponseMessage_ptr response);
                 
                 void on_auth_ack(AuthAckMessage_ptr response);
+                
+                void on_answer_challenge_sent(bool success, const sopmq::error::network_error& error);
                 
                 cluster_connection::ptr _connection;
                 session& _session;

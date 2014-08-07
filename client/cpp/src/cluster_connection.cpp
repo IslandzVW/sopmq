@@ -85,9 +85,9 @@ namespace sopmq {
         }
         
         void cluster_connection::send_message(message_type type, Message_ptr message,
-                                              network_status_callback errorCb)
+                                              network_status_callback statusCb)
         {
-            messageutil::write_message(type, message, _ioService, _socket, errorCb);
+            messageutil::write_message(type, message, _ioService, _socket, statusCb);
         }
         
         void cluster_connection::get_next_message(network_error_callback errorCb)
