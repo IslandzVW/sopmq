@@ -80,12 +80,12 @@ namespace sopmq {
             /// The minimum time we back off a connection when there is
             /// a failure
             ///
-            const static int MINIMUM_BACKOFF_SECS = 60;
+            static const int MINIMUM_BACKOFF_SECS;
             
             ///
             /// The maximum amount of time we set for the next retry
             ///
-            const static int MAXIMUM_BACKOFF_SECS = 60 * 60;
+            static const int MAXIMUM_BACKOFF_SECS;
             
             
             ///

@@ -23,6 +23,9 @@ namespace bc = boost::chrono;
 
 namespace sopmq {
     namespace client {
+        
+        const int cluster_endpoint::MINIMUM_BACKOFF_SECS = 60;
+        const int cluster_endpoint::MAXIMUM_BACKOFF_SECS = 60 * 60;
 
         cluster_endpoint::cluster_endpoint(const shared::net::endpoint& ep)
         : _endpoint(ep), _isFailed(false)

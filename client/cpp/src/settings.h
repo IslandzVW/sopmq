@@ -36,7 +36,7 @@ namespace sopmq {
         class settings : public boost::noncopyable
         {
         public:
-            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE = 10485760;
+            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE;
             
             ///
             /// Returns our singleton instance

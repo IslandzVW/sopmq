@@ -60,12 +60,12 @@ namespace sopmq {
             ///
             /// Number of seconds between heartbeats
             ///
-            static const unsigned short HEARTBEAT_INTERVAL_SECS = 10;
+            static const unsigned short HEARTBEAT_INTERVAL_SECS;
             
             ///
             /// Number of seconds before a node is considered dead
             ///
-            static const unsigned short HEARTBEAT_TIMEOUT_SECS = 30;
+            static const unsigned short HEARTBEAT_TIMEOUT_SECS;
             
             
             
