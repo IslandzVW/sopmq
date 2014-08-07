@@ -56,10 +56,10 @@ namespace sopmq {
             gcm->set_type(GetChallengeMessage::CLIENT);
             gcm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), 0));
             
-            _connection->send_message(message::MT_GET_CHALLENGE, gcm, std::bind(&session::on_network_error, this, _1));
+            _connection->send_message(message::MT_GET_CHALLENGE, gcm, std::bind(&session::on_network_status, this, _1, _2));
         }
         
-        void session::on_network_error(const sopmq::error::network_error &error)
+        void session::on_network_status(bool success, const sopmq::error::network_error &error)
         {
             
         }

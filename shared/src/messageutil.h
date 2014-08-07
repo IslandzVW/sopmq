@@ -38,7 +38,17 @@
 namespace sopmq {
     namespace message {
         
+        ///
+        /// Callback that will be fired on a network error
+        ///
         typedef std::function<void(const sopmq::error::network_error& error)> network_error_callback;
+        
+        ///
+        /// Callback that will be fired after the completion of a network operation
+        /// The first parameter indicates if the operation was successful, the second parameter
+        /// is the error that occured if applicable
+        ///
+        typedef std::function<void(bool, const sopmq::error::network_error& error)> network_status_callback;
         
         ///
         /// Context for read_message
@@ -95,7 +105,7 @@ namespace sopmq {
             
             std::unique_ptr<char[], void(*)(char*)> headerBuf;
             std::string messageBuf;
-            network_error_callback errorCallback;
+            network_status_callback statusCallback;
         };
         
         typedef std::shared_ptr<send_context> send_context_ptr
@@ -128,7 +138,7 @@ namespace sopmq {
                                       Message_ptr message,
                                       boost::asio::io_service& ioService,
                                       boost::asio::ip::tcp::socket& socket,
-                                      network_error_callback errorCallback);
+                                      network_status_callback statusCallback);
             
             
         private:

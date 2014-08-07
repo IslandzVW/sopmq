@@ -20,8 +20,10 @@
 
 namespace ba = boost::asio;
 using namespace std::placeholders;
+
 using sopmq::message::message_dispatcher;
 using sopmq::message::network_error_callback;
+using sopmq::message::network_status_callback;
 using sopmq::message::messageutil;
 using sopmq::message::message_type;
 
@@ -83,7 +85,7 @@ namespace sopmq {
         }
         
         void cluster_connection::send_message(message_type type, Message_ptr message,
-                                              network_error_callback errorCb)
+                                              network_status_callback errorCb)
         {
             messageutil::write_message(type, message, _ioService, _socket, errorCb);
         }

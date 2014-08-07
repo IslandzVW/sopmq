@@ -27,8 +27,10 @@ namespace sopmq {
         class network_error : public std::runtime_error
         {
         public:
+            network_error();
             explicit network_error(const std::string& what);
             explicit network_error(const boost::system::error_code& e);
+            
             virtual ~network_error();
         };
         

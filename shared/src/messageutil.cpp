@@ -223,16 +223,26 @@ namespace sopmq {
         void messageutil::write_message(sopmq::message::message_type type, Message_ptr message,
                                         boost::asio::io_service &ioService,
                                         boost::asio::ip::tcp::socket &socket,
-                                        network_error_callback errorCallback)
+                                        network_status_callback statusCallback)
         {
             send_context_ptr ctx(new send_context
                                  {
                                      std::unique_ptr<char[], void(*)(char*)>(static_cast<char*>(s_mem_pool.malloc()), &messageutil::free_mem),
                                      std::string(),
-                                     errorCallback
+                                     statusCallback
                                  });
             
             message->SerializeToString(&ctx->messageBuf);
+            
+            auto netId = boost::asio::detail::socket_ops::host_to_network_short(type);
+            auto netSize = boost::asio::detail::socket_ops::host_to_network_long(ctx->messageBuf.size());
+            BOOST_STATIC_ASSERT(sizeof(netId) == 2);
+            BOOST_STATIC_ASSERT(sizeof(netSize) == 4);
+            
+            BOOST_STATIC_ASSERT(sizeof(netId) + sizeof(netSize) == HEADER_SIZE);
+            
+            std::memcpy(ctx->headerBuf.get(), &netId, sizeof(netId));
+            std::memcpy(ctx->headerBuf.get() + sizeof(netId), &netSize, sizeof(netSize));
             
             std::array<ba::const_buffer, 2> bufs = {
                 {
@@ -251,11 +261,11 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->errorCallback(sopmq::error::network_error(error));
+                ctx->statusCallback(false, sopmq::error::network_error(error));
             }
             else
             {
-                
+                ctx->statusCallback(true, sopmq::error::network_error(error));
             }
         }
         
