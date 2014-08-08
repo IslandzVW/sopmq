@@ -9,6 +9,9 @@ set(INCLUDES ${INCLUDES} ${SHARED_DIR}/src)
 set(INCLUDES ${INCLUDES} ${NODE_DIR}/src)
 set(INCLUDES ${INCLUDES} ${CLIENT_DIR}/src)
 
+set(INCLUDES ${INCLUDES} ${CRYPTOPP_INCLUDE_DIR})
+set(LIBS ${LIBS} ${CRYPTOPP_LIBRARIES})
+
 include_directories (${Boost_INCLUDE_DIRS}
                      ${gtest_SOURCE_DIR}/include
                      ${INCLUDES}
