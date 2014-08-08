@@ -22,6 +22,7 @@
 #include "logging.h"
 #include "authentication_state.h"
 #include "messageutil.h"
+#include "logging.h"
 
 using sopmq::message::message_dispatcher;
 using sopmq::message::messageutil;
@@ -50,15 +51,12 @@ namespace sopmq {
             _password = password;
             
             _session_state.reset(new authentication_state(_connection, *this, username, password, authCallback));
-        }
-        
-        void session::on_message_send(bool success, const sopmq::error::network_error &error)
-        {
-            
+            _session_state->state_entry();
         }
         
         void session::protocol_violation()
         {
+            LOG_SRC(error) << "protocol violation";
             this->invalidate();
         }
         
@@ -70,12 +68,14 @@ namespace sopmq {
         
         void session::auth_callback(bool authSuccess)
         {
-            if (! authSuccess)
+            if (authSuccess)
+            {
+                
+            }
+            else
             {
                 this->invalidate();
             }
-            
-            
         }
     }
 }

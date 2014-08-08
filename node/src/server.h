@@ -41,6 +41,11 @@ namespace sopmq {
             void start();
             
             ///
+            /// Stops the server
+            ///
+            void stop();
+            
+            ///
             /// Called when a connection has been started and is alive
             ///
             void connection_started(connection::connection::ptr conn);

@@ -63,6 +63,8 @@ namespace ba = boost::asio;
 namespace sopmq {
     namespace message {
         
+        const int messageutil::HEADER_SIZE = sizeof(uint16_t) + sizeof(uint32_t);
+        
         boost::pool<> messageutil::s_mem_pool(messageutil::HEADER_SIZE);
         
         void messageutil::read_message(boost::asio::io_service& ioService,

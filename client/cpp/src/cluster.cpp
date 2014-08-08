@@ -71,7 +71,8 @@ namespace sopmq {
         {
             if (result.was_successful())
             {
-                
+                session::ptr newSession = std::make_shared<session>(shared_from_this(), ctx.connection);
+                ctx.handler(newSession, error::connection_error());
             }
             else
             {

@@ -32,6 +32,8 @@ namespace sopmq {
             public:
                 isession_state();
                 virtual ~isession_state();
+                
+                virtual void state_entry() = 0;
             };
             
         }

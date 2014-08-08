@@ -20,6 +20,12 @@
 namespace sopmq {
     namespace error {
         
+        connection_error::connection_error()
+        : std::runtime_error("")
+        {
+            
+        }
+        
         connection_error::connection_error(const std::string& what)
         : std::runtime_error(what)
         {

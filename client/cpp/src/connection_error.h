@@ -43,6 +43,7 @@ namespace sopmq {
         class connection_error : public std::runtime_error
         {
         public:
+            connection_error();
             connection_error(const std::string& what);
             connection_error(const boost::system::error_code& error);
             virtual ~connection_error();

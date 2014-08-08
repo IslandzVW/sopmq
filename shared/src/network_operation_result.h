@@ -75,6 +75,12 @@ namespace sopmq {
             ///
             static network_operation_result from_error_code(const boost::system::error_code& e);
             
+            ///
+            /// Generate a network error result from a boost error code with additional information
+            ///
+            static network_operation_result from_error_code(const std::string& info,
+                                                            const boost::system::error_code& e);
+            
             
         public:
             explicit network_operation_result(error_type et);

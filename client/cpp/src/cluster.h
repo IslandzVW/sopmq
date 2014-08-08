@@ -36,7 +36,7 @@ namespace sopmq {
         /// A cluster is a collection of endpoints that is managed to provide
         /// fault tolerance in the face of errors
         ///
-        class cluster : public boost::noncopyable
+        class cluster : public boost::noncopyable, public std::enable_shared_from_this<cluster>
         {
         public:
             typedef std::shared_ptr<cluster> ptr;

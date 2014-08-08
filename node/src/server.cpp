@@ -53,6 +53,11 @@ namespace sopmq {
                                                boost::asio::placeholders::error));
         }
         
+        void server::stop()
+        {
+            _acceptor.close();
+        }
+        
         void server::handle_accept(connection::connection::ptr conn, const boost::system::error_code& error)
         {
             if (! error)

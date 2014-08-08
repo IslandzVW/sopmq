@@ -43,7 +43,7 @@ namespace sopmq {
                                      std::function<void(bool)> authCallback);
                 virtual ~authentication_state();
                 
-                void state_entry();
+                virtual void state_entry();
                 
             private:
                 void on_unhandled_message(Message_ptr message, const std::string& typeName);

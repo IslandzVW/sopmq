@@ -68,7 +68,6 @@ namespace sopmq {
         private:
             void invalidate();
             void auth_callback(bool authSuccess);
-            void on_message_send(bool success, const sopmq::error::network_error& error);
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;

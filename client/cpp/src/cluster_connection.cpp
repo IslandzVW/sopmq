@@ -18,6 +18,8 @@
 #include "cluster_connection.h"
 #include "settings.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace ba = boost::asio;
 using namespace std::placeholders;
 
@@ -34,7 +36,8 @@ namespace sopmq {
         cluster_connection::cluster_connection(cluster_endpoint::ptr ep,
                                                ba::io_service& ioService)
         : _endpoint(ep), _ioService(ioService), _resolver(ioService),
-        _query(ep->network_endpoint().host_name(), ""),
+        _query(ep->network_endpoint().host_name(),
+               boost::lexical_cast<std::string>(ep->network_endpoint().port())),
         _socket(ioService), _dispatcher(0), _next_id(0)
         {
             
@@ -66,7 +69,7 @@ namespace sopmq {
             else
             {
                 //resolution failed
-                ccb(network_operation_result::from_error_code(err));
+                ccb(network_operation_result::from_error_code("name resolution failed", err));
             }
         }
         
@@ -81,7 +84,7 @@ namespace sopmq {
             else
             {
                 //connection failed
-                ccb(network_operation_result::from_error_code(err));
+                ccb(network_operation_result::from_error_code("connect failed", err));
             }
         }
         

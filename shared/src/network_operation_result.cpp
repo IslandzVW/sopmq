@@ -51,6 +51,12 @@ namespace sopmq {
             return network_operation_result(ET_NETWORK, error::network_error(e));
         }
         
+        network_operation_result network_operation_result::from_error_code(const std::string& info,
+                                                                           const boost::system::error_code &e)
+        {
+            return network_operation_result(ET_NETWORK, error::network_error(info + ": " + e.message()));
+        }
+        
         bool network_operation_result::was_successful() const
         {
             return _et == error_type::ET_NONE;

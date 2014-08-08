@@ -27,11 +27,11 @@
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
 #include <boost/shared_array.hpp>
-#include <memory>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/pool/pool.hpp>
 
+#include <memory>
 #include <functional>
 #include <map>
 #include <cstdint>
@@ -110,8 +110,7 @@ namespace sopmq {
 			send_context(const send_context&);
         };
         
-        typedef std::shared_ptr<send_context> send_context_ptr
-        ;
+        typedef std::shared_ptr<send_context> send_context_ptr;
         
         ///
         /// Utility functions that deal with network messages
@@ -143,7 +142,7 @@ namespace sopmq {
             static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
             
         private:
-            static const int HEADER_SIZE = sizeof(uint16_t) + sizeof(uint32_t);
+            static const int HEADER_SIZE;
             
             static boost::pool<> s_mem_pool;
             static void free_mem(char* mem);

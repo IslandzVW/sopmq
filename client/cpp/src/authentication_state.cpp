@@ -60,6 +60,8 @@ namespace sopmq {
             
             void authentication_state::state_entry()
             {
+                LOG_SRC(debug) << "authentication_state::state_entry()";
+                
                 //send a request to the server to get an auth challenge
                 GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
                 gcm->set_type(GetChallengeMessage::CLIENT);
