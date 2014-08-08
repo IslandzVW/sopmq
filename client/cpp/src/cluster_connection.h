@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__cluster_connection__
-#define __Project__cluster_connection__
+#ifndef __sopmq__cluster_connection__
+#define __sopmq__cluster_connection__
 
 #include "cluster_endpoint.h"
 #include "message_dispatcher.h"
@@ -42,8 +42,6 @@ namespace sopmq {
         public:
             typedef std::shared_ptr<cluster_connection> ptr;
             
-            typedef std::function<void(bool, boost::system::error_code)> connect_callback;
-            
         public:
             cluster_connection(cluster_endpoint::ptr ep,
                                boost::asio::io_service& ioService);
@@ -52,7 +50,7 @@ namespace sopmq {
             ///
             /// Begins an async connect to the enpoint provided in the ctor
             ///
-            void connect(connect_callback ccb);
+            void connect(message::network_status_callback ccb);
             
             ///
             /// Sets the message dispatcher for this connection
@@ -83,14 +81,15 @@ namespace sopmq {
             ///
             /// Listens for the next message from the wire and dispatches it to the assigned dispatcher
             ///
-            void get_next_message(sopmq::message::network_error_callback errorCb);
+            void get_next_message(message::network_status_callback statusCb);
             
         private:
             void after_resolve(const boost::system::error_code& err,
-                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator, connect_callback ccb);
+                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                               message::network_status_callback ccb);
             
             void after_connect(const boost::system::error_code& err,
-                               connect_callback ccb);
+                               message::network_status_callback ccb);
             
             cluster_endpoint::ptr _endpoint;
             boost::asio::io_service& _ioService;
@@ -107,4 +106,4 @@ namespace sopmq {
 }
 
 
-#endif /* defined(__Project__cluster_connection__) */
+#endif /* defined(__sopmq__cluster_connection__) */

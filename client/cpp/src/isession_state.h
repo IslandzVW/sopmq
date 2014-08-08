@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__isession_state__
-#define __Project__isession_state__
+#ifndef __sopmq__isession_state__
+#define __sopmq__isession_state__
 
 #include <memory>
 
@@ -38,4 +38,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__isession_state__) */
+#endif /* defined(__sopmq__isession_state__) */

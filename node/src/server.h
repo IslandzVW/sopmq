@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__server__
-#define __Project__server__
+#ifndef __sopmq__server__
+#define __sopmq__server__
 
 #include "connection.h"
 
@@ -66,4 +66,4 @@ namespace sopmq {
 }
 
 
-#endif /* defined(__Project__server__) */
+#endif /* defined(__sopmq__server__) */

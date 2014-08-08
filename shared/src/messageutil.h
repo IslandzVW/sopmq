@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-#ifndef __Project__messageutil__
-#define __Project__messageutil__
+#ifndef __sopmq__messageutil__
+#define __sopmq__messageutil__
 
 #include "message_types.h"
 #include "network_error.h"
 #include "message_dispatcher.h"
 #include "Identifier.pb.h"
+#include "network_operation_result.h"
 
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
@@ -37,18 +38,11 @@
 
 namespace sopmq {
     namespace message {
-        
-        ///
-        /// Callback that will be fired on a network error
-        ///
-        typedef std::function<void(const sopmq::error::network_error& error)> network_error_callback;
-        
+
         ///
         /// Callback that will be fired after the completion of a network operation
-        /// The first parameter indicates if the operation was successful, the second parameter
-        /// is the error that occured if applicable
         ///
-        typedef std::function<void(bool, const sopmq::error::network_error& error)> network_status_callback;
+        typedef std::function<void(const sopmq::net::network_operation_result&)> network_status_callback;
         
         ///
         /// Context for read_message
@@ -63,7 +57,7 @@ namespace sopmq {
             ///
             /// Callback for error conditions
             ///
-            network_error_callback error_callback;
+            network_status_callback status_callback;
             
             ///
             /// The maximum size for any message
@@ -104,13 +98,13 @@ namespace sopmq {
 			typedef std::unique_ptr<char[], void(*)(char*)> header_buf_ptr;
 
 			send_context(header_buf_ptr headerbuf, const std::string& messagebuf, network_status_callback status)
-				: headerBuf(std::move(headerbuf)), messageBuf(messagebuf), statusCallback(status)
+				: header_buf(std::move(headerbuf)), message_buf(messagebuf), status_callback(status)
 			{
 			}
 
-			header_buf_ptr headerBuf;
-            std::string messageBuf;
-            network_status_callback statusCallback;
+			header_buf_ptr header_buf;
+            std::string message_buf;
+            network_status_callback status_callback;
 
 		private: 
 			send_context(const send_context&);
@@ -130,14 +124,9 @@ namespace sopmq {
             ///
             static void read_message(boost::asio::io_service& ioService,
                                      boost::asio::ip::tcp::socket& socket,
-                                     network_error_callback errorCallback,
+                                     network_status_callback statusCallback,
                                      message_dispatcher& dispatcher,
                                      uint32_t maxSize);
-            
-            ///
-            /// Builds a new identifier to tack onto a message
-            ///
-            static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
             
             ///
             /// Writes a message to the wire
@@ -148,6 +137,10 @@ namespace sopmq {
                                       boost::asio::ip::tcp::socket& socket,
                                       network_status_callback statusCallback);
             
+            ///
+            /// Builds a new identifier to tack onto a message
+            ///
+            static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
             
         private:
             static const int HEADER_SIZE = sizeof(uint16_t) + sizeof(uint32_t);
@@ -190,14 +183,17 @@ namespace sopmq {
             {
                 if (! message->ParseFromArray(ctx->message_buffer.get(), ctx->message_size))
                 {
+                    auto e = sopmq::error::network_error("Unable to parse new message of type "
+                                                         + boost::lexical_cast<std::string>(ctx->type)
+                                                         + " message corrupted?");
+                    
                     //error
-                    ctx->error_callback(sopmq::error::network_error("Unable to parse new message of type "
-                                                                    + boost::lexical_cast<std::string>(ctx->type)
-                                                                    + " message corrupted?"));
+                    ctx->status_callback(net::network_operation_result(net::ET_NETWORK, e));
                 }
                 else
                 {
                     //dispatch
+                    ctx->status_callback(net::network_operation_result::success());
                     ctx->dispatcher.dispatch(message);
                 }
             }
@@ -207,4 +203,4 @@ namespace sopmq {
 }
 
 
-#endif /* defined(__Project__messageutil__) */
+#endif /* defined(__sopmq__messageutil__) */

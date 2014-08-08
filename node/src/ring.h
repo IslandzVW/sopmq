@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__ring__
-#define __Project__ring__
+#ifndef __sopmq__ring__
+#define __sopmq__ring__
 
 #include <map>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -85,4 +85,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__ring__) */
+#endif /* defined(__sopmq__ring__) */

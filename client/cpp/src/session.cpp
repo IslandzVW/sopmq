@@ -46,20 +46,13 @@ namespace sopmq {
         void session::authenticate(const std::string& username, const std::string& password,
                                    authenticate_callback authCallback)
         {
-            _session_state.reset(new authentication_state(_connection, *this, username, password, authCallback));
-            
             _username = username;
             _password = password;
             
-            //send a request to the server to get an auth challenge
-            GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
-            gcm->set_type(GetChallengeMessage::CLIENT);
-            gcm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), 0));
-            
-            _connection->send_message(message::MT_GET_CHALLENGE, gcm, std::bind(&session::on_network_status, this, _1, _2));
+            _session_state.reset(new authentication_state(_connection, *this, username, password, authCallback));
         }
         
-        void session::on_network_status(bool success, const sopmq::error::network_error &error)
+        void session::on_message_send(bool success, const sopmq::error::network_error &error)
         {
             
         }

@@ -58,11 +58,14 @@ namespace sopmq {
                 
             }
             
-            void csunauthenticated::handle_network_error(const network_error& error)
+            void csunauthenticated::handle_network_result(const net::network_operation_result& result)
             {
                 if (auto connptr = _conn.lock())
                 {
-                    connptr->handle_error(error);
+                    if (! result.was_successful())
+                    {
+                        connptr->handle_error(result.get_error());
+                    }
                 }
             }
             
@@ -72,7 +75,7 @@ namespace sopmq {
                 {
                     //read a message from the network
                     messageutil::read_message(_ioService, connptr->get_socket(),
-                                              std::bind(&csunauthenticated::handle_network_error, this, _1),
+                                              std::bind(&csunauthenticated::handle_network_result, this, _1),
                                               _dispatcher, settings::instance().maxMessageSize);
                 }
             }

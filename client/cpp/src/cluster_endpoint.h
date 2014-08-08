@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__cluster_endpoint__
-#define __Project__cluster_endpoint__
+#ifndef __sopmq__cluster_endpoint__
+#define __sopmq__cluster_endpoint__
 
 #include <boost/chrono/system_clocks.hpp>
 #include "endpoint.h"
@@ -118,4 +118,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__cluster_endpoint__) */
+#endif /* defined(__sopmq__cluster_endpoint__) */

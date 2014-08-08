@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__network_error__
-#define __Project__network_error__
+#ifndef __sopmq__network_error__
+#define __sopmq__network_error__
 
 #include <stdexcept>
 #include <boost/system/error_code.hpp>
@@ -37,4 +37,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__network_error__) */
+#endif /* defined(__sopmq__network_error__) */

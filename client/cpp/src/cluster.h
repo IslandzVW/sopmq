@@ -20,6 +20,7 @@
 #include "connection_error.h"
 #include "session.h"
 #include "cluster_connection.h"
+#include "network_operation_result.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -41,7 +42,7 @@ namespace sopmq {
             typedef std::shared_ptr<cluster> ptr;
             typedef std::weak_ptr<cluster> wptr;
             
-            typedef std::function<void(session::ptr, sopmq::error::connection_error)> connect_handler;
+            typedef std::function<void(session::ptr, const sopmq::error::connection_error&)> connect_handler;
             
         public:
             template <typename ColType>
@@ -96,7 +97,7 @@ namespace sopmq {
             ///
             /// Called when a connection has been made or failed
             ///
-            void connection_result(bool success, boost::system::error_code err, connect_context ctx);
+            void connection_result(const net::network_operation_result& result, connect_context ctx);
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet

@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__message_dispatcher__
-#define __Project__message_dispatcher__
+#ifndef __sopmq__message_dispatcher__
+#define __sopmq__message_dispatcher__
 
 #include "message_ptrs.h"
 
@@ -119,4 +119,4 @@ namespace sopmq {
 }
 
 
-#endif /* defined(__Project__message_dispatcher__) */
+#endif /* defined(__sopmq__message_dispatcher__) */

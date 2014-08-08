@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__connection__
-#define __Project__connection__
+#ifndef __sopmq__connection__
+#define __sopmq__connection__
 
 #include <memory>
 #include <boost/weak_ptr.hpp>
@@ -85,4 +85,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__connection__) */
+#endif /* defined(__sopmq__connection__) */

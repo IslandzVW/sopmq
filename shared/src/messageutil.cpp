@@ -50,6 +50,7 @@
 
 
 #include <boost/make_shared.hpp>
+#include <boost/lexical_cast.hpp>
 #include <array>
 
 
@@ -66,12 +67,12 @@ namespace sopmq {
         
         void messageutil::read_message(boost::asio::io_service& ioService,
                                        boost::asio::ip::tcp::socket& socket,
-                                       network_error_callback errorCallback,
+                                       network_status_callback errorCallback,
                                        message_dispatcher& dispatcher,
                                        uint32_t maxSize)
         {
             message_context_ptr ctx(std::make_shared<message_context>(dispatcher));
-            ctx->error_callback = errorCallback;
+            ctx->status_callback = errorCallback;
             ctx->max_message_size = maxSize;
             
             //read the message type
@@ -89,14 +90,17 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->error_callback(network_error(error.message()));
+                ctx->status_callback(net::network_operation_result::from_error_code(error));
                 return;
             }
             
             //validate the message
             if (messageType <= sopmq::message::MT_INVALID || messageType >= sopmq::message::MT_INVALID_OUT_OF_RANGE)
             {
-                ctx->error_callback(network_error("Message type was invalid"));
+                ctx->status_callback(net::network_operation_result(net::ET_INVALID_TYPE,
+                                                                   network_error("Message type "
+                                                                                 + boost::lexical_cast<std::string>(messageType)
+                                                                                 + " is invalid")));
                 return;
             }
             
@@ -117,7 +121,7 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->error_callback(network_error(error.message()));
+                ctx->status_callback(net::network_operation_result::from_error_code(error));
                 return;
             }
             
@@ -125,7 +129,9 @@ namespace sopmq {
             if (messageSize > ctx->max_message_size)
             {
                 LOG_SRC(error) << "message is too large (" << messageSize / 1024 << " MB)";
-                ctx->error_callback(network_error("Message was too large"));
+                
+                ctx->status_callback(net::network_operation_result(net::ET_INVALID_TYPE,
+                                                                   network_error("Message was too large")));
                 return;
             }
             
@@ -151,7 +157,7 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->error_callback(network_error(error.message()));
+                ctx->status_callback(net::network_operation_result::from_error_code(error));
                 return;
             }
             
@@ -231,22 +237,22 @@ namespace sopmq {
                                  statusCallback
                                  ));
             
-            message->SerializeToString(&ctx->messageBuf);
+            message->SerializeToString(&ctx->message_buf);
             
             auto netId = boost::asio::detail::socket_ops::host_to_network_short(type);
-            auto netSize = boost::asio::detail::socket_ops::host_to_network_long(ctx->messageBuf.size());
+            auto netSize = boost::asio::detail::socket_ops::host_to_network_long(ctx->message_buf.size());
             BOOST_STATIC_ASSERT(sizeof(netId) == 2);
             BOOST_STATIC_ASSERT(sizeof(netSize) == 4);
             
             BOOST_STATIC_ASSERT(sizeof(netId) + sizeof(netSize) == HEADER_SIZE);
             
-            std::memcpy(ctx->headerBuf.get(), &netId, sizeof(netId));
-            std::memcpy(ctx->headerBuf.get() + sizeof(netId), &netSize, sizeof(netSize));
+            std::memcpy(ctx->header_buf.get(), &netId, sizeof(netId));
+            std::memcpy(ctx->header_buf.get() + sizeof(netId), &netSize, sizeof(netSize));
             
             std::array<ba::const_buffer, 2> bufs = {
                 {
-                ba::buffer(ctx->headerBuf.get(), HEADER_SIZE),
-                ba::buffer(ctx->messageBuf)
+                ba::buffer(ctx->header_buf.get(), HEADER_SIZE),
+                ba::buffer(ctx->message_buf)
                 }
             };
             
@@ -260,11 +266,11 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->statusCallback(false, sopmq::error::network_error(error));
+                ctx->status_callback(net::network_operation_result::from_error_code(error));
             }
             else
             {
-                ctx->statusCallback(true, sopmq::error::network_error(error));
+                ctx->status_callback(net::network_operation_result::success());
             }
         }
         

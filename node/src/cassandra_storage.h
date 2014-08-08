@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__cassandra_storage__
-#define __Project__cassandra_storage__
+#ifndef __sopmq__cassandra_storage__
+#define __sopmq__cassandra_storage__
 
 #include <cassandra.h>
 
@@ -53,4 +53,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__cassandra_storage__) */
+#endif /* defined(__sopmq__cassandra_storage__) */

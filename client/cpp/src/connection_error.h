@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__connection_error__
-#define __Project__connection_error__
+#ifndef __sopmq__connection_error__
+#define __sopmq__connection_error__
 
 #include "endpoint.h"
 
@@ -79,4 +79,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__connection_error__) */
+#endif /* defined(__sopmq__connection_error__) */

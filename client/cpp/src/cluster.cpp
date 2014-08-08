@@ -63,19 +63,19 @@ namespace sopmq {
                     conn
                 };
             
-            conn->connect(std::bind(&cluster::connection_result, this, _1, _2, ctx));
+            conn->connect(std::bind(&cluster::connection_result, this, _1, ctx));
         }
         
-        void cluster::connection_result(bool success, boost::system::error_code err,
+        void cluster::connection_result(const net::network_operation_result& result,
                                         connect_context ctx)
         {
-            if (success)
+            if (result.was_successful())
             {
                 
             }
             else
             {
-                ctx.handler(nullptr, connection_error(err.message()));
+                ctx.handler(nullptr, error::connection_error(result.get_error().what()));
             }
         }
         

@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-#ifndef __Project__csunauthenticated__
-#define __Project__csunauthenticated__
+#ifndef __sopmq__csunauthenticated__
+#define __sopmq__csunauthenticated__
 
 #include "iconnection_state.h"
 #include "connection.h"
 #include "message_dispatcher.h"
 #include "message_ptrs.h"
-#include "network_error.h"
+#include "network_operation_result.h"
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -56,10 +56,10 @@ namespace sopmq {
                 
                 void handle_get_challenge_message(GetChallengeMessage_ptr message);
                 
-                void handle_network_error(const sopmq::error::network_error& error);
+                void handle_network_result(const net::network_operation_result& result);
             };
         }
     }
 }
 
-#endif /* defined(__Project__csunauthenticated__) */
+#endif /* defined(__sopmq__csunauthenticated__) */

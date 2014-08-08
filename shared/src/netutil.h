@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__netutil__
-#define __Project__netutil__
+#ifndef __sopmq__netutil__
+#define __sopmq__netutil__
 
 #include <boost/asio.hpp>
 #include <boost/pool/poolfwd.hpp>
@@ -71,4 +71,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__netutil__) */
+#endif /* defined(__sopmq__netutil__) */

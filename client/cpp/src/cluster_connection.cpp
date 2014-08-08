@@ -22,10 +22,11 @@ namespace ba = boost::asio;
 using namespace std::placeholders;
 
 using sopmq::message::message_dispatcher;
-using sopmq::message::network_error_callback;
 using sopmq::message::network_status_callback;
 using sopmq::message::messageutil;
 using sopmq::message::message_type;
+using sopmq::net::network_operation_result;
+using sopmq::error::network_error;
 
 namespace sopmq {
     namespace client {
@@ -44,7 +45,7 @@ namespace sopmq {
             
         }
         
-        void cluster_connection::connect(connect_callback ccb)
+        void cluster_connection::connect(network_status_callback ccb)
         {
             _resolver.async_resolve(_query,
                                     std::bind(&cluster_connection::after_resolve,
@@ -53,7 +54,7 @@ namespace sopmq {
         
         void cluster_connection::after_resolve(const boost::system::error_code& err,
                                                ba::ip::tcp::resolver::iterator endpoint_iterator,
-                                               connect_callback ccb)
+                                               network_status_callback ccb)
         {
             if (!err)
             {
@@ -65,22 +66,22 @@ namespace sopmq {
             else
             {
                 //resolution failed
-                ccb(false, err);
+                ccb(network_operation_result::from_error_code(err));
             }
         }
         
         void cluster_connection::after_connect(const boost::system::error_code& err,
-                                               connect_callback ccb)
+                                               network_status_callback ccb)
         {
             if (!err)
             {
                 //connection is good, tell our callback
-                ccb(true, err);
+                ccb(network_operation_result::success());
             }
             else
             {
                 //connection failed
-                ccb(false, err);
+                ccb(network_operation_result::from_error_code(err));
             }
         }
         
@@ -90,7 +91,7 @@ namespace sopmq {
             messageutil::write_message(type, message, _ioService, _socket, statusCb);
         }
         
-        void cluster_connection::get_next_message(network_error_callback errorCb)
+        void cluster_connection::get_next_message(network_status_callback errorCb)
         {
             messageutil::read_message(_ioService, _socket, errorCb, *_dispatcher,
                                       settings::instance().maxMessageSize);

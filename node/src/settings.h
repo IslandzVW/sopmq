@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__settings__
-#define __Project__settings__
+#ifndef __sopmq__settings__
+#define __sopmq__settings__
 
 #include <string>
 #include <vector>
@@ -82,4 +82,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__settings__) */
+#endif /* defined(__sopmq__settings__) */

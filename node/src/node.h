@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__node__
-#define __Project__node__
+#ifndef __sopmq__node__
+#define __sopmq__node__
 
 #include <memory>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -89,4 +89,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__node__) */
+#endif /* defined(__sopmq__node__) */

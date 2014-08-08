@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__util__
-#define __Project__util__
+#ifndef __sopmq__util__
+#define __sopmq__util__
 
 #include <string>
 
@@ -41,4 +41,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__util__) */
+#endif /* defined(__sopmq__util__) */

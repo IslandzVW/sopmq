@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__endpoint__
-#define __Project__endpoint__
+#ifndef __sopmq__endpoint__
+#define __sopmq__endpoint__
 
 #include <string>
 #include <exception>
@@ -130,4 +130,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__endpoint__) */
+#endif /* defined(__sopmq__endpoint__) */

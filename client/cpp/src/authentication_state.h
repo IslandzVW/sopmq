@@ -15,13 +15,14 @@
  * limitations under the License.
  */
 
-#ifndef __Project__authentication_state__
-#define __Project__authentication_state__
+#ifndef __sopmq__authentication_state__
+#define __sopmq__authentication_state__
 
 #include "message_dispatcher.h"
 #include "cluster_connection.h"
 #include "isession_state.h"
 #include "network_error.h"
+#include "network_operation_result.h"
 
 namespace sopmq {
     namespace client {
@@ -42,6 +43,8 @@ namespace sopmq {
                                      std::function<void(bool)> authCallback);
                 virtual ~authentication_state();
                 
+                void state_entry();
+                
             private:
                 void on_unhandled_message(Message_ptr message, const std::string& typeName);
                 
@@ -49,7 +52,7 @@ namespace sopmq {
                 
                 void on_auth_ack(AuthAckMessage_ptr response);
                 
-                void on_answer_challenge_sent(bool success, const sopmq::error::network_error& error);
+                void on_message_sent(const net::network_operation_result& result);
                 
                 cluster_connection::ptr _connection;
                 session& _session;
@@ -64,4 +67,4 @@ namespace sopmq {
 }
 
 
-#endif /* defined(__Project__authentication_state__) */
+#endif /* defined(__sopmq__authentication_state__) */

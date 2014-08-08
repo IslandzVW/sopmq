@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef __Project__session__
-#define __Project__session__
+#ifndef __sopmq__session__
+#define __sopmq__session__
 
 #include "cluster_connection.h"
 #include "message_dispatcher.h"
@@ -68,7 +68,7 @@ namespace sopmq {
         private:
             void invalidate();
             void auth_callback(bool authSuccess);
-            void on_network_status(bool success, const sopmq::error::network_error& error);
+            void on_message_send(bool success, const sopmq::error::network_error& error);
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
@@ -83,4 +83,4 @@ namespace sopmq {
     }
 }
 
-#endif /* defined(__Project__session__) */
+#endif /* defined(__sopmq__session__) */
