@@ -34,7 +34,7 @@ namespace sopmq {
         
         server::server(ba::io_service& ioService, unsigned short port)
         : _ioService(ioService), _port(port), _endpoint(ba::ip::tcp::v4(), _port),
-        _acceptor(_ioService, _endpoint)
+        _acceptor(_ioService, _endpoint), _stopping(false)
         {
             BOOST_LOG_TRIVIAL(info) << "starting mq services on TCP/" << _port;
         }
@@ -55,11 +55,14 @@ namespace sopmq {
         
         void server::stop()
         {
+			_stopping = true;
             _acceptor.close();
         }
         
         void server::handle_accept(connection::connection::ptr conn, const boost::system::error_code& error)
         {
+			if (_stopping) return;
+
             if (! error)
             {
                 try {

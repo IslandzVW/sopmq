@@ -18,12 +18,12 @@
 #ifndef __sopmq__settings__
 #define __sopmq__settings__
 
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/noncopyable.hpp>
+
 #include <string>
 #include <vector>
 #include <cstdint>
-
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace bmp = boost::multiprecision;
 
@@ -36,6 +36,11 @@ namespace sopmq {
         class settings : public boost::noncopyable
         {
         public:
+			///
+			/// The default maximum message size
+			///
+			static const uint32_t DEFAULT_MAX_MESSAGE_SIZE;
+
             ///
             /// Returns our singleton instance
             ///

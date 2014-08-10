@@ -18,12 +18,12 @@
 #ifndef __client__settings__
 #define __client__settings__
 
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/noncopyable.hpp>
+
 #include <string>
 #include <vector>
 #include <cstdint>
-
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/noncopyable.hpp>
 
 namespace bmp = boost::multiprecision;
 

@@ -90,13 +90,13 @@ namespace sopmq {
         typedef std::shared_ptr<message_context> message_context_ptr;
         
         
+		typedef std::unique_ptr<char[], void(*)(char*)> header_buf_ptr;
+
         ///
         /// Context when writing a message
         ///
         struct send_context
 		{
-			typedef std::unique_ptr<char[], void(*)(char*)> header_buf_ptr;
-
 			send_context(header_buf_ptr headerbuf, const std::string& messagebuf, network_status_callback status)
 				: header_buf(std::move(headerbuf)), message_buf(messagebuf), status_callback(status)
 			{
@@ -108,6 +108,7 @@ namespace sopmq {
 
 		private: 
 			send_context(const send_context&);
+			send_context& operator =(const send_context&);
         };
         
         typedef std::shared_ptr<send_context> send_context_ptr;

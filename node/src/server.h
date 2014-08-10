@@ -61,6 +61,7 @@ namespace sopmq {
             boost::asio::ip::tcp::endpoint _endpoint;
             boost::asio::ip::tcp::acceptor _acceptor;
             std::set<connection::connection::ptr> _connections;
+			bool _stopping;
             
             
             void accept_new();
