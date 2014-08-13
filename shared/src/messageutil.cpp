@@ -234,10 +234,10 @@ namespace sopmq {
                                         boost::asio::ip::tcp::socket &socket,
                                         network_status_callback statusCallback)
         {
-			char* headerBuffer = static_cast<char*>(s_mem_pool.malloc());
-			header_buf_ptr headerPtr(headerBuffer, &messageutil::free_mem);
+            char* headerBuffer = static_cast<char*>(s_mem_pool.malloc());
+            header_buf_ptr headerPtr(headerBuffer, &messageutil::free_mem);
 
-			send_context_ptr ctx = std::make_shared<send_context>(std::move(headerPtr), std::string(), statusCallback);
+            send_context_ptr ctx = std::make_shared<send_context>(std::move(headerPtr), std::string(), statusCallback);
             
             message->SerializeToString(&ctx->message_buf);
             
@@ -278,10 +278,10 @@ namespace sopmq {
         
         void messageutil::free_mem(char *mem)
         {
-			if (mem != nullptr)
-			{
-				s_mem_pool.free(mem);
-			}
+            if (mem != nullptr)
+            {
+                s_mem_pool.free(mem);
+            }
         }
     }
 }

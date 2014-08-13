@@ -55,13 +55,13 @@ namespace sopmq {
         
         void server::stop()
         {
-			_stopping = true;
+            _stopping = true;
             _acceptor.close();
         }
         
         void server::handle_accept(connection::connection::ptr conn, const boost::system::error_code& error)
         {
-			if (_stopping) return;
+            if (_stopping) return;
 
             if (! error)
             {
