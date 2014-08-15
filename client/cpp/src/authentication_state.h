@@ -24,6 +24,8 @@
 #include "network_error.h"
 #include "network_operation_result.h"
 
+#include <memory>
+
 namespace sopmq {
     namespace client {
         
@@ -35,10 +37,10 @@ namespace sopmq {
             /// Client session state before the client has been authorized
             /// by a SOPMQ node
             ///
-            class authentication_state : public isession_state
+            class authentication_state : public isession_state, public std::enable_shared_from_this<authentication_state>
             {
             public:
-                authentication_state(cluster_connection::ptr conn, session& session,
+                authentication_state(cluster_connection::ptr conn, std::weak_ptr<session> session,
                                      const std::string& username, const std::string& password,
                                      std::function<void(bool)> authCallback);
                 virtual ~authentication_state();
@@ -54,8 +56,10 @@ namespace sopmq {
                 
                 void on_message_sent(const net::network_operation_result& result);
                 
+                void on_message_received(const net::network_operation_result& result);
+                
                 cluster_connection::ptr _connection;
-                session& _session;
+                std::weak_ptr<session> _session;
                 std::string _username;
                 std::string _password;
                 std::function<void(bool)> _authCallback;

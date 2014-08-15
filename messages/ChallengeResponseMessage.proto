@@ -3,5 +3,5 @@ import "Identifier.proto";
 message ChallengeResponseMessage {
 	required Identifier identity = 1;
 
-	required string challenge = 2;
+	required bytes challenge = 2;
 }

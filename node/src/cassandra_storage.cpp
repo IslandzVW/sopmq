@@ -46,10 +46,8 @@ namespace sopmq {
 
 					first = false;
 				}
-
-				CassString contact_points = cass_string_init(ipList.str().c_str());
-
-				cass_cluster_set_contact_points(_cluster, contact_points);
+                
+                cass_cluster_set_contact_points(_cluster, ipList.str().c_str());
             }
             
             cassandra_storage::~cassandra_storage()

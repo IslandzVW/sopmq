@@ -20,6 +20,9 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/filters.h>
 
+#include <random>
+#include <limits>
+
 using namespace CryptoPP;
 
 namespace sopmq {
@@ -32,6 +35,23 @@ namespace sopmq {
             StringSource ss(input, inputSize, new HexEncoder(new StringSink(encoded)));
             
             return encoded;
+        }
+        
+        std::string util::random_bytes(int count)
+        {
+            
+            std::random_device rng;
+            std::uniform_int_distribution<> dist(std::numeric_limits<char>::min(),
+                                                           std::numeric_limits<char>::max());
+            
+            std::string outstr;
+            outstr.reserve(count);
+            
+            for(int i = 0; i < count; ++i) {
+                outstr += (char)dist(rng);
+            }
+            
+            return outstr;
         }
 
         util::util()

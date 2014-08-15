@@ -23,9 +23,13 @@
 #include "message_dispatcher.h"
 #include "message_ptrs.h"
 #include "network_operation_result.h"
+#include "GetChallengeMessage.pb.h"
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
+
+#include <cstdint>
+#include <memory>
 
 namespace sopmq {
     namespace node {
@@ -35,7 +39,8 @@ namespace sopmq {
             /// State before a connection has been authenticated
             ///
             class csunauthenticated :   public iconnection_state,
-                                        public boost::noncopyable
+                                        public boost::noncopyable,
+                                        public std::enable_shared_from_this<csunauthenticated>
             {
             public:
                 csunauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
@@ -48,15 +53,30 @@ namespace sopmq {
                 // iconnection_state
                 
             private:
+                ///
+                /// Size of the auth challenge sent to connectors
+                ///
+                static const int CHALLENGE_SIZE;
+                
                 boost::asio::io_service& _ioService;
                 connection::wptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
+                GetChallengeMessage_Type _authType;
                 
                 void unhandled_message(Message_ptr message);
                 
                 void handle_get_challenge_message(GetChallengeMessage_ptr message);
                 
-                void handle_network_result(const net::network_operation_result& result);
+                void handle_read_result(const net::network_operation_result& result);
+                
+                void generate_challenge_response(connection::ptr conn, std::uint32_t replyTo);
+                
+                void read_next_message(connection::ptr conn);
+                
+                void handle_answer_challenge_message(AnswerChallengeMessage_ptr message);
+                
+                void handle_write_result(const net::network_operation_result& result);
+                
             };
         }
     }

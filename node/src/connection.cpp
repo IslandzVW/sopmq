@@ -26,15 +26,22 @@
 
 namespace ba = boost::asio;
 using sopmq::error::network_error;
+using sopmq::message::message_type;
+using sopmq::message::network_status_callback;
+using sopmq::message::messageutil;
 
 namespace sopmq {
     namespace node {
         namespace connection {
             
             connection::connection(ba::io_service& ioService)
-            : _ioService(ioService), _conn(_ioService)
+            : _ioService(ioService), _conn(_ioService), _next_id(0)
             {
                 
+            }
+            
+            connection::~connection()
+            {
             }
             
             ba::ip::tcp::socket& connection::get_socket()
@@ -56,7 +63,7 @@ namespace sopmq {
                     throw network_error(std::string("connection startup error") + e.what());
                 }
                 
-                _state.reset(new csunauthenticated(_ioService, shared_from_this()));
+                _state = std::make_shared<csunauthenticated>(_ioService, shared_from_this());
                 _state->start();
             }
             
@@ -74,6 +81,18 @@ namespace sopmq {
                 _conn.close(ec);
                 
                 _server->connection_terminated(shared_from_this());
+            }
+            
+            std::uint32_t connection::get_next_id()
+            {
+                return ++_next_id;
+            }
+            
+            void connection::send_message(message_type type, Message_ptr message,
+                                          network_status_callback statusCb)
+            {
+                messageutil::write_message(type, message, _ioService, _conn,
+                                           statusCb);
             }
         }
     }

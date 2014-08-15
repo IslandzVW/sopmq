@@ -70,13 +70,17 @@ TEST_F(OperationsTest, TestAuthentication)
     
     auto authCb = [&](bool authd)
     {
+        clientIoService.stop();
         ASSERT_TRUE(authd);
     };
     
+    session::ptr mSession;
     auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
     {
         ASSERT_TRUE(session != nullptr) << e.what();
         
+        //make sure session stays in scope for the tests
+        mSession = session;
         session->authenticate("test", "test", authCb);
     };
     

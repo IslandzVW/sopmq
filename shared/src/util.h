@@ -34,6 +34,12 @@ namespace sopmq {
             ///
             static std::string hex_encode(const unsigned char* input, int inputSize);
         
+            ///
+            /// Generates a string of random bytes
+            /// \param count The number of random bytes to generate
+            ///
+            static std::string random_bytes(int count);
+            
         private:
             util();
             ~util();

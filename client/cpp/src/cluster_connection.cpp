@@ -121,7 +121,5 @@ namespace sopmq {
             return ++_next_id;
         }
         
-        
-        
     }
 }

@@ -18,13 +18,19 @@
 #ifndef __sopmq__connection__
 #define __sopmq__connection__
 
-#include <memory>
+#include "iconnection_state.h"
+
+#include "message_ptrs.h"
+#include "message_types.h"
+#include "messageutil.h"
+
 #include <boost/weak_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
 
-#include "iconnection_state.h"
+#include <memory>
+#include <cstdint>
 
 namespace sopmq {
     namespace error {
@@ -51,6 +57,7 @@ namespace sopmq {
                 
             public:
                 connection(boost::asio::io_service& ioService);
+                virtual ~connection();
                 
                 ///
                 /// Returns the TCP socket associated with this connection
@@ -72,12 +79,25 @@ namespace sopmq {
                 ///
                 void close();
                 
+                ///
+                /// Returns the next message identifier on this connection
+                ///
+                std::uint32_t get_next_id();
+                
+                ///
+                /// Sends a message over this connection
+                ///
+                void send_message(sopmq::message::message_type type, Message_ptr message,
+                                  sopmq::message::network_status_callback statusCb);
+                
             private:
                 boost::asio::io_service& _ioService;
                 boost::asio::ip::tcp::socket _conn;
                 server* _server;
                 boost::asio::ip::tcp::endpoint _ep;
                 iconnection_state::ptr _state;
+                
+                std::uint32_t _next_id;
             };
         
         

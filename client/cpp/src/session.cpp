@@ -41,7 +41,8 @@ namespace sopmq {
         
         session::~session()
         {
-            
+            this->invalidate();
+            LOG_SRC(debug) << "~session()";
         }
         
         void session::authenticate(const std::string& username, const std::string& password,
@@ -50,7 +51,8 @@ namespace sopmq {
             _username = username;
             _password = password;
             
-            _session_state.reset(new authentication_state(_connection, *this, username, password, authCallback));
+            _session_state = std::make_shared<authentication_state>(_connection, shared_from_this(),
+                                                                    username, password, authCallback);
             _session_state->state_entry();
         }
         
@@ -64,18 +66,6 @@ namespace sopmq {
         {
             _valid = false;
             _connection->close();
-        }
-        
-        void session::auth_callback(bool authSuccess)
-        {
-            if (authSuccess)
-            {
-                
-            }
-            else
-            {
-                this->invalidate();
-            }
         }
     }
 }

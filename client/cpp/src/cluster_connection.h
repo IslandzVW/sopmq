@@ -83,6 +83,7 @@ namespace sopmq {
             ///
             void get_next_message(message::network_status_callback statusCb);
             
+                         
         private:
             void after_resolve(const boost::system::error_code& err,
                                boost::asio::ip::tcp::resolver::iterator endpoint_iterator,

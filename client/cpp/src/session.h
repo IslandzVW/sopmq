@@ -38,10 +38,11 @@ namespace sopmq {
         ///
         /// A session with a sopmq cluster.
         ///
-        class session : public boost::noncopyable
+        class session : public boost::noncopyable, public std::enable_shared_from_this<session>
         {
         public:
             typedef std::shared_ptr<session> ptr;
+            typedef std::weak_ptr<session> wptr;
             
             typedef std::function<void(bool)> authenticate_callback;
             
@@ -67,13 +68,12 @@ namespace sopmq {
             
         private:
             void invalidate();
-            void auth_callback(bool authSuccess);
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
             bool _valid;
             
-            impl::isession_state::uptr _session_state;
+            impl::isession_state::ptr _session_state;
             
             std::string _username;
             std::string _password;

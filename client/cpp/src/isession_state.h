@@ -27,7 +27,7 @@ namespace sopmq {
             class isession_state
             {
             public:
-                typedef std::unique_ptr<isession_state> uptr;
+                typedef std::shared_ptr<isession_state> ptr;
                 
             public:
                 isession_state();

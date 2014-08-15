@@ -15,22 +15,4 @@
  * limitations under the License.
  */
 
-#include "iconnection_state.h"
-
-namespace sopmq {
-    namespace node {
-        namespace connection {
-            
-            iconnection_state::iconnection_state()
-            {
-                
-            }
-            
-            iconnection_state::~iconnection_state()
-            {
-                
-            }
-            
-        }
-    }
-}
+#include "user_account.h"

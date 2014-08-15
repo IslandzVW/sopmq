@@ -34,6 +34,7 @@ namespace sopmq {
                 typedef std::shared_ptr<iconnection_state> ptr;
                 
             public:
+                iconnection_state();
                 virtual ~iconnection_state();
                 
                 ///
