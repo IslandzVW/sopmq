@@ -27,7 +27,14 @@
 
 namespace bmp = boost::multiprecision;
 
+///
+/// SOPMQ
+///
 namespace sopmq {
+    
+    ///
+    /// Namespace for the sopmq server
+    ///
     namespace node {
         
         ///

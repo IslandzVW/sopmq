@@ -29,10 +29,11 @@ namespace sopmq {
         class user_account
         {
             ///
-            /// Returns whether or not a user is authorized to log
+            /// Returns whether or not a user is authorized to log in
+            ///
             /// \param nameHashHexString A hex version of the sha256 hash of the username
             /// \param challengeBytes The bytes that were sent as part of the auth challenge
-            /// \param passwordChallengeHashHexString The result of the sha256([pw_hash] + challenge)
+            /// \param passwordChallengeHashHexString The result of the sha256(sha256(pw) + challenge)
             ///
             static bool is_authorized(const std::string& nameHashHexString,
                                       const std::string& challengeBytes,
