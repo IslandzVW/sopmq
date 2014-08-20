@@ -17,11 +17,14 @@
 
 #include "cassandra_storage.h"
 #include "settings.h"
+#include "cass_ptrs.h"
+#include "storage_error.h"
 
 #include <boost/asio.hpp>
 
 #include <string>
 #include <sstream>
+#include <array>
 
 using std::string;
 
@@ -33,9 +36,7 @@ namespace sopmq {
             
             cassandra_storage::cassandra_storage()
             {
-				CassError rc = CASS_OK;
 				_cluster = cass_cluster_new();
-				CassFuture* session_future = NULL;
 
 				std::stringstream ipList;
 				bool first = true;
@@ -63,57 +64,52 @@ namespace sopmq {
             
             void cassandra_storage::init()
             {
-                CassFuture* connect_future = cass_cluster_connect(_cluster);
+                const std::array<std::string, 2> CREATE_STATEMENTS =
+                {
+                    "CREATE KEYSPACE IF NOT EXISTS " + KEYSPACE_NAME +
+                        " WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };",
+                    
+                    "CREATE TABLE IF NOT EXISTS " + KEYSPACE_NAME + ".users (" +
+                        "uname_hash varchar PRIMARY KEY, " +
+                        "username varchar, " +
+                        "pw_hash varchar, " +
+                        "user_level int " +
+                    ");"
+                    
+                };
                 
-                if (cass_future_error_code(connect_future) == CASS_OK) {
-                    CassFuture* close_future = NULL;
-                    CassSession* session = cass_future_get_session(connect_future);
-                    
-                    /* Build statement and execute query */
-                    CassString query = cass_string_init("SELECT keyspace_name "
-                                                        "FROM system.schema_keyspaces;");
-                    CassStatement* statement = cass_statement_new(query, 0);
-                    
-                    CassFuture* result_future = cass_session_execute(session, statement);
-                    
-                    if(cass_future_error_code(result_future) == CASS_OK) {
-                        /* Retrieve result set and iterator over the rows */
-                        const CassResult* result = cass_future_get_result(result_future);
-                        CassIterator* rows = cass_iterator_from_result(result);
-                        
-                        while(cass_iterator_next(rows)) {
-                            const CassRow* row = cass_iterator_get_row(rows);
-                            const CassValue* value = cass_row_get_column_by_name(row, "keyspace_name");
-                            
-                            CassString keyspace_name;
-                            cass_value_get_string(value, &keyspace_name);
-                            printf("keyspace_name: '%.*s'\n", (int)keyspace_name.length,
-                                   keyspace_name.data);
-                        }
-                        
-                        cass_result_free(result);
-                        cass_iterator_free(rows);
-                    } else {
-                        /* Handle error */
-                        CassString message = cass_future_error_message(result_future);
-                        fprintf(stderr, "Unable to run query: '%.*s'\n", (int)message.length,
-                                message.data);
-                    } 
-                    
-                    cass_future_free(result_future);
-                    
-                    /* Close the session */
-                    close_future = cass_session_close(session);
-                    cass_future_wait(close_future);
-                    cass_future_free(close_future);
-                } else {
-                    /* Handle error */
-                    CassString message = cass_future_error_message(connect_future);
-                    fprintf(stderr, "Unable to connect: '%.*s'\n", (int)message.length, 
-                            message.data);
+                CassFuturePtr connect_future(cass_cluster_connect(_cluster));
+                this->throw_on_error(connect_future.get());
+                
+                CassSession* session = cass_future_get_session(connect_future.get());
+                
+                for (auto statement : CREATE_STATEMENTS)
+                {
+                    this->execute_statement(session, statement);
                 }
                 
-                cass_future_free(connect_future);
+                /* Close the session */
+                CassFuturePtr close_future(cass_session_close(session));
+                cass_future_wait(close_future.get());
+            }
+            
+            void cassandra_storage::execute_statement(CassSession* session, const std::string& statementText)
+            {
+                /* Build statement and execute */
+                CassString query = cass_string_init(statementText.c_str());
+                CassStatement* statement = cass_statement_new(query, 0);
+                
+                CassFuturePtr result_future(cass_session_execute(session, statement));
+                this->throw_on_error(result_future.get());
+            }
+            
+            void cassandra_storage::throw_on_error(CassFuture* future)
+            {
+                if (cass_future_error_code(future) != CASS_OK) {
+                    /* Handle error */
+                    CassString message = cass_future_error_message(future);
+                    throw storage_error(std::string(message.data, message.length));
+                }
             }
             
         }

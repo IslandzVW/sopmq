@@ -22,11 +22,16 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
+
+#include <memory>
 #include <string>
+
+#include "cass_ptrs.h"
 
 namespace sopmq {
     namespace node {
         namespace storage {
+            
             
             ///
             /// Encapsulates the cassandra storage cluster operations
@@ -53,6 +58,10 @@ namespace sopmq {
                 /// The name of our keyspace
                 ///
                 static const std::string& KEYSPACE_NAME;
+                
+                void execute_statement(CassSession* session, const std::string& statement);
+                
+                void throw_on_error(CassFuture* future);
                 
                 cassandra_storage();
                 ~cassandra_storage();

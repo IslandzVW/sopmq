@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
+#include "settings.h"
+#include "cassandra_storage.h"
+#include "storage_error.h"
+
 #include <boost/program_options.hpp>
 #include <boost/log/trivial.hpp>
 
 #include <string>
 #include <exception>
-
-#include "settings.h"
-#include "cassandra_storage.h"
 
 namespace po = boost::program_options;
 
@@ -34,11 +35,11 @@ const string& PRODUCT = "InWorldz SOPMQ nodetool";
 const string& VERSION = "0.1";
 
 po::variables_map vm;
+po::options_description desc("Allowed options");
 
 bool process_options(int argc, char* argv[])
 {
     //read in options from the command line
-    po::options_description desc("Allowed options");
     desc.add_options()
         ("help,h", "produce help message")
         ("init,i", "initialize cassandra data storage (requires storage_nodes)")
@@ -75,12 +76,19 @@ bool process_options(int argc, char* argv[])
 
 void do_init()
 {
-    cassandra_storage::instance().init();
+    try {
+        cassandra_storage::instance().init();
+        
+    } catch (const sopmq::node::storage::storage_error& e) {
+        BOOST_LOG_TRIVIAL(fatal) << "Unable to init cassandra storage: " << e.what();
+        
+    }
 }
 
 int main(int argc, char* argv[])
 {
     BOOST_LOG_TRIVIAL(info) << PRODUCT << " v" << VERSION << endl;
+    bool found_op = false;
     
     if (! process_options(argc, argv))
     {
@@ -89,7 +97,13 @@ int main(int argc, char* argv[])
     
     if (vm.count("init"))
     {
+        found_op = true;
         do_init();
+    }
+    
+    if (! found_op)
+    {
+        cout << desc << "\n";
     }
     
     return 0;
