@@ -13,30 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# - Try to find libcql (cassandra C++ driver)
+# - Try to find libcassandra (cassandra C++ driver)
 # Once done this will define
-#  LIBCQL_FOUND - System has LibCQL
-#  LIBCQL_INCLUDE_DIRS - The LibCQL include directories
-#  LIBCQL_LIBRARIES - The libraries needed to use LibCQL
-#  LIBCQL_DEFINITIONS - Compiler switches required for using LibCQL
+#  LIBCASSANDRA_FOUND - System has LibCassandra
+#  LIBCASSANDRA_INCLUDE_DIRS - The LibCassandra include directories
+#  LIBCASSANDRA_LIBRARIES - The libraries needed to use LibCassandra
+#  LIBCASSANDRA_DEFINITIONS - Compiler switches required for using LibCassandra
 
 
-find_path(LIBCQL_INCLUDE_DIR cql/cql.hpp
+find_path(LIBCASSANDRA_INCLUDE_DIR cassandra.h
           HINTS
-          PATH_SUFFIXES libcql )
+          PATH_SUFFIXES libcassandra )
 
-find_library(LIBCQL_LIBRARY NAMES cql
+find_library(LIBCASSANDRA_LIBRARY NAMES cassandra
              HINTS )
 
 
-set(LIBCQL_LIBRARIES ${LIBCQL_LIBRARY} )
-set(LIBCQL_INCLUDE_DIRS ${LIBCQL_INCLUDE_DIR} )
+set(LIBCASSANDRA_LIBRARIES ${LIBCASSANDRA_LIBRARY} )
+set(LIBCASSANDRA_INCLUDE_DIRS ${LIBCASSANDRA_INCLUDE_DIR} )
 
 include(FindPackageHandleStandardArgs)
 
 # handle the QUIETLY and REQUIRED arguments and set LIBCQL_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(LibCQL  DEFAULT_MSG
-                                  LIBCQL_LIBRARY LIBCQL_INCLUDE_DIR)
+find_package_handle_standard_args(LibCASSANDRA  DEFAULT_MSG
+                                  LIBCASSANDRA_LIBRARY LIBCASSANDRA_INCLUDE_DIR)
 
-mark_as_advanced(LIBCQL_INCLUDE_DIR LIBCQL_LIBRARY )
+mark_as_advanced(LIBCASSANDRA_INCLUDE_DIR LIBCASSANDRA_LIBRARY )

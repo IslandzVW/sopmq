@@ -30,9 +30,10 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 find_package(OpenSSL REQUIRED)
 set(LIBS ${LIBS} ${OPENSSL_LIBRARIES})
 
-find_package(LibCQL REQUIRED)
-set(INCLUDES ${INCLUDES} ${LIBCQL_INCLUDE_DIR})
-set(LIBS ${LIBS} ${LIBCQL_LIBRARIES})
+find_package(LibCASSANDRA REQUIRED)
+set(INCLUDES ${INCLUDES} ${LIBCASSANDRA_INCLUDE_DIR})
+set(LIBS ${LIBS} ${LIBCASSANDRA_LIBRARIES})
+message(${LIBCASSANDRA_LIBRARIES})
 
 find_package(CryptoPP REQUIRED)
 set(INCLUDES ${INCLUDES} ${CRYPTOPP_INCLUDE_DIR})
@@ -45,7 +46,7 @@ set(LIBS ${LIBS} ${PROTOBUF_LIBRARIES})
 add_definitions(${DEFS})
 file(GLOB LIB_SRCS src/*.h src/*.cpp)
 list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/node-main.cpp)
-
+list(REMOVE_ITEM LIB_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/nodetool-main.cpp)
 #message(${LIB_SRCS})
 
 #file(GLOB MESSAGE_SRCS ../messages/cpp/*.h ../messages/cpp/*.cc ../messages/cpp/*.cpp)
@@ -62,3 +63,6 @@ target_link_libraries(sopmq-nodelib ${LIBS})
 
 add_executable(sopmq-node src/node-main.cpp)
 target_link_libraries(sopmq-node ${LIBS} sopmq-nodelib)
+
+add_executable(sopmq-nodetool src/nodetool-main.cpp)
+target_link_libraries(sopmq-nodetool ${LIBS} sopmq-nodelib)

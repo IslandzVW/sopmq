@@ -38,6 +38,11 @@ namespace sopmq {
             static bool is_authorized(const std::string& nameHashHexString,
                                       const std::string& challengeBytes,
                                       const std::string& passwordChallengeHashHexString);
+            
+            ///
+            /// Creates a new user, writes it to the datastore, and returns it
+            ///
+            static user_account create(const std::string& userName, const std::string& password);
         };
         
     }

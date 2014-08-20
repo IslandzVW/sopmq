@@ -34,7 +34,16 @@ namespace sopmq {
             class cassandra_storage : public boost::noncopyable
             {
             public:
+                ///
+                /// Retrieves the singleton instance
+                ///
                 static cassandra_storage& instance();
+                
+                ///
+                /// Should be called to initialize cassandra storage for the first time.
+                /// Creates all the necessary tables for operation
+                ///
+                void init();
                 
                 
             private:

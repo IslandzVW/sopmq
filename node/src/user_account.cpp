@@ -16,3 +16,14 @@
  */
 
 #include "user_account.h"
+
+namespace sopmq {
+    namespace node {
+        
+        user_account user_account::create(const std::string& userName, const std::string& password)
+        {
+            
+        }
+        
+    }
+}
