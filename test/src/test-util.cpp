@@ -25,11 +25,11 @@ using sopmq::shared::util;
 
 TEST(UtilTest, HexEncoderWorks)
 {
-    std::string testStr("abcde");
+    std::string testStr("abcdeO");
     
     std::string result = util::hex_encode((const unsigned char*)testStr.c_str(), testStr.size());
     
-    ASSERT_EQ("6162636465", result);
+    ASSERT_EQ("61626364654F", result);
 }
 
 TEST(UtilTest, RandomBytes)
