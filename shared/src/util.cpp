@@ -32,7 +32,7 @@ namespace sopmq {
         {
             std::string encoded;
             
-            StringSource ss(input, inputSize, new HexEncoder(new StringSink(encoded)));
+            StringSource ss(input, inputSize, true, new HexEncoder(new StringSink(encoded)));
             
             return encoded;
         }

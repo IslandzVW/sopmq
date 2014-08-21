@@ -28,8 +28,9 @@ namespace sopmq {
         ///
         class user_account
         {
+        public:
             ///
-            /// Returns whether or not a user is authorized to log in
+            /// \brief Returns whether or not a user is authorized to log in
             ///
             /// \param nameHashHexString A hex version of the sha256 hash of the username
             /// \param challengeBytes The bytes that were sent as part of the auth challenge
@@ -40,9 +41,42 @@ namespace sopmq {
                                       const std::string& passwordChallengeHashHexString);
             
             ///
-            /// Creates a new user, writes it to the datastore, and returns it
+            /// \brief Creates a new user, writes it to the datastore, and returns it
             ///
-            static user_account create(const std::string& userName, const std::string& password);
+            static user_account create(const std::string& userName, const std::string& password,
+                                       int userLevel);
+            
+        public:
+            user_account();
+            user_account(const std::string& nameHash, const std::string& userName,
+                         const std::string& pwHash, int level);
+            virtual ~user_account();
+            
+            ///
+            /// \brief Returns the username for this account
+            ///
+            const std::string& username() const;
+            
+            ///
+            /// \brief Returns the hex representation of the sha hash of the name
+            ///
+            const std::string& name_hash() const;
+            
+            ///
+            /// \brief Returns the hex representation of the sha hash of the password
+            ///
+            const std::string& pw_hash() const;
+            
+            ///
+            /// \brief Returns the user level of this account
+            ///
+            int user_level() const;
+            
+        private:
+            std::string _name_hash;
+            std::string _username;
+            std::string _pw_hash;
+            int _user_level;
         };
         
     }

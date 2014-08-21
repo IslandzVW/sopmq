@@ -27,9 +27,11 @@ namespace sopmq {
     namespace node {
         namespace storage {
             
-            class CassFutureDeleter { public: void operator()(CassFuture* p) { cass_future_free(p); } };
+            class CassFutureDeleter { public: void operator()(CassFuture* p) { if (p) cass_future_free(p); } };
             typedef std::unique_ptr<CassFuture, CassFutureDeleter> CassFuturePtr;
             
+            class CassStatementDeleter { public: void operator()(CassStatement* p) { if (p) cass_statement_free(p); } };
+            typedef std::unique_ptr<CassStatement, CassStatementDeleter> CassStatementPtr;
         }
     }
 }

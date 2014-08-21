@@ -97,9 +97,9 @@ namespace sopmq {
             {
                 /* Build statement and execute */
                 CassString query = cass_string_init(statementText.c_str());
-                CassStatement* statement = cass_statement_new(query, 0);
+                CassStatementPtr statement(cass_statement_new(query, 0));
                 
-                CassFuturePtr result_future(cass_session_execute(session, statement));
+                CassFuturePtr result_future(cass_session_execute(session, statement.get()));
                 this->throw_on_error(result_future.get());
             }
             
@@ -110,6 +110,32 @@ namespace sopmq {
                     CassString message = cass_future_error_message(future);
                     throw storage_error(std::string(message.data, message.length));
                 }
+            }
+            
+            void cassandra_storage::create_user(const std::string& usernameHash, const std::string& username,
+                                                const std::string& pwHash, int userLevel)
+            {
+                CassFuturePtr connect_future(cass_cluster_connect(_cluster));
+                this->throw_on_error(connect_future.get());
+                
+                CassSession* session = cass_future_get_session(connect_future.get());
+                
+                std::string insert("INSERT INTO " + KEYSPACE_NAME + ".users"
+                                   "(uname_hash, username, pw_hash, user_level) VALUES (?, ?, ?, ?);");
+                CassString query = cass_string_init(insert.c_str());
+                CassStatementPtr statement(cass_statement_new(query, 4));
+                
+                cass_statement_bind_string(statement.get(), 0, cass_string_init(usernameHash.c_str()));
+                cass_statement_bind_string(statement.get(), 1, cass_string_init(username.c_str()));
+                cass_statement_bind_string(statement.get(), 2, cass_string_init(pwHash.c_str()));
+                cass_statement_bind_int32(statement.get(), 3, userLevel);
+                
+                CassFuturePtr result_future(cass_session_execute(session, statement.get()));
+                this->throw_on_error(result_future.get());
+                
+                /* Close the session */
+                CassFuturePtr close_future(cass_session_close(session));
+                cass_future_wait(close_future.get());
             }
             
         }

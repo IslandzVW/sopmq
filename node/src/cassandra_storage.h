@@ -40,22 +40,29 @@ namespace sopmq {
             {
             public:
                 ///
-                /// Retrieves the singleton instance
+                /// \brief Retrieves the singleton instance
                 ///
                 static cassandra_storage& instance();
                 
+                ///
+                /// \brief Called to initialize cassandra storage for the first time (synchronous)
                 ///
                 /// Should be called to initialize cassandra storage for the first time.
                 /// Creates all the necessary tables for operation
                 ///
                 void init();
                 
-                
+                ///
+                /// \brief Creates a new user for the sopmq cluster (synchronous)
+                ///
+                void create_user(const std::string& usernameHash, const std::string& username,
+                                 const std::string& pwHash, int userLevel);
+                                 
             private:
 				CassCluster* _cluster;
 
                 ///
-                /// The name of our keyspace
+                /// \brief The name of our keyspace
                 ///
                 static const std::string& KEYSPACE_NAME;
                 

@@ -17,12 +17,72 @@
 
 #include "user_account.h"
 
+#include "util.h"
+#include "cassandra_storage.h"
+
+#include <cryptopp/sha.h>
+
+using sopmq::shared::util;
+using sopmq::node::storage::cassandra_storage;
+
 namespace sopmq {
     namespace node {
         
-        user_account user_account::create(const std::string& userName, const std::string& password)
+        user_account user_account::create(const std::string& userName, const std::string& password,
+                                          int userLevel)
+        {
+            unsigned char hashResult[CryptoPP::SHA256::DIGESTSIZE];
+            
+            CryptoPP::SHA256 sha;
+            
+            sha.CalculateDigest(&hashResult[0], (unsigned char*)userName.c_str(), userName.length());
+            std::string userHex = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+            
+            sha.Restart();
+            
+            sha.CalculateDigest(&hashResult[0], (unsigned char*)password.c_str(), password.length());
+            std::string pwHex = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+            
+            cassandra_storage::instance().create_user(userHex, userName, pwHex, userLevel);
+            
+            return user_account(userHex, userName, pwHex, userLevel);
+        }
+        
+        user_account::user_account()
         {
             
+        }
+        
+        user_account::user_account(const std::string& nameHash, const std::string& userName,
+                                   const std::string& pwHash, int level)
+        : _name_hash(nameHash), _username(userName), _pw_hash(pwHash), _user_level(level)
+        {
+            
+        }
+        
+        user_account::~user_account()
+        {
+            
+        }
+        
+        const std::string& user_account::username() const
+        {
+            return _username;
+        }
+        
+        const std::string& user_account::name_hash() const
+        {
+            return _name_hash;
+        }
+        
+        const std::string& user_account::pw_hash() const
+        {
+            return _pw_hash;
+        }
+        
+        int user_account::user_level() const
+        {
+            return _user_level;
         }
         
     }
