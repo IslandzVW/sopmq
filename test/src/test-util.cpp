@@ -31,3 +31,9 @@ TEST(UtilTest, HexEncoderWorks)
     
     ASSERT_EQ("6162636465", result);
 }
+
+TEST(UtilTest, RandomBytes)
+{
+    std::string bytes = util::random_bytes(1024);
+    ASSERT_EQ(1024, bytes.length());
+}
