@@ -19,6 +19,7 @@
 #define __sopmq__user_account__
 
 #include <string>
+#include <functional>
 
 namespace sopmq {
     namespace node {
@@ -35,10 +36,12 @@ namespace sopmq {
             /// \param nameHashHexString A hex version of the sha256 hash of the username
             /// \param challengeBytes The bytes that were sent as part of the auth challenge
             /// \param passwordChallengeHashHexString The result of the sha256(sha256(pw) + challenge)
+            /// \param authCallback Callback executed with the authorization status for the user
             ///
-            static bool is_authorized(const std::string& nameHashHexString,
+            static void is_authorized(const std::string& nameHashHexString,
                                       const std::string& challengeBytes,
-                                      const std::string& passwordChallengeHashHexString);
+                                      const std::string& passwordChallengeHashHexString,
+                                      std::function<void(bool)> authCallback);
             
             ///
             /// \brief Creates a new user, writes it to the datastore, and returns it

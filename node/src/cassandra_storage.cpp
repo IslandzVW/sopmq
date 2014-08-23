@@ -25,6 +25,7 @@
 #include <string>
 #include <sstream>
 #include <array>
+#include <functional>
 
 using std::string;
 
@@ -136,6 +137,12 @@ namespace sopmq {
                 /* Close the session */
                 CassFuturePtr close_future(cass_session_close(session));
                 cass_future_wait(close_future.get());
+            }
+            
+            void cassandra_storage::find_user(const std::string &usernameHash,
+                                              std::function<void(bool, user_account)> callback)
+            {
+                
             }
             
         }

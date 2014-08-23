@@ -48,7 +48,48 @@ namespace sopmq {
             return user_account(userHex, userName, pwHex, userLevel);
         }
         
+        void user_account::is_authorized(const std::string& nameHashHexString,
+                                         const std::string& challengeBytes,
+                                         const std::string& passwordChallengeHashHexString,
+                                         std::function<void(bool)> authCallback)
+        {
+            auto userLookupCb = [=](bool found, user_account acct)
+            {
+                if (!found || acct.user_level() == 0)
+                {
+                    authCallback(false);
+                }
+                
+                //we need to take the sha256 of the stored password hash and the
+                //auth challenge and compare that to the challenge response that
+                //was passed in
+                CryptoPP::SHA256 sha;
+                
+                unsigned char goodHash[CryptoPP::SHA256::DIGESTSIZE];
+                std::string goodPwHashAndChallenge(acct.pw_hash() + challengeBytes);
+                
+                sha.CalculateDigest(&goodHash[0], (unsigned char*)goodPwHashAndChallenge.c_str(),
+                                    goodPwHashAndChallenge.length());
+                
+                unsigned char givenHash[CryptoPP::SHA256::DIGESTSIZE];
+                sha.CalculateDigest(&givenHash[0], (unsigned char*)passwordChallengeHashHexString.c_str(),
+                                    passwordChallengeHashHexString.length());
+                
+                if (memcmp(goodHash, givenHash, CryptoPP::SHA256::DIGESTSIZE) == 0)
+                {
+                    authCallback(true);
+                }
+                else
+                {
+                    authCallback(false);
+                }
+            };
+            
+            cassandra_storage::instance().find_user(nameHashHexString, userLookupCb);
+        }
+        
         user_account::user_account()
+        : _user_level(0)
         {
             
         }

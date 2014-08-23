@@ -27,6 +27,7 @@
 #include <string>
 
 #include "cass_ptrs.h"
+#include "user_account.h"
 
 namespace sopmq {
     namespace node {
@@ -44,6 +45,7 @@ namespace sopmq {
                 ///
                 static cassandra_storage& instance();
                 
+            public:
                 ///
                 /// \brief Called to initialize cassandra storage for the first time (synchronous)
                 ///
@@ -57,6 +59,12 @@ namespace sopmq {
                 ///
                 void create_user(const std::string& usernameHash, const std::string& username,
                                  const std::string& pwHash, int userLevel);
+                
+                ///
+                /// \brief Finds a user by primary key (user name hash hex string)
+                ///
+                void find_user(const std::string& usernameHash,
+                               std::function<void(bool, user_account)> callback);
                                  
             private:
 				CassCluster* _cluster;
