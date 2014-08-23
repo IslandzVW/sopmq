@@ -18,7 +18,7 @@
 #include "cassandra_storage.h"
 #include "settings.h"
 #include "cass_ptrs.h"
-#include "storage_error.h"
+#include "cassandra_storage_async_helpers.h"
 
 #include <boost/asio.hpp>
 
@@ -26,6 +26,7 @@
 #include <sstream>
 #include <array>
 #include <functional>
+#include <vector>
 
 using std::string;
 
@@ -139,10 +140,63 @@ namespace sopmq {
                 cass_future_wait(close_future.get());
             }
             
-            void cassandra_storage::find_user(const std::string &usernameHash,
-                                              std::function<void(bool, user_account)> callback)
+            std::string cassandra_storage::get_string_column_value(const CassRow* row, const std::string& colname)
             {
+                const CassValue* value = cass_row_get_column_by_name(row, colname.c_str());
+                CassString val_string;
+                cass_value_get_string(value, &val_string);
                 
+                return std::string(val_string.data, val_string.length);
+            }
+            
+            int cassandra_storage::get_int_column_value(const CassRow* row, const std::string& colname)
+            {
+                const CassValue* value = cass_row_get_column_by_name(row, colname.c_str());
+                int ival;
+                cass_value_get_int32(value, &ival);
+                
+                return ival;
+            }
+            
+            void cassandra_storage::find_user(const std::string &usernameHash,
+                                              std::function<void(const find_user_result&)> callback)
+            {
+                std::function<void(cassasync::async_query_state&)> cb = [=](cassasync::async_query_state& qstate)
+                {
+                    if (qstate.error)
+                    {
+                        find_user_result result;
+                        result.error = std::move(qstate.error);
+                        callback(result);
+                    }
+                    
+                    
+                    if (cass_iterator_next(qstate.rows.get()))
+                    {
+                        const CassRow* row = cass_iterator_get_row(qstate.rows.get());
+                        
+                        user_account acct(get_string_column_value(row, "uname_hash"),
+                                          get_string_column_value(row, "username"),
+                                          get_string_column_value(row, "pw_hash"),
+                                          get_int_column_value(row, "level"));
+                        
+                        find_user_result fur;
+                        fur.account = acct;
+                    }
+                    else
+                    {
+                        find_user_result fur;
+                        fur.user_found = false;
+                        callback(fur);
+                    }
+                };
+                
+                cassasync::async_query_state* qstate = new cassasync::async_query_state();
+                qstate->query = "SELECT * FROM " + KEYSPACE_NAME + ".users WHERE uname_hash = ?";
+                qstate->params.push_back(usernameHash);
+                qstate->result_callback = cb;
+                
+                cassasync::async_query(qstate, _cluster);
             }
             
         }

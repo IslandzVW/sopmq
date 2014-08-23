@@ -22,6 +22,7 @@
 #define __sopmq__cass_ptrs__
 
 #include <cassandra.h>
+#include <memory>
 
 namespace sopmq {
     namespace node {
@@ -32,6 +33,12 @@ namespace sopmq {
             
             class CassStatementDeleter { public: void operator()(CassStatement* p) { if (p) cass_statement_free(p); } };
             typedef std::unique_ptr<CassStatement, CassStatementDeleter> CassStatementPtr;
+            
+            class CassResultDeleter { public: void operator()(const CassResult* p) { if (p) cass_result_free(p); } };
+            typedef std::unique_ptr<const CassResult, CassResultDeleter> CassResultConstPtr;
+            
+            class CassIteratorDeleter { public: void operator()(CassIterator* p) { if (p) cass_iterator_free(p); } };
+            typedef std::unique_ptr<CassIterator, CassIteratorDeleter> CassIteratorPtr;
         }
     }
 }

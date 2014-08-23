@@ -19,9 +19,49 @@
 
 #include "user_account.h"
 #include "settings.h"
+#include "util.h"
+
+#include <cryptopp/sha.h>
+#include <condition_variable>
+#include <mutex>
+
+
+
+using sopmq::node::settings;
+using sopmq::node::user_account;
+using sopmq::shared::util;
 
 TEST(AccountTest, TestCreateAccount)
 {
-    //sopmq::node::settings::instance().cassandraSeeds.push_back("");
-    //sopmq::node::user_account::create(<#const std::string &userName#>, <#const std::string &password#>, <#int userLevel#>)
+    if (settings::instance().cassandraSeeds.size() == 0) return;
+    
+    const char* const USERNAME = "test user";
+    const char* const PASSWORD = "password";
+    
+    user_account::create(USERNAME, PASSWORD, 1);
+    
+    
+    unsigned char hashResult[CryptoPP::SHA256::DIGESTSIZE];
+    CryptoPP::SHA256 sha;
+    sha.CalculateDigest(&hashResult[0], (unsigned char*)USERNAME, strlen(USERNAME));
+    
+    std::string nameHash = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+    
+    std::mutex m;
+    std::condition_variable cv;
+    
+    user_account foundAcct;
+    bool returned = false;
+    
+    user_account::find(nameHash, [&] (bool found, user_account acct) {
+        std::lock_guard<std::mutex> lk(m);
+        returned = true;
+        foundAcct = acct;
+        cv.notify_one();
+    });
+    
+    std::unique_lock<std::mutex> lk(m);
+    cv.wait(lk, [&] {return returned == true;});
+    
+    ASSERT_EQ(1, foundAcct.user_level());
 }

@@ -49,6 +49,12 @@ namespace sopmq {
             static user_account create(const std::string& userName, const std::string& password,
                                        int userLevel);
             
+            ///
+            /// \brief Finds a user by username hash
+            ///
+            static void find(const std::string& nameHashHexString,
+                             std::function<void(bool, user_account)> findCallback);
+            
         public:
             user_account();
             user_account(const std::string& nameHash, const std::string& userName,

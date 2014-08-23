@@ -18,6 +18,10 @@
 #ifndef __sopmq__cassandra_storage__
 #define __sopmq__cassandra_storage__
 
+#include "cass_ptrs.h"
+#include "user_account.h"
+#include "storage_error.h"
+
 #include <cassandra.h>
 
 #include <boost/shared_ptr.hpp>
@@ -26,12 +30,19 @@
 #include <memory>
 #include <string>
 
-#include "cass_ptrs.h"
-#include "user_account.h"
-
 namespace sopmq {
     namespace node {
         namespace storage {
+            
+            ///
+            /// The result of the find_user operation
+            ///
+            struct find_user_result
+            {
+                bool user_found;
+                std::unique_ptr<storage_error> error;
+                user_account account;
+            };
             
             
             ///
@@ -64,7 +75,7 @@ namespace sopmq {
                 /// \brief Finds a user by primary key (user name hash hex string)
                 ///
                 void find_user(const std::string& usernameHash,
-                               std::function<void(bool, user_account)> callback);
+                               std::function<void(const find_user_result&)> callback);
                                  
             private:
 				CassCluster* _cluster;
@@ -77,6 +88,10 @@ namespace sopmq {
                 void execute_statement(CassSession* session, const std::string& statement);
                 
                 void throw_on_error(CassFuture* future);
+                
+                std::string get_string_column_value(const CassRow* row, const std::string& colname);
+                
+                int get_int_column_value(const CassRow* row, const std::string& colname);
                 
                 cassandra_storage();
                 ~cassandra_storage();

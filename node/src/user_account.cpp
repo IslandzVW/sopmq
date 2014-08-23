@@ -53,9 +53,9 @@ namespace sopmq {
                                          const std::string& passwordChallengeHashHexString,
                                          std::function<void(bool)> authCallback)
         {
-            auto userLookupCb = [=](bool found, user_account acct)
+            auto userLookupCb = [=](const storage::find_user_result& fur)
             {
-                if (!found || acct.user_level() == 0)
+                if (!fur.user_found || fur.account.user_level() == 0)
                 {
                     authCallback(false);
                 }
@@ -66,7 +66,7 @@ namespace sopmq {
                 CryptoPP::SHA256 sha;
                 
                 unsigned char goodHash[CryptoPP::SHA256::DIGESTSIZE];
-                std::string goodPwHashAndChallenge(acct.pw_hash() + challengeBytes);
+                std::string goodPwHashAndChallenge(fur.account.pw_hash() + challengeBytes);
                 
                 sha.CalculateDigest(&goodHash[0], (unsigned char*)goodPwHashAndChallenge.c_str(),
                                     goodPwHashAndChallenge.length());
@@ -83,6 +83,25 @@ namespace sopmq {
                 {
                     authCallback(false);
                 }
+            };
+            
+            cassandra_storage::instance().find_user(nameHashHexString, userLookupCb);
+        }
+        
+        void user_account::find(const std::string& nameHashHexString,
+                                std::function<void(bool, user_account)> findCallback)
+        {
+            auto userLookupCb = [=](const storage::find_user_result& fur)
+            {
+                if (!fur.user_found)
+                {
+                    findCallback(false, user_account());
+                }
+                else
+                {
+                    findCallback(true, fur.account);
+                }
+                
             };
             
             cassandra_storage::instance().find_user(nameHashHexString, userLookupCb);
