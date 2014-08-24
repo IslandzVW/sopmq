@@ -25,7 +25,8 @@ namespace cassasync {
     {
         async_query_state* qstate = static_cast<async_query_state*>(data);
         cass_future_free(f);
-        qstate->result_callback(*qstate);
+        
+        delete qstate;
     }
     
     bool check_async_future_error(CassFuture* f, async_query_state* qstate)
@@ -42,7 +43,9 @@ namespace cassasync {
             }
             else
             {
-                //we need to close the session first
+                //callback and then close the session
+                qstate->result_callback(*qstate);
+                
                 CassFuture* session_close_future = cass_session_close(qstate->session);
                 cass_future_set_callback(session_close_future, &after_session_closed, qstate);
             }
@@ -63,6 +66,8 @@ namespace cassasync {
         CassResultConstPtr result(cass_future_get_result(qstate->result_future.get()));
         
         qstate->rows.reset(cass_iterator_from_result(result.get()));
+        
+        qstate->result_callback(*qstate);
         
         //close the session
         CassFuture* session_close_future = cass_session_close(qstate->session);
