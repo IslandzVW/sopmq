@@ -64,8 +64,6 @@ namespace cassasync {
         
         qstate->rows.reset(cass_iterator_from_result(result.get()));
         
-        qstate->result_callback(*qstate);
-        
         //close the session
         CassFuture* session_close_future = cass_session_close(qstate->session);
         cass_future_set_callback(session_close_future, &after_session_closed, qstate);

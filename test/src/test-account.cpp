@@ -52,9 +52,11 @@ TEST(AccountTest, TestCreateAccount)
     
     user_account foundAcct;
     bool returned = false;
+    bool ufound = false;
     
     user_account::find(nameHash, [&] (bool found, user_account acct) {
         std::lock_guard<std::mutex> lk(m);
+        ufound = found;
         returned = true;
         foundAcct = acct;
         cv.notify_one();
@@ -63,5 +65,7 @@ TEST(AccountTest, TestCreateAccount)
     std::unique_lock<std::mutex> lk(m);
     cv.wait(lk, [&] {return returned == true;});
     
+    ASSERT_EQ(true, ufound);
     ASSERT_EQ(1, foundAcct.user_level());
+    ASSERT_EQ(USERNAME, foundAcct.username());
 }

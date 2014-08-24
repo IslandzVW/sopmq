@@ -143,6 +143,8 @@ namespace sopmq {
             std::string cassandra_storage::get_string_column_value(const CassRow* row, const std::string& colname)
             {
                 const CassValue* value = cass_row_get_column_by_name(row, colname.c_str());
+                if (!value) return "";
+                
                 CassString val_string;
                 cass_value_get_string(value, &val_string);
                 
@@ -152,6 +154,8 @@ namespace sopmq {
             int cassandra_storage::get_int_column_value(const CassRow* row, const std::string& colname)
             {
                 const CassValue* value = cass_row_get_column_by_name(row, colname.c_str());
+                if (!value) return 0;
+                    
                 int ival;
                 cass_value_get_int32(value, &ival);
                 
@@ -166,11 +170,14 @@ namespace sopmq {
                     if (qstate.error)
                     {
                         find_user_result result;
+                        result.user_found = false;
                         result.error = std::move(qstate.error);
                         callback(result);
+                        
+                        return;
                     }
                     
-                    
+                    find_user_result fur;
                     if (cass_iterator_next(qstate.rows.get()))
                     {
                         const CassRow* row = cass_iterator_get_row(qstate.rows.get());
@@ -178,17 +185,17 @@ namespace sopmq {
                         user_account acct(get_string_column_value(row, "uname_hash"),
                                           get_string_column_value(row, "username"),
                                           get_string_column_value(row, "pw_hash"),
-                                          get_int_column_value(row, "level"));
+                                          get_int_column_value(row, "user_level"));
                         
-                        find_user_result fur;
+                        fur.user_found = true;
                         fur.account = acct;
                     }
                     else
                     {
-                        find_user_result fur;
                         fur.user_found = false;
-                        callback(fur);
                     }
+                    
+                    callback(fur);
                 };
                 
                 cassasync::async_query_state* qstate = new cassasync::async_query_state();
