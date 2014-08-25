@@ -126,15 +126,13 @@ namespace sopmq {
                 CryptoPP::SHA256 sha;
                 
                 sha.CalculateDigest(&hashResult[0], (unsigned char*)_username.c_str(), _username.length());
-                std::string result = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
-                
-                result += " ";
+                std::string username = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
                 
                 std::string pwAndChallenge(_password);
                 pwAndChallenge += challenge;
                 
                 sha.CalculateDigest(&hashResult[0], (unsigned char*)pwAndChallenge.c_str(), pwAndChallenge.length());
-                result += util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+                std::string result = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
                 
                 //clear the handler for the challenge response since we're not looking for that anymore
                 _dispatcher->set_handler(std::function<void(ChallengeResponseMessage_ptr)>());
@@ -145,7 +143,9 @@ namespace sopmq {
                 
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
                 acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));
-                acm->set_response(result);
+                acm->set_uname_hash(username);
+                acm->set_challenge_response(result);
+                
                 _connection->send_message(message::MT_ANSWER_CHALLENGE, acm,
                                           std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
                 

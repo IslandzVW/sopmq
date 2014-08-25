@@ -30,6 +30,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 
 namespace sopmq {
     namespace node {
@@ -62,6 +63,8 @@ namespace sopmq {
                 connection::wptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
                 GetChallengeMessage_Type _authType;
+                
+                std::string _challenge;
                 
                 void unhandled_message(Message_ptr message);
                 

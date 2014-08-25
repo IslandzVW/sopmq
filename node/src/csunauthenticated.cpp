@@ -21,10 +21,12 @@
 #include "settings.h"
 #include "logging.h"
 #include "util.h"
+#include "user_account.h"
 
 #include "ChallengeResponseMessage.pb.h"
 #include "AnswerChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "AuthAckMessage.pb.h"
 
 #include <functional>
 
@@ -33,6 +35,7 @@ using sopmq::message::messageutil;
 using sopmq::node::settings;
 using sopmq::error::network_error;
 using sopmq::shared::util;
+using sopmq::node::user_account;
 
 namespace ba = boost::asio;
 
@@ -83,7 +86,10 @@ namespace sopmq {
             void csunauthenticated::generate_challenge_response(connection::ptr conn, std::uint32_t replyTo)
             {
                 ChallengeResponseMessage_ptr response = std::make_shared<ChallengeResponseMessage>();
-                response->set_challenge(util::random_bytes(CHALLENGE_SIZE));
+                
+                _challenge = util::random_bytes(CHALLENGE_SIZE);
+                
+                response->set_challenge(_challenge);
                 response->set_allocated_identity(messageutil::build_id(conn->get_next_id(), replyTo));
                 
                 // clear the challenge handler.
@@ -103,7 +109,38 @@ namespace sopmq {
             {
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
                 
+                auto connptr = _conn.lock();
+                if (connptr == nullptr) return;
                 
+                std::function<void(bool)> authCallback = [&](bool authd) {
+                    //remember this is coming back from the libuv stuff inside the cassandra
+                    //driver, so we need to get back into our IO thread
+                    
+                    if (authd)
+                    {
+                        //user is good to go
+                        _ioService.post([&] {
+                            AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
+                            response->set_authorized(true);
+                            response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
+                            connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                                            shared_from_this(), _1));
+                        });
+                    }
+                    else
+                    {
+                        //no good
+                        _ioService.post([&] {
+                            AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
+                            response->set_authorized(false);
+                            response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
+                            connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                                            shared_from_this(), _1));
+                        });
+                    }
+                };
+                
+                user_account::is_authorized(message->uname_hash(), _challenge, message->challenge_response(), authCallback);
             }
             
             void csunauthenticated::handle_read_result(const net::network_operation_result& result)
