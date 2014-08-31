@@ -47,7 +47,7 @@ protected:
         if (settings::instance().cassandraSeeds.size() == 0) return;
         
         thread = new boost::thread(std::bind(&OperationsTest::do_run, this));
-        boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
     }
     
     void do_run()
