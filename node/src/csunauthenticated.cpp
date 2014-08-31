@@ -53,7 +53,7 @@ namespace sopmq {
             
             csunauthenticated::~csunauthenticated()
             {
-                
+                LOG_SRC(debug) << "~csunauthenticated()";
             }
             
             void csunauthenticated::unhandled_message(Message_ptr message)
@@ -97,7 +97,7 @@ namespace sopmq {
                 
                 // set the new handler for the client answer
                 std::function<void(AnswerChallengeMessage_ptr)> func
-                    = std::bind(&csunauthenticated::handle_answer_challenge_message, shared_from_this(), _1);
+                    = std::bind(&csunauthenticated::handle_answer_challenge_message, this, _1);
                 
                 _dispatcher.set_handler(func);
                 
@@ -109,9 +109,6 @@ namespace sopmq {
             {
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
                 
-                auto connptr = _conn.lock();
-                if (connptr == nullptr) return;
-                
                 std::function<void(bool)> authCallback = [&](bool authd) {
                     //remember this is coming back from the libuv stuff inside the cassandra
                     //driver, so we need to get back into our IO thread
@@ -120,6 +117,9 @@ namespace sopmq {
                     {
                         //user is good to go
                         _ioService.post([&] {
+                            auto connptr = _conn.lock();
+                            if (connptr == nullptr) return;
+                            
                             AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
                             response->set_authorized(true);
                             response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
@@ -131,6 +131,9 @@ namespace sopmq {
                     {
                         //no good
                         _ioService.post([&] {
+                            auto connptr = _conn.lock();
+                            if (connptr == nullptr) return;
+                            
                             AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
                             response->set_authorized(false);
                             response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
@@ -170,7 +173,7 @@ namespace sopmq {
             void csunauthenticated::start()
             {
                 std::function<void(GetChallengeMessage_ptr)> func
-                    = std::bind(&csunauthenticated::handle_get_challenge_message, shared_from_this(), _1);
+                    = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1);
                 
                 _dispatcher.set_handler(func);
                 
@@ -189,7 +192,7 @@ namespace sopmq {
             {
                 //read a message from the network
                 messageutil::read_message(_ioService, conn->get_socket(),
-                                          std::bind(&csunauthenticated::handle_read_result, this, _1),
+                                          std::bind(&csunauthenticated::handle_read_result, shared_from_this(), _1),
                                           _dispatcher, settings::instance().maxMessageSize);
             }
         }

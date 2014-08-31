@@ -138,7 +138,7 @@ namespace sopmq {
                 _dispatcher->set_handler(std::function<void(ChallengeResponseMessage_ptr)>());
 
                 //set the handler for the AuthAck
-				std::function<void(AuthAckMessage_ptr)> func = std::bind(&authentication_state::on_auth_ack, shared_from_this(), _1);
+				std::function<void(AuthAckMessage_ptr)> func = std::bind(&authentication_state::on_auth_ack, this, _1);
                 _dispatcher->set_handler(func);
                 
                 AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();

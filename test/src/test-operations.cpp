@@ -20,6 +20,8 @@
 #include "server.h"
 #include "cluster_builder.h"
 #include "endpoint.h"
+#include "settings.h"
+#include "user_account.h"
 
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
@@ -30,6 +32,8 @@
 
 using namespace sopmq::client;
 using namespace sopmq::shared::net;
+using sopmq::node::settings;
+using sopmq::node::user_account;
 
 class OperationsTest : public ::testing::Test
 {
@@ -62,7 +66,13 @@ protected:
 
 TEST_F(OperationsTest, TestAuthentication)
 {
-    /*
+    if (settings::instance().cassandraSeeds.size() == 0) return;
+    
+    const char* const USERNAME = "test";
+    const char* const PASSWORD = "test";
+    
+    user_account::create(USERNAME, PASSWORD, 1);
+    
     boost::asio::io_service clientIoService;
     cluster_builder builder;
     builder.add_endpoint(endpoint("sopmq1://127.0.0.1:8481"));
@@ -89,5 +99,4 @@ TEST_F(OperationsTest, TestAuthentication)
     
     boost::asio::io_service::work work(clientIoService);
     clientIoService.run();
-     */
 }
