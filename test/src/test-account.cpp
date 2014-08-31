@@ -105,7 +105,7 @@ TEST(AccountTest, TestAccountAuthorized)
     bool uauthd = false;
     bool returned = false;
     
-    user_account::is_authorized(nameHash, challengeBytes, pwHashAndChallenge, [&] (bool authd) {
+    user_account::is_authorized(nameHash, challengeBytes, challengeResponse, [&] (bool authd) {
         std::lock_guard<std::mutex> lk(m);
         returned = true;
         uauthd = authd;

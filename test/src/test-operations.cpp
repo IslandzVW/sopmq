@@ -44,6 +44,8 @@ protected:
     
     virtual void SetUp()
     {
+        if (settings::instance().cassandraSeeds.size() == 0) return;
+        
         thread = new boost::thread(std::bind(&OperationsTest::do_run, this));
         boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
     }
@@ -60,6 +62,8 @@ protected:
     
     virtual void TearDown()
     {
+        if (settings::instance().cassandraSeeds.size() == 0) return;
+        
         s->stop();
     }
 };
@@ -79,9 +83,12 @@ TEST_F(OperationsTest, TestAuthentication)
     
     auto clstr = builder.build();
     
+    bool authRan = false;
+    
     auto authCb = [&](bool authd)
     {
         clientIoService.stop();
+        authRan = true;
         ASSERT_TRUE(authd);
     };
     
@@ -99,4 +106,47 @@ TEST_F(OperationsTest, TestAuthentication)
     
     boost::asio::io_service::work work(clientIoService);
     clientIoService.run();
+    
+    ASSERT_TRUE(authRan);
+}
+
+TEST_F(OperationsTest, TestAuthenticationFailure)
+{
+    if (settings::instance().cassandraSeeds.size() == 0) return;
+    
+    const char* const USERNAME = "test";
+    const char* const PASSWORD = "test";
+    
+    user_account::create(USERNAME, PASSWORD, 1);
+    
+    boost::asio::io_service clientIoService;
+    cluster_builder builder;
+    builder.add_endpoint(endpoint("sopmq1://127.0.0.1:8481"));
+    
+    auto clstr = builder.build();
+    
+    bool authRan = false;
+    auto authCb = [&](bool authd)
+    {
+        clientIoService.stop();
+        authRan = true;
+        ASSERT_FALSE(authd);
+    };
+    
+    session::ptr mSession;
+    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    {
+        ASSERT_TRUE(session != nullptr) << e.what();
+        
+        //make sure session stays in scope for the tests
+        mSession = session;
+        session->authenticate("testhjgasdh", "testdsadsadsa", authCb);
+    };
+    
+    clstr->connect(clientIoService, connHandler);
+    
+    boost::asio::io_service::work work(clientIoService);
+    clientIoService.run();
+    
+    ASSERT_TRUE(authRan);
 }

@@ -71,11 +71,9 @@ namespace sopmq {
                 sha.CalculateDigest(&goodHash[0], (unsigned char*)goodPwHashAndChallenge.c_str(),
                                     goodPwHashAndChallenge.length());
                 
-                unsigned char givenHash[CryptoPP::SHA256::DIGESTSIZE];
-                sha.CalculateDigest(&givenHash[0], (unsigned char*)passwordChallengeHashHexString.c_str(),
-                                    passwordChallengeHashHexString.length());
+                goodPwHashAndChallenge = util::hex_encode(goodHash, CryptoPP::SHA256::DIGESTSIZE);
                 
-                if (memcmp(goodHash, givenHash, CryptoPP::SHA256::DIGESTSIZE) == 0)
+                if (goodPwHashAndChallenge == passwordChallengeHashHexString)
                 {
                     authCallback(true);
                 }

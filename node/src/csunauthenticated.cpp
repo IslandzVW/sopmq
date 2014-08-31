@@ -48,7 +48,6 @@ namespace sopmq {
             csunauthenticated::csunauthenticated(ba::io_service& ioService, connection::wptr conn)
             : _ioService(ioService), _conn(conn), _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1))
             {
-				
             }
             
             csunauthenticated::~csunauthenticated()
@@ -103,20 +102,21 @@ namespace sopmq {
                 
                 conn->send_message(message::MT_CHALLENGE_RESPONSE, response,
                                    std::bind(&csunauthenticated::handle_write_result, shared_from_this(), _1));
+                this->read_next_message(conn);
             }
             
             void csunauthenticated::handle_answer_challenge_message(AnswerChallengeMessage_ptr message)
             {
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
                 
-                std::function<void(bool)> authCallback = [&](bool authd) {
+                std::function<void(bool)> authCallback = [=](bool authd) {
                     //remember this is coming back from the libuv stuff inside the cassandra
                     //driver, so we need to get back into our IO thread
                     
                     if (authd)
                     {
                         //user is good to go
-                        _ioService.post([&] {
+                        _ioService.post([=] {
                             auto connptr = _conn.lock();
                             if (connptr == nullptr) return;
                             
@@ -130,7 +130,7 @@ namespace sopmq {
                     else
                     {
                         //no good
-                        _ioService.post([&] {
+                        _ioService.post([=] {
                             auto connptr = _conn.lock();
                             if (connptr == nullptr) return;
                             
@@ -153,10 +153,6 @@ namespace sopmq {
                     if (! result.was_successful())
                     {
                         connptr->handle_error(result.get_error());
-                    }
-                    else
-                    {
-                        this->read_next_message(connptr);
                     }
                 }
             }
