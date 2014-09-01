@@ -1,0 +1,9 @@
+root = true
+
+[*.cpp]
+indent_style = space
+indent_size = 4
+
+[*.h]
+indent_style = space
+indent_size = 4

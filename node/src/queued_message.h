@@ -18,6 +18,18 @@
 #ifndef __sopmq__queued_message__
 #define __sopmq__queued_message__
 
+namespace sopmq {
+    namespace node {
 
+        class queued_message
+        {
+        public:
+
+        private:
+
+        };
+
+    }
+}
 
 #endif /* defined(__sopmq__queued_message__) */

@@ -37,6 +37,7 @@ namespace sopmq {
         _acceptor(_ioService, _endpoint), _stopping(false)
         {
             BOOST_LOG_TRIVIAL(info) << "starting mq services on TCP/" << _port;
+            
         }
         
         void server::start()
