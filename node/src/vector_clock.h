@@ -35,6 +35,21 @@ namespace sopmq {
             typedef std::array<std::uint64_t, RF> type;
         };
 
+        template <std::size_t RF>
+        bool operator <(const typename vclock_t<RF>::type& lhs, const typename vclock_t<RF>::type& rhs)
+        {
+            for (std::size_t i = 0; i < RF; i++)
+            {
+                if (lhs[i] < rhs[i])
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
     }
 }
 #endif

@@ -20,12 +20,43 @@
 
 #include "queued_message.h"
 
+#include <boost/heap/fibonacci_heap.hpp>
+
 #include <string>
 #include <cstdint>
 #include <boost/chrono.hpp>
+#include <unordered_map>
 
 namespace sopmq {
     namespace node {
+
+        ///
+        /// Message map for queued_message by id.
+        /// \tparam RF Replication factor
+        ///
+        template <size_t RF>
+        struct message_map_t
+        {
+            typedef std::unordered_map<boost::uuids::uuid, queued_message<RF>> type;
+        };
+
+        ///
+        /// Priority queue for queued_message sorted by vclock
+        /// \tparam RF Replication factor
+        ///
+        template <size_t RF>
+        struct message_queue_t
+        {
+            struct compare_node
+            {
+                bool operator()(const queued_message<RF>& n1, const queued_message<RF>& n2) const
+                {
+                    return n1.vector_clock() < n2.vector_clock();
+                }
+            };
+
+            typedef boost::heap::fibonacci_heap<typename queued_message<RF>::ptr, compare_node> type;
+        };
 
         ///
         /// Queue for incoming messages from producers
@@ -60,13 +91,24 @@ namespace sopmq {
             {
                 _unstamped_messages.emplace(id, std::move(*data));
             }
-
+            
             ///
-            ///
-            ///
+            /// Sets the vector clock for the given message
+            /// \param id The id of the message to set the clock on
+            /// \param vclock The clock to set on the message
             ///
             void stamp(boost::uuids::uuid id, typename vclock_t<RF>::type vclock)
             {
+                auto iter = _unstamped_messages.find(id);
+                if (iter != _unstamped_messages.end())
+                {
+                    _queued_messages.push(std::make_shared<queued_message<RF>>(*std::move_iterator(iter)));
+                    _unstamped_messages.erase(asd);
+                }
+                else
+                {
+
+                }
             }
 
         private:
@@ -95,6 +137,11 @@ namespace sopmq {
             /// a vector clock yet
             ///
             typename message_map_t<RF>::type _unstamped_messages;
+
+            ///
+            /// Messages that are actively in the queue and can be claimed
+            ///
+            typename message_queue_t<RF>::type _queued_messages;
         };
     }
 }

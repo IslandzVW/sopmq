@@ -26,7 +26,6 @@
 #include <array>
 #include <cstdint>
 #include <memory>
-#include <unordered_map>
 
 namespace sopmq {
     namespace node {
@@ -98,16 +97,6 @@ namespace sopmq {
             std::string _data;
             boost::chrono::steady_clock::time_point _local_time;
             typename vclock_t<RF>::type _vclock;
-        };
-
-        ///
-        /// Message map for queued_message by id.
-        /// \tparam RF Replication factor
-        ///
-        template <size_t RF>
-        struct message_map_t
-        {
-            typedef std::unordered_map<boost::uuids::uuid, queued_message<RF>> type;
         };
     }
 }
