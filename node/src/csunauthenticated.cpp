@@ -108,7 +108,8 @@ namespace sopmq {
             void csunauthenticated::handle_answer_challenge_message(AnswerChallengeMessage_ptr message)
             {
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
-                
+                auto t = shared_from_this();
+
                 std::function<void(bool)> authCallback = [=](bool authd) {
                     //remember this is coming back from the libuv stuff inside the cassandra
                     //driver, so we need to get back into our IO thread
@@ -124,7 +125,7 @@ namespace sopmq {
                             response->set_authorized(true);
                             response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            shared_from_this(), _1));
+                                                                                            this->shared_from_this(), _1));
                         });
                     }
                     else
@@ -138,7 +139,7 @@ namespace sopmq {
                             response->set_authorized(false);
                             response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            shared_from_this(), _1));
+                                                                                            this->shared_from_this(), _1));
                         });
                     }
                 };

@@ -15,11 +15,26 @@
  * limitations under the License.
  */
 
-#include "queued_message.h"
+#ifndef __sopmq__vector_clock__
+#define __sopmq__vector_clock__
+
+#include <array>
+#include <cstdint>
+#include <cstddef>
 
 namespace sopmq {
     namespace node {
 
+        ///
+        /// Vector clock of the given replication factor
+        /// \tparam RF The replication factor
+        ///
+        template <std::size_t RF>
+        struct vclock_t
+        {
+            typedef std::array<std::uint64_t, RF> type;
+        };
 
     }
 }
+#endif

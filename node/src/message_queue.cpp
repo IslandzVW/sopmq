@@ -15,11 +15,4 @@
  * limitations under the License.
  */
 
-#include "queued_message.h"
-
-namespace sopmq {
-    namespace node {
-
-
-    }
-}
+#include "message_queue.h"
