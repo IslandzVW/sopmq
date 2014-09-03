@@ -67,6 +67,7 @@ namespace sopmq {
             void dispatch(ChallengeResponseMessage_ptr challengeResponseMessage);
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
             void dispatch(Identifier_ptr identifier);
+            void dispatch(VectorClock_ptr vectorClock);
             //[[[end]]]
             
         public:
@@ -80,6 +81,7 @@ namespace sopmq {
             void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             void set_handler(std::function<void(Identifier_ptr)> handler);
+            void set_handler(std::function<void(VectorClock_ptr)> handler);
             //[[[end]]]
             
         private:
@@ -95,6 +97,7 @@ namespace sopmq {
             std::function<void(ChallengeResponseMessage_ptr)> _challengeResponseMessageHandler;
             std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
             std::function<void(Identifier_ptr)> _identifierHandler;
+            std::function<void(VectorClock_ptr)> _vectorClockHandler;
             //[[[end]]]
             
             ///

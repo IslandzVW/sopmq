@@ -46,6 +46,7 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "VectorClock.pb.h"
 //[[[end]]]
 
 

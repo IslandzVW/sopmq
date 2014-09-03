@@ -61,6 +61,9 @@ typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 class Identifier;
 typedef std::shared_ptr<Identifier> Identifier_ptr;
 
+class VectorClock;
+typedef std::shared_ptr<VectorClock> VectorClock_ptr;
+
 
 //[[[end]]]
 

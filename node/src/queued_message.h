@@ -53,7 +53,7 @@ namespace sopmq {
             ///
             /// Sets the vector clock value for this message
             ///
-            void set_vclock(vclock_t clock)
+            void set_vclock(typename vclock_t<RF>::type clock)
             {
                 _vclock = clock;
             }

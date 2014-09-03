@@ -99,11 +99,13 @@ namespace sopmq {
             ///
             void stamp(boost::uuids::uuid id, typename vclock_t<RF>::type vclock)
             {
+                typedef typename message_map_t<RF>::type::iterator IterType;
+                
                 auto iter = _unstamped_messages.find(id);
                 if (iter != _unstamped_messages.end())
                 {
-                    _queued_messages.push(std::make_shared<queued_message<RF>>(*std::move_iterator(iter)));
-                    _unstamped_messages.erase(asd);
+                    _queued_messages.push(std::make_shared<queued_message<RF>>(*std::move_iterator<IterType>(iter)));
+                    _unstamped_messages.erase(iter);
                 }
                 else
                 {

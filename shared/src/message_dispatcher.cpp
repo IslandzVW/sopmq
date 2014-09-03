@@ -45,6 +45,7 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "VectorClock.pb.h"
 //[[[end]]]
 
 namespace sopmq {
@@ -101,6 +102,12 @@ namespace sopmq {
             do_dispatch(_identifierHandler, identifier);
         }
 
+
+        void message_dispatcher::dispatch(VectorClock_ptr vectorClock)
+        {
+            do_dispatch(_vectorClockHandler, vectorClock);
+        }
+
         //[[[end]]]
         
         /*[[[cog
@@ -141,6 +148,12 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(Identifier_ptr)> handler)
         {
             _identifierHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(VectorClock_ptr)> handler)
+        {
+            _vectorClockHandler = handler;
         }
 
         //[[[end]]]
