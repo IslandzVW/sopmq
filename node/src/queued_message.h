@@ -91,6 +91,22 @@ namespace sopmq {
                 return _local_time;
             }
 
+			///
+			/// Updates the local timestamp for the given message to NOW
+			///
+			void update_local_timestamp()
+			{
+				_local_time = boost::chrono::steady_clock::now();
+			}
+
+			///
+			/// Returns the size of the message
+			///
+			uint32_t size()
+			{
+				return sizeof(_id) + sizeof(_local_time) + sizeof(_vclock) + _data.length(); 
+			}
+
 
         private:
             boost::uuids::uuid _id;

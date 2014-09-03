@@ -19,8 +19,10 @@
 #define __sopmq__message_queue__
 
 #include "queued_message.h"
+#include "message_not_found_error.h"
 
 #include <boost/heap/fibonacci_heap.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <string>
 #include <cstdint>
@@ -86,9 +88,18 @@ namespace sopmq {
             ///
             /// \brief Places the message into the unstamped collection
             /// Places the message into the unstamped collection and takes ownership of the data
+			/// \param id The unique ID of this message
+			/// \param data The binary payload for the message
+			/// \param ttlSecs The number of seconds this message should live in the queue
             ///
-            void enqueue(boost::uuids::uuid id, std::string* data)
+            void enqueue(boost::uuids::uuid id, std::string* data, uint32_t ttlSecs)
             {
+				if (! _ttl_set)
+				{
+					_ttl_set = true;
+					_ttl = ttlSecs;
+				}
+
                 _unstamped_messages.emplace(id, std::move(*data));
             }
             
@@ -104,14 +115,33 @@ namespace sopmq {
                 auto iter = _unstamped_messages.find(id);
                 if (iter != _unstamped_messages.end())
                 {
-                    _queued_messages.push(std::make_shared<queued_message<RF>>(*std::move_iterator<IterType>(iter)));
+					auto message = std::make_shared<queued_message<RF>>(*std::move_iterator<IterType>(iter));
+					message->update_local_timestamp();
+
+                    _queued_messages.push(message);
                     _unstamped_messages.erase(iter);
                 }
                 else
                 {
-
+					throw message_not_found_error("Message with ID " + boost::lexical_cast<std::string>(id) +
+						"was not found and could not be stamped");
                 }
             }
+
+			///
+			/// Expires messages that are beyond their TTL
+			///
+			void expire_messages()
+			{
+			}
+
+			///
+			/// The total memory size of all messages in this queue in bytes
+			///
+			uint32_t size()
+			{
+				return _total_message_size;
+			}
 
         private:
             ///
@@ -144,6 +174,22 @@ namespace sopmq {
             /// Messages that are actively in the queue and can be claimed
             ///
             typename message_queue_t<RF>::type _queued_messages;
+
+			///
+			/// Whether or not the TTL has been set yet
+			///
+			bool _ttl_set;
+
+			///
+			/// The TTL of all messages in this queue based on the TTL of the first message
+			/// received
+			///
+			uint32_t _ttl;
+			
+			///
+			/// The total size of all the messages in this queue
+			///
+			uint32_t _total_message_size;
         };
     }
 }
