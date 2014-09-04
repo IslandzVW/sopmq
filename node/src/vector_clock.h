@@ -48,6 +48,12 @@ namespace sopmq {
 
             return false;
         }
+        
+        template <std::size_t RF>
+        bool operator >(const typename vclock_t<RF>::type& lhs, const typename vclock_t<RF>::type& rhs)
+        {
+            return (!(lhs < rhs)) && (lhs != rhs);
+        }
 
 
     }

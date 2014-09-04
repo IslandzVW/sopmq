@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <boost/chrono.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace sopmq {
     namespace node {
@@ -61,7 +62,7 @@ namespace sopmq {
         };
 
         ///
-        /// Queue for incoming messages from producers
+        /// \brief Queue for incoming messages from producers
         ///
         template <size_t RF>
         class message_queue
@@ -86,8 +87,8 @@ namespace sopmq {
             }
 
             ///
-            /// \brief Places the message into the unstamped collection
             /// Places the message into the unstamped collection and takes ownership of the data
+            /// \brief Places the message into the unstamped collection
 			/// \param id The unique ID of this message
 			/// \param data The binary payload for the message
 			/// \param ttlSecs The number of seconds this message should live in the queue
@@ -104,7 +105,7 @@ namespace sopmq {
             }
             
             ///
-            /// Sets the vector clock for the given message
+            /// \brief Sets the vector clock for the given message
             /// \param id The id of the message to set the clock on
             /// \param vclock The clock to set on the message
             ///
@@ -124,25 +125,68 @@ namespace sopmq {
                 else
                 {
 					throw message_not_found_error("Message with ID " + boost::lexical_cast<std::string>(id) +
-						"was not found and could not be stamped");
+                                                  " was not found and could not be stamped");
                 }
             }
 
 			///
-			/// Expires messages that are beyond their TTL
+			/// \brief Expires messages that are beyond their TTL
 			///
 			void expire_messages()
 			{
+                auto now = boost::chrono::steady_clock::now();
+                
+                
+                
+                while (!_queued_messages.empty() &&
+                       now - _queued_messages.top().local_time() > boost::chrono::seconds(_ttl))
+                {
+                    _queued_messages.pop();
+                }
 			}
 
 			///
-			/// The total memory size of all messages in this queue in bytes
+			/// \brief The total memory size of all messages in this queue in bytes
 			///
 			uint32_t size()
 			{
 				return _total_message_size;
 			}
-
+            
+            ///
+            /// \brief Claims and returns all messages in this queue
+            ///
+            std::vector<typename queued_message<RF>::ptr> claim_all()
+            {
+                std::vector<typename queued_message<RF>::ptr> messages(_queued_messages.ordered_begin(),
+                                                                       _queued_messages.ordered_end());
+                
+                _queued_messages.clear();
+                
+                return messages;
+            }
+            
+            ///
+            /// \brief Peeks messages greater than the given vclock
+            ///
+            std::vector<typename queued_message<RF>::ptr> peek(typename vclock_t<RF>::type lastMessage)
+            {
+                auto end = _queued_messages.ordered_end();
+                auto start = _queued_messages.ordered_begin();
+                
+                for (; start != end; ++start)
+                {
+                    if (start.vector_clock() > lastMessage)
+                    {
+                        break;
+                    }
+                }
+                
+                std::vector<typename queued_message<RF>::ptr> messages(start, end);
+                
+                return messages;
+            }
+            
         private:
             ///
             /// Hex representation of the Murmur hash for this queue name
