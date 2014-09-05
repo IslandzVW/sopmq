@@ -20,6 +20,7 @@
 
 #include "queued_message.h"
 #include "message_not_found_error.h"
+#include "vector_clock.h"
 
 #include <boost/heap/fibonacci_heap.hpp>
 #include <boost/lexical_cast.hpp>
@@ -109,7 +110,7 @@ namespace sopmq {
             /// \param id The id of the message to set the clock on
             /// \param vclock The clock to set on the message
             ///
-            void stamp(boost::uuids::uuid id, typename vclock_t<RF>::type vclock)
+            void stamp(boost::uuids::uuid id, vector_clock<RF> vclock)
             {
                 typedef typename message_map_t<RF>::type::iterator IterType;
                 
@@ -135,8 +136,6 @@ namespace sopmq {
 			void expire_messages()
 			{
                 auto now = boost::chrono::steady_clock::now();
-                
-                
                 
                 while (!_queued_messages.empty() &&
                        now - _queued_messages.top().local_time() > boost::chrono::seconds(_ttl))
@@ -169,7 +168,7 @@ namespace sopmq {
             ///
             /// \brief Peeks messages greater than the given vclock
             ///
-            std::vector<typename queued_message<RF>::ptr> peek(typename vclock_t<RF>::type lastMessage)
+            std::vector<typename queued_message<RF>::ptr> peek(vector_clock<RF> lastMessage)
             {
                 auto end = _queued_messages.ordered_end();
                 auto start = _queued_messages.ordered_begin();
@@ -201,7 +200,7 @@ namespace sopmq {
             ///
             /// Our current clock value for message vector clocks
             ///
-            std::uint64_t _clock;
+            vector_clock<RF> _clock;
 
             ///
             /// The last time a message was received for this queue

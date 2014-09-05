@@ -54,9 +54,9 @@ namespace sopmq {
             ///
             /// Sets the vector clock value for this message
             ///
-            void set_vclock(typename vclock_t<RF>::type clock)
+            void set_vclock(vector_clock<RF>& mclock)
             {
-                _vclock = clock;
+                _vclock = mclock;
             }
 
 
@@ -79,7 +79,7 @@ namespace sopmq {
             ///
             /// Returns the vector clock for this message
             ///
-            const typename vclock_t<RF>::type& vector_clock() const
+            const vector_clock<RF>& clock() const
             {
                 return _vclock;
             }
@@ -113,7 +113,7 @@ namespace sopmq {
             boost::uuids::uuid _id;
             std::string _data;
             boost::chrono::steady_clock::time_point _local_time;
-            typename vclock_t<RF>::type _vclock;
+            vector_clock<RF> _vclock;
         };
     }
 }

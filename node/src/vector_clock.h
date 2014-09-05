@@ -21,6 +21,7 @@
 #include <array>
 #include <cstdint>
 #include <cstddef>
+#include <algorithm>
 
 namespace sopmq {
     namespace node {
@@ -30,17 +31,63 @@ namespace sopmq {
         /// \tparam RF The replication factor
         ///
         template <std::size_t RF>
-        struct vclock_t
+        class vector_clock
         {
-            typedef std::array<std::uint64_t, RF> type;
+        public:
+            typedef std::array<std::uint64_t, RF> vclock_t;
+            
+        public:
+            vector_clock()
+            : _value()
+            {
+                
+            }
+            
+            ///
+            /// Returns the clock's value
+            ///
+            inline vclock_t& value()
+            {
+                return _value;
+            }
+            
+            ///
+            /// Returns a new vector clock that contains the highest value from
+            /// the given clocks
+            ///
+            static vector_clock max(const vector_clock& a, const vector_clock& b)
+            {
+                vector_clock result;
+                for (size_t i = 0; i < RF; ++i)
+                {
+                    result.value()[i] = std::max(a.value()[i], b.value[i]);
+                }
+                
+                return result;
+            }
+            
+        private:
+            vclock_t _value;
         };
+        
+        template <std::size_t RF>
+        bool operator ==(const vector_clock<RF>& lhs, const vector_clock<RF>& rhs)
+        {
+            return lhs.value() == rhs.value();
+        }
+        
+        template <std::size_t RF>
+        bool operator !=(const vector_clock<RF>& lhs, const vector_clock<RF>& rhs)
+        {
+            return !(lhs == rhs);
+        }
 
         template <std::size_t RF>
-        bool operator <(const typename vclock_t<RF>::type& lhs, const typename vclock_t<RF>::type& rhs)
+        bool operator <(const vector_clock<RF>& lhs, const vector_clock<RF>& rhs)
         {
             for (std::size_t i = 0; i < RF; i++)
             {
-                if (lhs[i] < rhs[i])
+                if (lhs.value()[i] < rhs.value()[i])
                 {
                     return true;
                 }
@@ -50,7 +97,7 @@ namespace sopmq {
         }
         
         template <std::size_t RF>
-        bool operator >(const typename vclock_t<RF>::type& lhs, const typename vclock_t<RF>::type& rhs)
+        bool operator >(const vector_clock<RF>& lhs, const vector_clock<RF>& rhs)
         {
             return (!(lhs < rhs)) && (lhs != rhs);
         }
