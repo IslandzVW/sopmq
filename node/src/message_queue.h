@@ -61,6 +61,16 @@ namespace sopmq {
 
             typedef boost::heap::fibonacci_heap<typename queued_message<RF>::ptr, compare_node> type;
         };
+        
+        ///
+        /// Map between a message ID and its handle
+        /// \tparam RF Replication factor
+        ///
+        template <size_t RF>
+        struct message_index_t
+        {
+            typedef std::unordered_map<boost::uuids::uuid, typename message_queue_t<RF>::type::handle_type> type;
+        };
 
         ///
         /// \brief Queue for incoming messages from producers
@@ -109,8 +119,9 @@ namespace sopmq {
             /// \brief Sets the vector clock for the given message
             /// \param id The id of the message to set the clock on
             /// \param vclock The clock to set on the message
+            /// \return Whether or not the message was found to set the stamp
             ///
-            void stamp(boost::uuids::uuid id, vector_clock<RF> vclock)
+            bool stamp(boost::uuids::uuid id, vector_clock<RF> vclock)
             {
                 typedef typename message_map_t<RF>::type::iterator IterType;
                 
@@ -121,12 +132,16 @@ namespace sopmq {
 					message->update_local_timestamp();
 
                     _queued_messages.push(message);
+                    _message_index.insert(id);
                     _unstamped_messages.erase(iter);
+                    
+                    _clock = vector_clock<RF>::max(_clock, vclock);
+                    
+                    return true;
                 }
                 else
                 {
-					throw message_not_found_error("Message with ID " + boost::lexical_cast<std::string>(id) +
-                                                  " was not found and could not be stamped");
+					return false;
                 }
             }
 
@@ -136,11 +151,32 @@ namespace sopmq {
 			void expire_messages()
 			{
                 auto now = boost::chrono::steady_clock::now();
+                auto ttlSecs = boost::chrono::seconds(_ttl);
                 
                 while (!_queued_messages.empty() &&
-                       now - _queued_messages.top().local_time() > boost::chrono::seconds(_ttl))
+                       now - _queued_messages.top().local_time() > ttlSecs)
                 {
+                    boost::uuids::uuid id = _queued_messages.top().id();
                     _queued_messages.pop();
+                    _message_index.erase(id);
+                }
+                
+                //also check unstamped for expirations
+                std::vector<boost::uuids::uuid> expired;
+                for (auto kvp : _unstamped_messages)
+                {
+                    if (kvp->value.local_time() > ttlSecs)
+                    {
+                        expired.push_back(kvp->key);
+                    }
+                }
+                
+                if (expired.size() > 0)
+                {
+                    for (auto id : expired)
+                    {
+                        _unstamped_messages.erase(id);
+                    }
                 }
 			}
 
@@ -151,19 +187,6 @@ namespace sopmq {
 			{
 				return _total_message_size;
 			}
-            
-            ///
-            /// \brief Claims and returns all messages in this queue
-            ///
-            std::vector<typename queued_message<RF>::ptr> claim_all()
-            {
-                std::vector<typename queued_message<RF>::ptr> messages(_queued_messages.ordered_begin(),
-                                                                       _queued_messages.ordered_end());
-                
-                _queued_messages.clear();
-                
-                return messages;
-            }
             
             ///
             /// \brief Peeks messages greater than the given vclock
@@ -184,6 +207,19 @@ namespace sopmq {
                 std::vector<typename queued_message<RF>::ptr> messages(start, end);
                 
                 return messages;
+            }
+            
+            ///
+            /// Removes a message from the queue
+            ///
+            void claim(boost::uuids::uuid messageId)
+            {
+                auto iter = _message_index.find(messageId);
+                if (iter != _message_index.end())
+                {
+                    _queued_messages.erase(*iter);
+                    _message_index.erase(messageId);
+                }
             }
             
         private:
@@ -217,7 +253,13 @@ namespace sopmq {
             /// Messages that are actively in the queue and can be claimed
             ///
             typename message_queue_t<RF>::type _queued_messages;
-
+            
+            ///
+            /// Message index from UUID to handle that can be used to reference
+            /// messages in _queued_messages
+            ///
+            typename message_index_t<RF>::type _message_index;
+            
 			///
 			/// Whether or not the TTL has been set yet
 			///
