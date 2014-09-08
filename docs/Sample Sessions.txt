@@ -2,11 +2,15 @@ Sample session for unhandled PostMessage
 -----------------------------------------
 
 Ring:
-			1
-		4		2
-			3
+					1
+					^
+					|
+			P->	4------>2
+			
+					3
 
 Producer connects to coordinator node 4.
+
 Producer posts a message to range handled by nodes 1, 2, and 3
 	With:
 		- StoreIfCantPipe: False
@@ -14,9 +18,16 @@ Producer posts a message to range handled by nodes 1, 2, and 3
 		
 Message written to a quorum and is queued on nodes 1, 2
 
--- 5 seconds passes --
+Nodes 1 and 2 return queue vector clocks to the coordinator node 4
 
-Message is dropped
+The vector clocks are combined by the coordinator and a message stamp 
+is sent back to nodes 1 and 2
+
+Nodes 1 and 2 update the message vector clock and put the message into the queue
+
+-- 5 seconds passes. no consumer picks up the messages --
+-- Message is dropped --
+
 Handling nodes 1 and 2 delete message from queues and remove the queues if they're empty
 Coordinator node 4 notes that the TTL is expired and returns Dropped status to Producer
 
@@ -26,20 +37,46 @@ Sample session for piped PostMessage
 ---------------------------------------
 
 Ring:
-			1
-		4		2
-			3
+				  / 1 <-----\		
+			P->	4		2 <--\ Cc <-- C
+				  \ 3
 
-Consumer connects to nodes 1 and 2 and subscribes to range 			
+Consumer coordinator connects to nodes 1 and 2 and subscribes to range 
+		- DownloadType: None
+		- InterceptType: Claim
+		
 Producer connects to coordinator node 4.
+
 Producer posts a message to range handled by nodes 1, 2, and 3
 	With:
 		- StoreIfCantPipe: False
 		- TTL: 5 seconds
 
-Message written to a quorum and is queued on nodes 1, and 3
-Message is piped to consumer on node 1 and piped status is returned to coordinator node 4
-Coordinator node 4 writes MessagePiped status to Producer
+Coordinator node 4 writes to a quorum on nodes 1, and 3
+The message is stored (not queued) on node 1 and 3, and local vclocks returned to node 4
+Node 4 uses the local vclocks, combines them, and sends a MessageStamp to node 1 and 3
+	- Node 3:
+		- adds the message to its queue with the updated vclock 
+	- Node 1: (with consumer connected) 
+		- We apply the vclock, queue the message, and pipe the message to consumer on node 1.
+		
+			- If the message transmission is successful to the consumer:
+			 	- MessagePiped notification is sent to coordinator node 4 and the message becomes 
+					claimed (removed)
+				- Coordinator node 4 forwards MessagePiped to Producer
+				- Note that since the message is queued, if another consumer subscribes to this queue while 
+					a message is being piped, they will consume the messages in the queue resulting in the 
+					same message being consumed more than once. However, the alternative is to not queue
+					the message, and then the message will get delivered out of order later if the write
+					to the producer fails after a new message is queued.
+				- Also, even if we chose to not queue the message, the message got queued on node 3. 
+					The new consumer connecting has a good chance of connecting to node 3 and consuming
+					
+			- If message transmission is not successful to the consumer, the message is left in
+				the queue on this node, node 1.
+			
+				
+				
 
 
 
@@ -52,14 +89,18 @@ Ring:
 			3
 
 Consumer connects to coordinator node 4
+
 Consumer coordinator connects to nodes 1 and 2 and subscribes to range 			
+
 Producer connects to coordinator node 3.
+
 Producer posts a message to range handled by nodes 1, 2, and 3
 	With:
 		- StoreIfCantPipe: False
 		- TTL: 5 seconds
 
 Coordinator node 4 dies
+
 Message written to a quorum and is queued on nodes 1, and 3
 
 -- 1 second passes --

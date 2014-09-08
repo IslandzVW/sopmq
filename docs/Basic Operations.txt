@@ -60,12 +60,20 @@ Parameters:
 		- PeekStoredMessages
 			Peek at messages that are currently in persistent storage in the given queue
 			Peeking does not remove the messages
-
+			
 	MaxLookbackDays
 		- The number of days we will look back into the queue for stored messages.
 			Setting this number too high can lead to performance problems
 
-Returns:
+	InterceptType = Peek, Claim
+		- Peek 
+			Don't claim messages that are sent to the queue. Just forward them to us.
+			
+		- Claim
+			Claim messages that are sent to the queue thereby deleting them 
+			(this does not guarantee only once delivery when there are multiple consumers)
+
+Returns: SubscribeResponseMessage
 	OK + The queue data/empty message,
 	NotAuth,
 	Unavailable
@@ -87,9 +95,9 @@ Parameters:
 		- Time to live for the message if it could not be piped
  
 	Message
-		-Binary blob
+		- Binary blob
 
-Returns:
+Returns: PostResponseMessage
 	MessagePiped,
 	MessageStored,
 	Dropped,
