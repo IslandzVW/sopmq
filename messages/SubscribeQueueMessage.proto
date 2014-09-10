@@ -1,0 +1,23 @@
+import "Identifier.proto";
+
+message SubscribeQueueMessage {
+	required Identifier identity = 1;
+
+	required string queue_id = 2;
+	
+	enum DownloadType {
+		NONE = 1;
+		CLAIMSTORED = 2;
+		PEEKSTORED = 3;
+	}
+
+	required DownloadType download_type = 3;
+	optional uint32 max_lookback_days = 4;
+
+	enum InterceptType {
+		PEEK = 1;
+		CLAIM = 2;
+	}
+
+	required InterceptType intercept_type = 5;
+}

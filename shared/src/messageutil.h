@@ -120,7 +120,7 @@ namespace sopmq {
         {
         public:
             ///
-            /// Reads an unknown message type from the wire
+            /// \brief Reads an unknown message type from the wire
             ///
             static void read_message(boost::asio::io_service& ioService,
                                      boost::asio::ip::tcp::socket& socket,
@@ -129,7 +129,7 @@ namespace sopmq {
                                      uint32_t maxSize);
             
             ///
-            /// Writes a message to the wire
+            /// \brief Writes a message to the wire
             ///
             static void write_message(message_type type,
                                       Message_ptr message,
@@ -138,9 +138,24 @@ namespace sopmq {
                                       network_status_callback statusCallback);
             
             ///
-            /// Builds a new identifier to tack onto a message
+            /// \brief Builds a new identifier to tack onto a message
             ///
             static Identifier* build_id(std::uint32_t id, std::uint32_t inReplyTo);
+            
+            ///
+            /// \brief Creates a new message in reply to the given message with the given id
+            /// \tparam T The message type to create
+            /// \param id The message identifier
+            /// \param inReplyTo The identifier of the message we are replying to
+            ///
+            template <typename T>
+            static std::shared_ptr<T> make_message(std::uint32_t id, std::uint32_t inReplyTo)
+            {
+                auto message = std::make_shared<T>();
+                message->set_allocated_identity(messageutil::build_id(id, inReplyTo));
+                
+                return message;
+            }
             
         private:
             static const int HEADER_SIZE;

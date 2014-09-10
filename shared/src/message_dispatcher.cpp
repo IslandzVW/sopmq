@@ -45,6 +45,10 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "PostMessage.pb.h"
+#include "PostResponseMessage.pb.h"
+#include "SubscribeQueueMessage.pb.h"
+#include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
 //[[[end]]]
 
@@ -64,6 +68,7 @@ namespace sopmq {
         
         /*[[[cog
          for fn in fnames:
+           
            rawname = os.path.splitext(os.path.basename(fn))[0]
            cog.outl("")
            cog.outl("void message_dispatcher::dispatch(%s_ptr %s)" % (rawname,first_lower(rawname)))
@@ -100,6 +105,30 @@ namespace sopmq {
         void message_dispatcher::dispatch(Identifier_ptr identifier)
         {
             do_dispatch(_identifierHandler, identifier);
+        }
+
+
+        void message_dispatcher::dispatch(PostMessage_ptr postMessage)
+        {
+            do_dispatch(_postMessageHandler, postMessage);
+        }
+
+
+        void message_dispatcher::dispatch(PostResponseMessage_ptr postResponseMessage)
+        {
+            do_dispatch(_postResponseMessageHandler, postResponseMessage);
+        }
+
+
+        void message_dispatcher::dispatch(SubscribeQueueMessage_ptr subscribeQueueMessage)
+        {
+            do_dispatch(_subscribeQueueMessageHandler, subscribeQueueMessage);
+        }
+
+
+        void message_dispatcher::dispatch(SubscribeResponseMessage_ptr subscribeResponseMessage)
+        {
+            do_dispatch(_subscribeResponseMessageHandler, subscribeResponseMessage);
         }
 
 
@@ -148,6 +177,30 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(Identifier_ptr)> handler)
         {
             _identifierHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(PostMessage_ptr)> handler)
+        {
+            _postMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(PostResponseMessage_ptr)> handler)
+        {
+            _postResponseMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(SubscribeQueueMessage_ptr)> handler)
+        {
+            _subscribeQueueMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(SubscribeResponseMessage_ptr)> handler)
+        {
+            _subscribeResponseMessageHandler = handler;
         }
 
 

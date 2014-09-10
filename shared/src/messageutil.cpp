@@ -46,6 +46,10 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "PostMessage.pb.h"
+#include "PostResponseMessage.pb.h"
+#include "SubscribeQueueMessage.pb.h"
+#include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
 //[[[end]]]
 
@@ -213,10 +217,26 @@ namespace sopmq {
                     messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
                     break;
 
+                case MT_POST:
+                    messageutil::template_dispatch(ctx, std::make_shared<PostMessage>());
+                    break;
+
+                case MT_POST_RESPONSE:
+                    messageutil::template_dispatch(ctx, std::make_shared<PostResponseMessage>());
+                    break;
+
+                case MT_SUBSCRIBE_QUEUE:
+                    messageutil::template_dispatch(ctx, std::make_shared<SubscribeQueueMessage>());
+                    break;
+
+                case MT_SUBSCRIBE_RESPONSE:
+                    messageutil::template_dispatch(ctx, std::make_shared<SubscribeResponseMessage>());
+                    break;
+
                 //[[[end]]]
                     
                 default:
-                    throw std::runtime_error("messageutil::switch_dispatch() unhandled message type"
+                    throw std::runtime_error("messageutil::switch_dispatch() unhandled message type "
                                              + boost::lexical_cast<std::string>(ctx->type));
             }
         }

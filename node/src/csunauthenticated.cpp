@@ -84,12 +84,11 @@ namespace sopmq {
             
             void csunauthenticated::generate_challenge_response(connection::ptr conn, std::uint32_t replyTo)
             {
-                ChallengeResponseMessage_ptr response = std::make_shared<ChallengeResponseMessage>();
+                ChallengeResponseMessage_ptr response = messageutil::make_message<ChallengeResponseMessage>(conn->get_next_id(), replyTo);
                 
                 _challenge = util::random_bytes(CHALLENGE_SIZE);
                 
                 response->set_challenge(_challenge);
-                response->set_allocated_identity(messageutil::build_id(conn->get_next_id(), replyTo));
                 
                 // clear the challenge handler.
                 _dispatcher.set_handler(std::function<void(GetChallengeMessage_ptr)>());
@@ -121,9 +120,8 @@ namespace sopmq {
                             auto connptr = _conn.lock();
                             if (connptr == nullptr) return;
                             
-                            AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
+                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
                             response->set_authorized(true);
-                            response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
                                                                                             this->shared_from_this(), _1));
                         });
@@ -135,9 +133,8 @@ namespace sopmq {
                             auto connptr = _conn.lock();
                             if (connptr == nullptr) return;
                             
-                            AuthAckMessage_ptr response = std::make_shared<AuthAckMessage>();
+                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
                             response->set_authorized(false);
-                            response->set_allocated_identity(messageutil::build_id(connptr->get_next_id(), message->identity().id()));
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
                                                                                             this->shared_from_this(), _1));
                         });

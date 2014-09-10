@@ -61,6 +61,18 @@ typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 class Identifier;
 typedef std::shared_ptr<Identifier> Identifier_ptr;
 
+class PostMessage;
+typedef std::shared_ptr<PostMessage> PostMessage_ptr;
+
+class PostResponseMessage;
+typedef std::shared_ptr<PostResponseMessage> PostResponseMessage_ptr;
+
+class SubscribeQueueMessage;
+typedef std::shared_ptr<SubscribeQueueMessage> SubscribeQueueMessage_ptr;
+
+class SubscribeResponseMessage;
+typedef std::shared_ptr<SubscribeResponseMessage> SubscribeResponseMessage_ptr;
+
 class VectorClock;
 typedef std::shared_ptr<VectorClock> VectorClock_ptr;
 

@@ -24,10 +24,10 @@
 
 #include <boost/heap/fibonacci_heap.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/chrono.hpp>
 
 #include <string>
 #include <cstdint>
-#include <boost/chrono.hpp>
 #include <unordered_map>
 #include <vector>
 

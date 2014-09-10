@@ -65,9 +65,8 @@ namespace sopmq {
                 _dispatcher->set_handler(func);
                 
                 //send a request to the server to get an auth challenge
-                GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
+                GetChallengeMessage_ptr gcm = messageutil::make_message<GetChallengeMessage>(_connection->get_next_id(), 0);
                 gcm->set_type(GetChallengeMessage::CLIENT);
-                gcm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), 0));
                 
                 _connection->send_message(message::MT_GET_CHALLENGE, gcm,
                                           std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
@@ -146,8 +145,7 @@ namespace sopmq {
 				std::function<void(AuthAckMessage_ptr)> func = std::bind(&authentication_state::on_auth_ack, this, _1);
                 _dispatcher->set_handler(func);
                 
-                AnswerChallengeMessage_ptr acm = std::make_shared<AnswerChallengeMessage>();
-                acm->set_allocated_identity(messageutil::build_id(_connection->get_next_id(), response->identity().id()));
+                AnswerChallengeMessage_ptr acm = messageutil::make_message<AnswerChallengeMessage>(_connection->get_next_id(), response->identity().id());
                 acm->set_uname_hash(unameHash);
                 acm->set_challenge_response(result);
                 

@@ -1,0 +1,14 @@
+import "Identifier.proto";
+
+message PostResponseMessage {
+	required Identifier identity = 1;
+	enum Status {
+		PIPED = 1;
+		STORED = 2;
+		DROPPED = 3;
+		NOTAUTH = 4;
+		UNAVAILABLE = 5;
+	}
+
+	required Status status  = 2;
+}

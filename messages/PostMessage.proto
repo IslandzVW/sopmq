@@ -1,0 +1,11 @@
+import "Identifier.proto";
+
+message PostMessage {
+	required Identifier identity = 1;
+
+	required bytes message_id = 2;	
+	required string queue_id = 3;
+	optional uint32 flags = 4;
+	required uint32 ttl = 5;
+	required bytes content = 6;
+}

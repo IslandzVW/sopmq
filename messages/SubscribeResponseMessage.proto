@@ -1,0 +1,12 @@
+import "Identifier.proto";
+
+message SubscribeResponseMessage {
+	required Identifier identity = 1;
+	enum Status {
+		OK = 1;
+		NOTAUTH = 2;
+		UNAVAILABLE = 3;
+	}
+
+	required Status status  = 2;
+}
