@@ -1,0 +1,22 @@
+Must keep generation number in vector clock to preserve queue ordering during a restart:
+
+A <---\                           a:1.1 b:1.1 c:1.0
+       ---  "Hi" a:1 b:1 c:0
+B <---/	                          a:1.1 b:1.1 c:1.0
+
+C
+
+
+A <---\                           a:1.2 b:1.1 c:1.1
+       ---  "How" a:2 b:1 c:1
+B 
+
+C <---/                           a:1.2 b:1.1 c:1.1
+
+
+Node A' is restarted. Message ID part of clock on A is reset to zero
+A   <---\                         
+         --- "Are" 	a:2.1 b:1.2 c:1.1	                <- .. but ordering maintained a:2.1 > a:1.2 && b:1 == b:1
+B   <---/                         
+
+C

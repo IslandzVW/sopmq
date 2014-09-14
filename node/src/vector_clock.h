@@ -18,6 +18,8 @@
 #ifndef __sopmq__vector_clock__
 #define __sopmq__vector_clock__
 
+#include "node_clock.h"
+
 #include <array>
 #include <cstdint>
 #include <cstddef>
@@ -34,7 +36,7 @@ namespace sopmq {
         class vector_clock
         {
         public:
-            typedef std::array<std::uint64_t, RF> vclock_t;
+            typedef std::array<node_clock, RF> vclock_t;
             
         public:
             vector_clock()

@@ -1,0 +1,27 @@
+A <---\                           a:1 b:1 c:0
+       ---  "Hi" a:1 b:1 c:0
+B <---/	                          a:1 b:1 c:0
+
+C
+
+
+A <---\                           a:2 b:1 c:1
+       ---  "How" a:2 b:1 c:1
+B 
+
+C <---/                           a:2 b:1 c:1
+
+
+Node A' is added. New range for queue becomes:
+A'  <---\                         a':1 a:3 b:1
+         --- "Are" a':1 a:3 b:1                 <- ordering maintained a:3 > a:2 && b:1 == b:1
+A   <---/                         a':1 a:3 b:1
+
+B
+
+
+A'
+
+A   <---\
+         --- "You" a':1 a:4 b:2
+B   <---/
