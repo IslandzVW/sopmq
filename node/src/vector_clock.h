@@ -19,6 +19,7 @@
 #define __sopmq__vector_clock__
 
 #include "node_clock.h"
+#include "comparison_error.h"
 
 #include <array>
 #include <cstdint>
@@ -57,8 +58,17 @@ namespace sopmq {
             /// Returns a new vector clock that contains the highest value from
             /// the given clocks
             ///
-            static vector_clock max(const vector_clock& a, const vector_clock& b)
+            static vector_clock<RF> max(const vector_clock<RF>& a, const vector_clock<RF>& b)
             {
+                //verify the clocks first
+                for (size_t i = 0; i < RF; ++i)
+                {
+                    if (a.value()[i].node_id != b.value()[b].node_id)
+                    {
+                        throw comparison_error("max() not valid for vector clocks with different quorums");
+                    }
+                }
+                
                 vector_clock result;
                 for (size_t i = 0; i < RF; ++i)
                 {
@@ -87,15 +97,38 @@ namespace sopmq {
         template <std::size_t RF>
         bool operator <(const vector_clock<RF>& lhs, const vector_clock<RF>& rhs)
         {
+            //we must be able to LT compare vector clocks with different
+            //node ids. therefore, we only compare nodes with matching ids
+            
+            //normally, once we see a left clock less than right, we can consider
+            //the left vector clock less. however, this function will also handle
+            //invalid clocks by keeping tract of the number of lesser clock values.
+            //we consider the left less than the right if it has a greater number
+            //of clocks less than the right
+            int numLeftLess = 0;
+            int numRightLess = 0;
+            
+            // most of the time the values will be node aligned. we should try to take
+            // advantage of this.
+            
             for (std::size_t i = 0; i < RF; i++)
             {
-                if (lhs.value()[i] < rhs.value()[i])
+                for (std::size_t j = 0; j < RF; j++)
                 {
-                    return true;
+                    const node_clock& left = lhs.value()[i];
+                    const node_clock& right = rhs.value()[j];
+                    
+                    if (left.node_id == right.node_id)
+                    {
+                        if (left < right) ++numLeftLess;
+                        else if (right < left) ++numRightLess;
+                        
+                        break;
+                    }
                 }
             }
 
-            return false;
+            return numLeftLess > numRightLess;
         }
         
         template <std::size_t RF>

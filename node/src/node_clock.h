@@ -46,35 +46,13 @@ namespace sopmq {
             std::uint64_t clock;
         };
         
-        bool operator ==(const node_clock& lhs, const node_clock& rhs)
-        {
-            return  lhs.node_id == rhs.node_id &&
-                    lhs.generation == rhs.generation &&
-                    lhs.clock == rhs.clock;
-        }
+        bool operator ==(const node_clock& lhs, const node_clock& rhs);
         
-        bool operator !=(const node_clock& lhs, const node_clock& rhs)
-        {
-            return !(lhs == rhs);
-        }
+        bool operator !=(const node_clock& lhs, const node_clock& rhs);
         
-        bool operator <(const node_clock& lhs, const node_clock& rhs)
-        {
-            if (lhs.node_id != rhs.node_id) return false;
-            
-            if (lhs.generation < rhs.generation ||
-                (lhs.generation == rhs.generation && lhs.clock < rhs.clock))
-            {
-                return true;
-            }
-            
-            return false;
-        }
+        bool operator <(const node_clock& lhs, const node_clock& rhs);
         
-        bool operator >(const node_clock& lhs, const node_clock& rhs)
-        {
-            return (!(lhs < rhs)) && (lhs != rhs);
-        }
+        bool operator >(const node_clock& lhs, const node_clock& rhs);
         
     }
 }
