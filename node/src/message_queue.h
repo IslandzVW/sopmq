@@ -22,13 +22,14 @@
 #include "message_not_found_error.h"
 #include "vector_clock.h"
 
-#include <boost/heap/fibonacci_heap.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/chrono.hpp>
+#include <boost/functional/hash.hpp>
 
 #include <string>
 #include <cstdint>
 #include <unordered_map>
+#include <set>
 #include <vector>
 
 namespace sopmq {
@@ -41,7 +42,7 @@ namespace sopmq {
         template <size_t RF>
         struct message_map_t
         {
-            typedef std::unordered_map<boost::uuids::uuid, queued_message<RF>> type;
+            typedef std::unordered_map<boost::uuids::uuid, queued_message<RF>, boost::hash<boost::uuids::uuid>> type;
         };
 
         ///
@@ -59,7 +60,7 @@ namespace sopmq {
                 }
             };
 
-            typedef boost::heap::fibonacci_heap<typename queued_message<RF>::ptr, compare_node> type;
+            typedef std::multiset<typename queued_message<RF>::ptr, compare_node> type;
         };
         
         ///
@@ -69,7 +70,7 @@ namespace sopmq {
         template <size_t RF>
         struct message_index_t
         {
-            typedef std::unordered_map<boost::uuids::uuid, typename message_queue_t<RF>::type::handle_type> type;
+            typedef std::unordered_map<boost::uuids::uuid, typename message_queue_t<RF>::type::iterator, boost::hash<boost::uuids::uuid>> type;
         };
 
         ///
@@ -84,7 +85,7 @@ namespace sopmq {
             /// \param queueId The hex representation of the murmur hash of this queues name
             ///
             message_queue(const std::string& queueId)
-                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _clock(0)
+                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now())
             {
 
             }
@@ -131,8 +132,9 @@ namespace sopmq {
 					auto message = std::make_shared<queued_message<RF>>(*std::move_iterator<IterType>(iter));
 					message->update_local_timestamp();
 
-                    _queued_messages.push(message);
-                    _message_index.insert(id);
+                    //hint that this will probably be the element proceeding the last :)
+                    auto pos = _queued_messages.insert(_queued_messages.rbegin(), message);
+                    _message_index.insert( typename message_index_t<RF>::type::value_type(id, pos) );
                     _unstamped_messages.erase(iter);
                     
                     _clock = vector_clock<RF>::max(_clock, vclock);
@@ -234,11 +236,6 @@ namespace sopmq {
             boost::chrono::steady_clock::time_point _created_on;
 
             ///
-            /// Our current clock value for message vector clocks
-            ///
-            vector_clock<RF> _clock;
-
-            ///
             /// The last time a message was received for this queue
             ///
             boost::chrono::steady_clock::time_point _last_message_received;
@@ -276,6 +273,11 @@ namespace sopmq {
 			///
 			uint32_t _total_message_size;
         };
+
+        ///
+        /// Message queue def for RF = 3
+        ///
+        typedef message_queue<3> message_queue3;
     }
 }
 

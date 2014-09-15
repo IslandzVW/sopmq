@@ -17,6 +17,24 @@
 
 #include "gtest/gtest.h"
 
-TEST(MessageQueueTest, MessageQueueWorks)
+#include "message_queue.h"
+#include "vector_clock.h"
+#include "node_clock.h"
+
+using namespace sopmq::node;
+
+
+
+TEST(MessageQueueTest, MessageQueueBasicOrdering)
 {
+    message_queue3 mq("abcde");
+    
+    node_clock a1 = {1, 1, 1};
+    node_clock b1 = {2, 1, 1};
+    node_clock c1 = {3, 1, 1};
+
+    vector_clock3 m1;
+    m1.value()[0] = a1;
+    m1.value()[1] = b1;
+    m1.value()[2] = c1;
 }

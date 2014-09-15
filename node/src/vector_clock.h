@@ -25,6 +25,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <algorithm>
+#include <type_traits>
 
 namespace sopmq {
     namespace node {
@@ -45,6 +46,15 @@ namespace sopmq {
             {
                 
             }
+
+            /*
+            //this doesnt compile under vc11  :(
+            template <std::size_t RF1 = RF, typename std::enable_if<RF1 == 3, int>::type = 0>
+            vector_clock(const node_clock& n1, const node_clock& n2, const node_clock& n3)
+                : _value{n1,n2,n3}
+            {
+            }
+            */
             
             ///
             /// Returns the clock's value
@@ -137,7 +147,10 @@ namespace sopmq {
             return (!(lhs < rhs)) && (lhs != rhs);
         }
 
-
+        ///
+        /// Vector clock def for RF = 3
+        ///
+        typedef vector_clock<3> vector_clock3;
     }
 }
 #endif
