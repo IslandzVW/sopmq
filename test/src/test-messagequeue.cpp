@@ -48,22 +48,6 @@ TEST(MessageQueueTest, MessageQueueBasicOrdering)
     
     
     
-    node_clock a2 = {1, 1, 2};
-    node_clock b2 = {2, 1, 2};
-    node_clock c2 = {3, 1, 1};
-    
-    vector_clock3 m2clock;
-    m2clock.set(0, a2);
-    m2clock.set(1, b2);
-    m2clock.set(2, c2);
-    
-    auto m2id = sopmq::shared::util::random_uuid();
-    std::string m2content("message2");
-    mq.enqueue(m2id, &m2content, 5);
-    mq.stamp(m2id, m2clock);
-    
-    
-    
     node_clock a3 = {1, 1, 2};
     node_clock b3 = {2, 1, 3};
     node_clock c3 = {3, 1, 2};
@@ -77,6 +61,22 @@ TEST(MessageQueueTest, MessageQueueBasicOrdering)
     std::string m3content("message3");
     mq.enqueue(m3id, &m3content, 5);
     mq.stamp(m3id, m3clock);
+    
+    
+    
+    node_clock a2 = {1, 1, 2};
+    node_clock b2 = {2, 1, 2};
+    node_clock c2 = {3, 1, 1};
+    
+    vector_clock3 m2clock;
+    m2clock.set(0, a2);
+    m2clock.set(1, b2);
+    m2clock.set(2, c2);
+    
+    auto m2id = sopmq::shared::util::random_uuid();
+    std::string m2content("message2");
+    mq.enqueue(m2id, &m2content, 5);
+    mq.stamp(m2id, m2clock);
     
     
     auto messages = mq.peekAll();
