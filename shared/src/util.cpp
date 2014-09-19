@@ -22,6 +22,7 @@
 
 #include <random>
 #include <limits>
+#include <boost/uuid/uuid_generators.hpp>
 
 using namespace CryptoPP;
 
@@ -52,6 +53,12 @@ namespace sopmq {
             }
             
             return outstr;
+        }
+        
+        boost::uuids::uuid util::random_uuid()
+        {
+            boost::uuids::random_generator gen;
+            return gen();
         }
 
         util::util()

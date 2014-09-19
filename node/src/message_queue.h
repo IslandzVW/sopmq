@@ -29,7 +29,7 @@
 #include <string>
 #include <cstdint>
 #include <unordered_map>
-#include <set>
+#include <map>
 #include <vector>
 
 namespace sopmq {
@@ -52,15 +52,7 @@ namespace sopmq {
         template <size_t RF>
         struct message_queue_t
         {
-            struct compare_node
-            {
-                bool operator()(const queued_message<RF>& n1, const queued_message<RF>& n2) const
-                {
-                    return n1.vector_clock() < n2.vector_clock();
-                }
-            };
-
-            typedef std::multiset<typename queued_message<RF>::ptr, compare_node> type;
+            typedef std::multimap<vector_clock<RF>, typename queued_message<RF>::ptr> type;
         };
         
         ///
@@ -112,8 +104,8 @@ namespace sopmq {
 					_ttl_set = true;
 					_ttl = ttlSecs;
 				}
-
-                _unstamped_messages.emplace(id, std::move(*data));
+                
+                _unstamped_messages.insert(typename message_map_t<RF>::type::value_type(id, queued_message<RF>(id, data)));
             }
             
             ///
@@ -129,15 +121,24 @@ namespace sopmq {
                 auto iter = _unstamped_messages.find(id);
                 if (iter != _unstamped_messages.end())
                 {
-					auto message = std::make_shared<queued_message<RF>>(*std::move_iterator<IterType>(iter));
+					auto message = std::make_shared<queued_message<RF>>(std::move(iter->second));
 					message->update_local_timestamp();
 
-                    //hint that this will probably be the element proceeding the last :)
-                    auto pos = _queued_messages.insert(_queued_messages.rbegin(), message);
+                    
+                    //hint that this will probably be the element proceeding the last
+                    typename message_queue_t<RF>::type::iterator pos;
+                    if (_queued_messages.size() > 0)
+                    {
+                        pos = _queued_messages.insert(_queued_messages.end()--,
+                                                      typename message_queue_t<RF>::type::value_type(vclock, message));
+                    }
+                    else
+                    {
+                        pos = _queued_messages.insert(typename message_queue_t<RF>::type::value_type(vclock, message));
+                    }
+                    
                     _message_index.insert( typename message_index_t<RF>::type::value_type(id, pos) );
                     _unstamped_messages.erase(iter);
-                    
-                    _clock = vector_clock<RF>::max(_clock, vclock);
                     
                     return true;
                 }
@@ -195,18 +196,29 @@ namespace sopmq {
             ///
             std::vector<typename queued_message<RF>::ptr> peek(vector_clock<RF> lastMessage)
             {
-                auto end = _queued_messages.ordered_end();
-                auto start = _queued_messages.ordered_begin();
+                std::vector<typename queued_message<RF>::ptr> messages;
                 
-                for (; start != end; ++start)
-                {
-                    if (start.vector_clock() > lastMessage)
-                    {
-                        break;
-                    }
-                }
+                auto start = _queued_messages.find(lastMessage);
                 
-                std::vector<typename queued_message<RF>::ptr> messages(start, end);
+                std::transform(start,
+                               _queued_messages.end(),
+                               std::back_inserter(messages),
+                               [](const std::pair<vector_clock<RF>, typename queued_message<RF>::ptr>& p) { return p.second; });
+                
+                return messages;
+            }
+            
+            ///
+            /// \brief Peeks all messages
+            ///
+            std::vector<typename queued_message<RF>::ptr> peekAll()
+            {
+                std::vector<typename queued_message<RF>::ptr> messages;
+                
+                std::transform(_queued_messages.begin(),
+                               _queued_messages.end(),
+                               std::back_inserter(messages),
+                               [](const std::pair<vector_clock<RF>, typename queued_message<RF>::ptr>& p) { return p.second; });
                 
                 return messages;
             }

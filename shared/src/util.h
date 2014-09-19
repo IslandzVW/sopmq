@@ -19,6 +19,7 @@
 #define __sopmq__util__
 
 #include <string>
+#include <boost/uuid/uuid.hpp>
 
 namespace sopmq {
     namespace shared {
@@ -39,6 +40,11 @@ namespace sopmq {
             /// \param count The number of random bytes to generate
             ///
             static std::string random_bytes(int count);
+            
+            ///
+            /// Generates a random uuid
+            ///
+            static boost::uuids::uuid random_uuid();
             
         private:
             util();

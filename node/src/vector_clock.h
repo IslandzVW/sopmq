@@ -59,9 +59,17 @@ namespace sopmq {
             ///
             /// Returns the clock's value
             ///
-            inline vclock_t& value()
+            inline const vclock_t& value() const
             {
                 return _value;
+            }
+            
+            ///
+            /// Sets the clock at the given position
+            ///
+            inline void set(size_t pos, const node_clock& clock)
+            {
+                _value[pos] = clock;
             }
             
             ///
