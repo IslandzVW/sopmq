@@ -67,6 +67,7 @@ namespace sopmq {
             void dispatch(ChallengeResponseMessage_ptr challengeResponseMessage);
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
             void dispatch(Identifier_ptr identifier);
+            void dispatch(NodeClock_ptr nodeClock);
             void dispatch(PostMessage_ptr postMessage);
             void dispatch(PostResponseMessage_ptr postResponseMessage);
             void dispatch(SubscribeQueueMessage_ptr subscribeQueueMessage);
@@ -85,6 +86,7 @@ namespace sopmq {
             void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             void set_handler(std::function<void(Identifier_ptr)> handler);
+            void set_handler(std::function<void(NodeClock_ptr)> handler);
             void set_handler(std::function<void(PostMessage_ptr)> handler);
             void set_handler(std::function<void(PostResponseMessage_ptr)> handler);
             void set_handler(std::function<void(SubscribeQueueMessage_ptr)> handler);
@@ -105,6 +107,7 @@ namespace sopmq {
             std::function<void(ChallengeResponseMessage_ptr)> _challengeResponseMessageHandler;
             std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
             std::function<void(Identifier_ptr)> _identifierHandler;
+            std::function<void(NodeClock_ptr)> _nodeClockHandler;
             std::function<void(PostMessage_ptr)> _postMessageHandler;
             std::function<void(PostResponseMessage_ptr)> _postResponseMessageHandler;
             std::function<void(SubscribeQueueMessage_ptr)> _subscribeQueueMessageHandler;

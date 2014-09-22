@@ -46,6 +46,7 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "NodeClock.pb.h"
 #include "PostMessage.pb.h"
 #include "PostResponseMessage.pb.h"
 #include "SubscribeQueueMessage.pb.h"

@@ -61,6 +61,9 @@ typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 class Identifier;
 typedef std::shared_ptr<Identifier> Identifier_ptr;
 
+class NodeClock;
+typedef std::shared_ptr<NodeClock> NodeClock_ptr;
+
 class PostMessage;
 typedef std::shared_ptr<PostMessage> PostMessage_ptr;
 

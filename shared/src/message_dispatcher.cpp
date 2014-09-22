@@ -45,6 +45,7 @@
 #include "ChallengeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
+#include "NodeClock.pb.h"
 #include "PostMessage.pb.h"
 #include "PostResponseMessage.pb.h"
 #include "SubscribeQueueMessage.pb.h"
@@ -105,6 +106,12 @@ namespace sopmq {
         void message_dispatcher::dispatch(Identifier_ptr identifier)
         {
             do_dispatch(_identifierHandler, identifier);
+        }
+
+
+        void message_dispatcher::dispatch(NodeClock_ptr nodeClock)
+        {
+            do_dispatch(_nodeClockHandler, nodeClock);
         }
 
 
@@ -177,6 +184,12 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(Identifier_ptr)> handler)
         {
             _identifierHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(NodeClock_ptr)> handler)
+        {
+            _nodeClockHandler = handler;
         }
 
 

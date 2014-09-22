@@ -1,4 +1,5 @@
+import "NodeClock.proto";
+
 message VectorClock {
-	required uint32 rf = 1;
-	repeated uint64 clocks = 2 [packed=true];
+	repeated NodeClock clocks = 1;
 }
