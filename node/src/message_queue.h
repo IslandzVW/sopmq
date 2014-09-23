@@ -72,13 +72,16 @@ namespace sopmq {
         template <size_t RF>
         class message_queue
         {
+        private:
+            typedef queued_message<RF> queued_messageX;
+            
         public:
             ///
             /// \brief CTOR
             /// \param queueId The hex representation of the murmur hash of this queues name
             ///
             message_queue(const std::string& queueId)
-                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now())
+                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _total_message_size(0)
             {
 
             }
@@ -106,7 +109,8 @@ namespace sopmq {
 					_ttl = ttlSecs;
 				}
                 
-                _unstamped_messages.insert(typename message_map_t<RF>::type::value_type(id, queued_message<RF>(id, data)));
+                _total_message_size += queued_messageX::calc_size(data->length());
+                _unstamped_messages.insert(typename message_map_t<RF>::type::value_type(id, queued_messageX(id, data)));
             }
             
             ///
@@ -122,7 +126,7 @@ namespace sopmq {
                 auto iter = _unstamped_messages.find(id);
                 if (iter != _unstamped_messages.end())
                 {
-					auto message = std::make_shared<queued_message<RF>>(std::move(iter->second));
+					auto message = std::make_shared<queued_messageX>(std::move(iter->second));
 					message->update_local_timestamp();
 
                     
@@ -160,6 +164,7 @@ namespace sopmq {
                 {
                     if(it->second->age() > ttlSecs)
                     {
+                        _total_message_size -= queued_messageX::calc_size(it->second->data().length());
                         it = _queued_messages.erase(it);
                     }
                     else
@@ -174,6 +179,7 @@ namespace sopmq {
                 {
                     if(it->second.age() > ttlSecs)
                     {
+                        _total_message_size -= queued_messageX::calc_size(it->second.data().length());
                         it = _unstamped_messages.erase(it);
                     }
                     else
@@ -203,7 +209,7 @@ namespace sopmq {
                 std::transform(start,
                                _queued_messages.end(),
                                std::back_inserter(messages),
-                               [](const std::pair<vector_clock<RF>, typename queued_message<RF>::ptr>& p) { return p.second; });
+                               [](const std::pair<vector_clock<RF>, typename queued_messageX::ptr>& p) { return p.second; });
                 
                 return messages;
             }
@@ -218,7 +224,7 @@ namespace sopmq {
                 std::transform(_queued_messages.begin(),
                                _queued_messages.end(),
                                std::back_inserter(messages),
-                               [](const std::pair<vector_clock<RF>, typename queued_message<RF>::ptr>& p) { return p.second; });
+                               [](const std::pair<vector_clock<RF>, typename queued_messageX::ptr>& p) { return p.second; });
                 
                 return messages;
             }
@@ -231,6 +237,7 @@ namespace sopmq {
                 auto iter = _message_index.find(messageId);
                 if (iter != _message_index.end())
                 {
+                    _total_message_size -= queued_messageX::calc_size(iter->second->data().length());
                     _queued_messages.erase(*iter);
                     _message_index.erase(messageId);
                 }
@@ -246,6 +253,11 @@ namespace sopmq {
             /// Time this queue was created
             /// 
             boost::chrono::steady_clock::time_point _created_on;
+            
+            ///
+			/// The total size of all the messages in this queue
+			///
+			uint32_t _total_message_size;
 
             ///
             /// The last time a message was received for this queue
@@ -279,11 +291,6 @@ namespace sopmq {
 			/// received
 			///
 			uint32_t _ttl;
-			
-			///
-			/// The total size of all the messages in this queue
-			///
-			uint32_t _total_message_size;
         };
 
         ///

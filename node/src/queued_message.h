@@ -113,8 +113,17 @@ namespace sopmq {
 			///
 			uint32_t size()
 			{
-				return sizeof(_id) + sizeof(_local_time) + sizeof(_vclock) + _data.length(); 
+				return calc_size(_data.length());
 			}
+            
+            static uint32_t calc_size(size_t dataSize)
+            {
+                return
+                    sizeof(boost::uuids::uuid)
+                    + sizeof(boost::chrono::steady_clock::time_point)
+                    + sizeof(vector_clock<RF>)
+                    + dataSize;
+            }
 
 
         private:
