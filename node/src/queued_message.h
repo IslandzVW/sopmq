@@ -91,7 +91,15 @@ namespace sopmq {
             {
                 return _local_time;
             }
-
+            
+            ///
+            /// The amount of time that this message has existed on this machine
+            ///
+            const boost::chrono::steady_clock::duration age() const
+            {
+                return boost::chrono::steady_clock::now() - _local_time;
+            }
+            
 			///
 			/// Updates the local timestamp for the given message to NOW
 			///

@@ -31,6 +31,7 @@
 #include <unordered_map>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 namespace sopmq {
     namespace node {
@@ -153,32 +154,31 @@ namespace sopmq {
 			///
 			void expire_messages()
 			{
-                auto now = boost::chrono::steady_clock::now();
                 auto ttlSecs = boost::chrono::seconds(_ttl);
                 
-                while (!_queued_messages.empty() &&
-                       now - _queued_messages.top().local_time() > ttlSecs)
+                for(auto it = _queued_messages.begin(), ite = _queued_messages.end(); it != ite;)
                 {
-                    boost::uuids::uuid id = _queued_messages.top().id();
-                    _queued_messages.pop();
-                    _message_index.erase(id);
-                }
-                
-                //also check unstamped for expirations
-                std::vector<boost::uuids::uuid> expired;
-                for (auto kvp : _unstamped_messages)
-                {
-                    if (kvp->value.local_time() > ttlSecs)
+                    if(it->second->age() > ttlSecs)
                     {
-                        expired.push_back(kvp->key);
+                        it = _queued_messages.erase(it);
+                    }
+                    else
+                    {
+                        //we can stop since these are in order
+                        break;
                     }
                 }
                 
-                if (expired.size() > 0)
+                //also check unstamped for expirations
+                for(auto it = _unstamped_messages.begin(), ite = _unstamped_messages.end(); it != ite;)
                 {
-                    for (auto id : expired)
+                    if(it->second.age() > ttlSecs)
                     {
-                        _unstamped_messages.erase(id);
+                        it = _unstamped_messages.erase(it);
+                    }
+                    else
+                    {
+                        ++it;
                     }
                 }
 			}
