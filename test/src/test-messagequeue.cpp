@@ -161,6 +161,8 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
     std::string m1content("message1");
     mq.enqueue(m1id, &m1content, 0);
     
+    auto lastSize = mq.size();
+    ASSERT_GT(mq.size(), 0);
     
     node_clock a2 = {1, 1, 2}; //<<
     node_clock b2 = {2, 1, 0};
@@ -174,6 +176,8 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
     auto m2id = sopmq::shared::util::random_uuid();
     std::string m2content("message2");
     mq.enqueue(m2id, &m2content, 0);
+    
+    ASSERT_GT(mq.size(), lastSize);
     
     boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
     
