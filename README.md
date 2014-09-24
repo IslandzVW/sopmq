@@ -3,6 +3,10 @@ sopmq
 
 Scalable optionally persistent message queue
 
+This project is in the very early stages of development and is not yet functional
+
+SOPMQ's design is intended to provide an at least once message queue with partition tolerance. SOPMQ models a CP system.
+
 ### Windows note
 
 This project uses the EditorConfig visual studio plugin to maintain tab and spacing settings.
@@ -13,6 +17,3 @@ cmake -D LIBCASSANDRA_LIBRARY=D:\lib\cpp-driver\build\Debug\cassandra.lib -D LIB
 
 More details on building later as the project matures
 
-#### Additional notes
-
-This project is in the very early stages of development and is not yet functional.
