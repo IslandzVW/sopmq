@@ -47,7 +47,12 @@ namespace sopmq {
             /// The default maximum message size
             ///
             static const uint32_t DEFAULT_MAX_MESSAGE_SIZE;
-
+            
+            ///
+            /// The default operation timeout in seconds
+            ///
+            static const uint32_t DEFAULT_OPERATION_TIMEOUT;
+            
             ///
             /// Returns our singleton instance
             ///
@@ -85,6 +90,10 @@ namespace sopmq {
             ///
             uint32_t maxMessageSize;
             
+            ///
+            /// The default operation timeout in seconds
+            ///
+            uint32_t defaultTimeout;
             
         private:
             settings();

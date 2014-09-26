@@ -127,6 +127,8 @@ namespace sopmq {
                             response->set_authorized(true);
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
                                                                                             this->shared_from_this(), _1));
+                            csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
+                            connptr->change_state(authstate);
                         });
                     }
                     else

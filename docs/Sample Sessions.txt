@@ -23,8 +23,6 @@ Nodes 1 and 2 return queue vector clocks to the coordinator node 4
 The vector clocks are combined by the coordinator and a message stamp 
 is sent back to nodes 1 and 2
 
-Nodes 1 and 2 update the message vector clock and put the message into the queue
-
 -- 5 seconds passes. no consumer picks up the messages --
 -- Message is dropped --
 

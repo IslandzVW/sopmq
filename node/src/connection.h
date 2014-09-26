@@ -90,6 +90,11 @@ namespace sopmq {
                 void send_message(sopmq::message::message_type type, Message_ptr message,
                                   sopmq::message::network_status_callback statusCb);
                 
+                ///
+                /// Changes to the given connection state
+                ///
+                void change_state(iconnection_state::ptr newState);
+                
             private:
                 boost::asio::io_service& _ioService;
                 boost::asio::ip::tcp::socket _conn;

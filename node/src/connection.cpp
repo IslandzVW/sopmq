@@ -94,6 +94,12 @@ namespace sopmq {
                 messageutil::write_message(type, message, _ioService, _conn,
                                            statusCb);
             }
+            
+            void connection::change_state(iconnection_state::ptr newState)
+            {
+                _state = newState;
+                _state->start();
+            }
         }
     }
 }

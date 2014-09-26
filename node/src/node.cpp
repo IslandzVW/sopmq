@@ -23,8 +23,8 @@ namespace bmp = boost::multiprecision;
 namespace sopmq {
     namespace node {
         
-        const unsigned short node::HEARTBEAT_INTERVAL_SECS = 10;
-        const unsigned short node::HEARTBEAT_TIMEOUT_SECS = 30;
+        const unsigned short node::HEARTBEAT_INTERVAL_SECS = 1;
+        const unsigned short node::HEARTBEAT_TIMEOUT_SECS = 15;
         
         node::node(bmp::uint128_t rangeStart, shared::net::endpoint endPoint)
         : _rangeStart(rangeStart), _endpoint(endPoint)

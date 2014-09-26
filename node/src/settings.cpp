@@ -21,6 +21,7 @@ namespace sopmq {
     namespace node {
 
         const uint32_t settings::DEFAULT_MAX_MESSAGE_SIZE = 10485760;
+        const uint32_t settings::DEFAULT_OPERATION_TIMEOUT = 10;
         
         settings::settings()
         {

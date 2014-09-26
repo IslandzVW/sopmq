@@ -20,7 +20,13 @@
 
 #include "iconnection_state.h"
 
+#include "connection.h"
+#include "message_dispatcher.h"
+#include "network_operation_result.h"
+#include "message_ptrs.h"
+
 #include <boost/noncopyable.hpp>
+#include <boost/asio.hpp>
 
 namespace sopmq {
     namespace node {
@@ -30,7 +36,28 @@ namespace sopmq {
                                     public boost::noncopyable,
                                     public std::enable_shared_from_this<csauthenticated>
             {
+            public:
+                csauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
+                virtual ~csauthenticated();
                 
+                //iconnection_state
+                void start();
+                std::string get_description() const;
+                //
+            
+            private:
+                boost::asio::io_service& _ioService;
+                connection::wptr _conn;
+                sopmq::message::message_dispatcher _dispatcher;
+                
+                
+                void unhandled_message(Message_ptr message);
+                
+                void read_next_message(connection::ptr conn);
+                
+                void handle_read_result(const net::network_operation_result& result);
+                
+                void handle_post_message(PostMessage_ptr message);
             };
             
         }

@@ -25,7 +25,8 @@ Parameters:
 	MaxLookbackDays
 		- The number of days we will look back into the queue for stored messages.
 			Setting this number too high can lead to performance problems
-Returns:
+			
+Returns ProxySubscribeResponse:
 	OK,
 	NotAuth,
 	NotHere
@@ -41,9 +42,58 @@ Parameters:
 	SubscriptionID
 		- UUID identifier for this subscription
 
-Returns:
+Returns ProxyUnsubscribeResponse:
 	OK,
 	NotAuth,
+
+
+
+ProxyPost
+------------------------
+From a coordinator node. Posts a new message to a queue on behalf of a client
+
+Parameters:
+	Message (PostMessage)
+		- A copy of the message from the client
+		
+Returns ProxyPostResponse (see below)
+	
+
+
+ProxyPostResponse
+----------------------
+A return response to a proxy post
+
+Parameters:
+	Status
+		NotAuth,
+		NotHere,
+			- This node does not handle this range
+		Queued
+		
+	VectorClock
+		- The clock for this message as assigned by the node
+
+
+
+StampMessage
+-----------------------
+Coordinator node returning the resulting vector clock from a quorum of nodes and
+requesting that this node stamp the message with the clock
+
+Parameters:
+	VectorClock
+		- The clock for the message
+
+
+
+PipedNotification
+------------------------
+Notifies a coordinator node that a message was successfully piped
+
+Parameters:
+	MessageId
+		- UUID of the message that was piped
 
 
 
