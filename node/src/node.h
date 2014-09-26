@@ -24,6 +24,7 @@
 #include <boost/chrono.hpp>
 
 #include <string>
+#include <cstdint>
 
 #include "endpoint.h"
 
@@ -37,8 +38,15 @@ namespace sopmq {
         class node : public boost::noncopyable
         {
         public:
-            node(boost::multiprecision::uint128_t rangeStart, shared::net::endpoint endPoint);
+            node(std::uint32_t nodeId, boost::multiprecision::uint128_t rangeStart,
+                 shared::net::endpoint endPoint);
+            
             virtual ~node();
+            
+            ///
+            /// Returns the unique identifier for this node
+            ///
+            uint32_t node_id() const;
             
             ///
             /// Returns the beginning of the range we handle
@@ -68,11 +76,15 @@ namespace sopmq {
             static const unsigned short HEARTBEAT_TIMEOUT_SECS;
             
             
+            ///
+            /// The unique identifier for this node
+            ///
+            std::uint32_t _node_id;
             
             ///
             /// The beginning of the range that we handle
             ///
-            boost::multiprecision::uint128_t _rangeStart;
+            boost::multiprecision::uint128_t _range_start;
             
             ///
             /// The endpoint to contact this node at

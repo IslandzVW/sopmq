@@ -26,8 +26,9 @@ namespace sopmq {
         const unsigned short node::HEARTBEAT_INTERVAL_SECS = 1;
         const unsigned short node::HEARTBEAT_TIMEOUT_SECS = 15;
         
-        node::node(bmp::uint128_t rangeStart, shared::net::endpoint endPoint)
-        : _rangeStart(rangeStart), _endpoint(endPoint)
+        node::node(std::uint32_t nodeId, bmp::uint128_t rangeStart,
+                   shared::net::endpoint endPoint)
+        : _node_id(nodeId), _range_start(rangeStart), _endpoint(endPoint)
         {
             
         }
@@ -37,9 +38,14 @@ namespace sopmq {
             
         }
         
+        uint32_t node::node_id() const
+        {
+            return _node_id;
+        }
+        
         bmp::uint128_t node::range_start() const
         {
-            return _rangeStart;
+            return _range_start;
         }
         
         shared::net::endpoint node::endpoint() const

@@ -19,6 +19,7 @@
 #define __sopmq__ring__
 
 #include <map>
+#include <unordered_map>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/noncopyable.hpp>
 #include <array>
@@ -59,12 +60,12 @@ namespace sopmq {
             ///
             /// Map to the ring, sorted by the range start of each node
             ///
-            std::map<boost::multiprecision::uint128_t, node_ptr> _ringByRange;
+            std::map<boost::multiprecision::uint128_t, node_ptr> _ring_by_range;
             
             ///
-            /// Map to the nodes of the ring by their endpoints
+            /// Map between the node ID and the node
             ///
-            std::map<shared::net::endpoint, node_ptr> _ringByEndpoint;
+            std::unordered_map<std::uint32_t, node_ptr> _nodes_by_id;
             
             ///
             /// Finds the location of the secondary node on the ring
@@ -80,6 +81,11 @@ namespace sopmq {
             /// Finds the location of the tertiary node on the ring given the iter to the secondary
             ///
             const_ring_iterator find_tertiary_node(const_ring_iterator secondaryIter) const;
+        
+            ///
+            /// Checks to make sure adding this node doesn't conflict with any other node
+            ///
+            void check_no_conflict(node_ptr newNode) const;
         };
         
     }

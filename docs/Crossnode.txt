@@ -89,7 +89,7 @@ Parameters:
 
 PipedNotification
 ------------------------
-Notifies a coordinator node that a message was successfully piped
+Notifies a coordinator node that a message was successfully piped (consumed)
 
 Parameters:
 	MessageId

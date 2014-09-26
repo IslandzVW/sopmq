@@ -19,6 +19,8 @@
 
 #include "ring.h"
 #include "endpoint.h"
+#include "range_conflict_error.h"
+#include "id_conflict_error.h"
 
 #include <boost/multiprecision/random.hpp>
 
@@ -43,7 +45,7 @@ TEST(RingTest, TestSingleNodeRingFind)
     ring r;
     uint128_t num = gen();
     
-    node_ptr node(new sopmq::node::node(0, endpoint("sopmq1://localhost:1")));
+    node_ptr node(new sopmq::node::node(1, 0, endpoint("sopmq1://localhost:1")));
     r.add_node(node);
     
     ASSERT_EQ(r.find_primary_node_for_key(num), node) ;
@@ -53,7 +55,7 @@ TEST(RingTest, TestSingleNodeRingFindWithSameKey)
 {
     ring r;
     
-    node_ptr node(new sopmq::node::node(20, endpoint("sopmq1://localhost:1")));
+    node_ptr node(new sopmq::node::node(1, 20, endpoint("sopmq1://localhost:1")));
     r.add_node(node);
     
     ASSERT_EQ(r.find_primary_node_for_key(20), node) ;
@@ -63,8 +65,8 @@ TEST(RingTest, TestDoubleNodeRingFind)
 {
     ring r;
     
-    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
-    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
     r.add_node(node1);
     r.add_node(node2);
     
@@ -78,8 +80,8 @@ TEST(RingTest, TestDoubleNodeRingFindWithSameKey)
 {
     ring r;
     
-    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
-    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
     r.add_node(node1);
     r.add_node(node2);
     
@@ -91,8 +93,8 @@ TEST(RingTest, TestFindPrimaryAndSecondary)
 {
     ring r;
     
-    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
-    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
     r.add_node(node1);
     r.add_node(node2);
     
@@ -121,10 +123,10 @@ TEST(RingTest, TestFindPrimaryAndSecondaryWith4Nodes)
 {
     ring r;
     
-    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
-    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
-    node_ptr node3(new sopmq::node::node(30, endpoint("sopmq1://localhost:3")));
-    node_ptr node4(new sopmq::node::node(40, endpoint("sopmq1://localhost:4")));
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
+    node_ptr node3(new sopmq::node::node(3, 30, endpoint("sopmq1://localhost:3")));
+    node_ptr node4(new sopmq::node::node(4, 40, endpoint("sopmq1://localhost:4")));
     r.add_node(node1);
     r.add_node(node2);
     r.add_node(node3);
@@ -180,10 +182,10 @@ TEST(RingTest, TestFindPrimarySecondaryAndTertiaryWith4Nodes)
 {
     ring r;
     
-    node_ptr node1(new sopmq::node::node(10, endpoint("sopmq1://localhost:1")));
-    node_ptr node2(new sopmq::node::node(20, endpoint("sopmq1://localhost:2")));
-    node_ptr node3(new sopmq::node::node(30, endpoint("sopmq1://localhost:3")));
-    node_ptr node4(new sopmq::node::node(40, endpoint("sopmq1://localhost:4")));
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
+    node_ptr node3(new sopmq::node::node(3, 30, endpoint("sopmq1://localhost:3")));
+    node_ptr node4(new sopmq::node::node(4, 40, endpoint("sopmq1://localhost:4")));
     r.add_node(node1);
     r.add_node(node2);
     r.add_node(node3);
@@ -242,4 +244,26 @@ TEST(RingTest, TestFindPrimarySecondaryAndTertiaryWith4Nodes)
     ASSERT_EQ(nodes[0], node4);
     ASSERT_EQ(nodes[1], node1);
     ASSERT_EQ(nodes[2], node2);
+}
+
+TEST(RingTest, TestIdConflict)
+{
+    ring r;
+    
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(1, 20, endpoint("sopmq1://localhost:2")));
+    r.add_node(node1);
+    
+    ASSERT_THROW(r.add_node(node2), sopmq::error::id_conflict_error);
+}
+
+TEST(RingTest, TestRangeConflict)
+{
+    ring r;
+    
+    node_ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node_ptr node2(new sopmq::node::node(2, 10, endpoint("sopmq1://localhost:2")));
+    r.add_node(node1);
+    
+    ASSERT_THROW(r.add_node(node2), sopmq::error::range_conflict_error);
 }
