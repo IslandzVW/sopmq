@@ -22,6 +22,7 @@
 #include "logging.h"
 #include "util.h"
 #include "user_account.h"
+#include "csauthenticated.h"
 
 #include "ChallengeResponseMessage.pb.h"
 #include "AnswerChallengeMessage.pb.h"
@@ -46,7 +47,9 @@ namespace sopmq {
             const int csunauthenticated::CHALLENGE_SIZE = 1024;
             
             csunauthenticated::csunauthenticated(ba::io_service& ioService, connection::wptr conn)
-            : _ioService(ioService), _conn(conn), _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1))
+            : _ioService(ioService), _conn(conn),
+            _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1)),
+            _closeAfterTransmission(false)
             {
             }
             
@@ -133,6 +136,7 @@ namespace sopmq {
                             auto connptr = _conn.lock();
                             if (connptr == nullptr) return;
                             
+                            _closeAfterTransmission = true;
                             AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
                             response->set_authorized(false);
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
@@ -158,9 +162,17 @@ namespace sopmq {
             void csunauthenticated::handle_write_result(const net::network_operation_result& result)
             {
                 auto connptr = _conn.lock();
-                if (!result.was_successful() && connptr)
+                if (connptr)
                 {
-                    connptr->handle_error(result.get_error());
+                    if (!result.was_successful())
+                    {
+                        connptr->handle_error(result.get_error());
+                    }
+                    
+                    if (_closeAfterTransmission)
+                    {
+                        connptr->handle_error(sopmq::error::network_error("connection forced closed by authentication"));
+                    }
                 }
             }
             

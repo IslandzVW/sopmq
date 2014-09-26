@@ -59,12 +59,15 @@ namespace sopmq {
                 ///
                 static const int CHALLENGE_SIZE;
                 
+                
                 boost::asio::io_service& _ioService;
                 connection::wptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
                 GetChallengeMessage_Type _authType;
                 
                 std::string _challenge;
+                
+                bool _closeAfterTransmission;
                 
                 void unhandled_message(Message_ptr message);
                 
