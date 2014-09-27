@@ -261,15 +261,15 @@ namespace sopmq {
 			uint32_t _total_message_size;
 
             ///
-			/// Whether or not the TTL has been set yet
-			///
-			bool _ttl_set;
+            /// Whether or not the TTL has been set yet
+            ///
+            bool _ttl_set;
 
-			///
-			/// The TTL of all messages in this queue based on the TTL of the first message
-			/// received
-			///
-			uint32_t _ttl;
+            ///
+            /// The TTL of all messages in this queue based on the TTL of the first message
+            /// received
+            ///
+            uint32_t _ttl;
 
             ///
             /// The last time a message was received for this queue
