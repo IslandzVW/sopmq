@@ -5,7 +5,7 @@ Scalable optionally persistent message queue
 
 This project is in the very early stages of development and is not yet functional
 
-SOPMQ's design is intended to provide an at least once message queue with partition tolerance. SOPMQ models a CP system.
+SOPMQ's design is intended to provide a distributed at least once message queue with partition tolerance. SOPMQ models a CP system.
 
 ### Windows note
 
