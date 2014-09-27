@@ -63,6 +63,11 @@ namespace sopmq {
             ///
             bool is_alive() const;
             
+            ///
+            /// Whether or not this node represents the current executing node
+            ///
+            bool is_self() const;
+            
             
         private:
             ///

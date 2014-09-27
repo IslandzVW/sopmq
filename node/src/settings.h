@@ -59,6 +59,12 @@ namespace sopmq {
             static settings& instance();
             
         public:
+            
+            ///
+            /// The unique identity of this node
+            ///
+            std::uint32_t nodeId;
+            
             ///
             /// The beginning of the range we're in charge of
             ///

@@ -17,8 +17,12 @@
 
 #include "node.h"
 
+#include "settings.h"
+
 namespace bc = boost::chrono;
 namespace bmp = boost::multiprecision;
+
+using sopmq::node::settings;
 
 namespace sopmq {
     namespace node {
@@ -64,6 +68,11 @@ namespace sopmq {
             }
             
             return true;
+        }
+        
+        bool node::is_self() const
+        {
+            return _node_id == settings::instance().nodeId;
         }
     }
 }
