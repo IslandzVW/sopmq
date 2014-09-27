@@ -81,7 +81,8 @@ namespace sopmq {
             /// \param queueId The hex representation of the murmur hash of this queues name
             ///
             message_queue(const std::string& queueId)
-                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _total_message_size(0)
+                : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _total_message_size(0),
+                _ttl_set(false), _ttl(0)
             {
 
             }
@@ -260,6 +261,17 @@ namespace sopmq {
 			uint32_t _total_message_size;
 
             ///
+			/// Whether or not the TTL has been set yet
+			///
+			bool _ttl_set;
+
+			///
+			/// The TTL of all messages in this queue based on the TTL of the first message
+			/// received
+			///
+			uint32_t _ttl;
+
+            ///
             /// The last time a message was received for this queue
             ///
             boost::chrono::steady_clock::time_point _last_message_received;
@@ -280,17 +292,6 @@ namespace sopmq {
             /// messages in _queued_messages
             ///
             typename message_index_t<RF>::type _message_index;
-            
-			///
-			/// Whether or not the TTL has been set yet
-			///
-			bool _ttl_set;
-
-			///
-			/// The TTL of all messages in this queue based on the TTL of the first message
-			/// received
-			///
-			uint32_t _ttl;
         };
 
         ///
