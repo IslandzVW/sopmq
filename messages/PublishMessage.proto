@@ -1,6 +1,6 @@
 import "Identifier.proto";
 
-message PostMessage {
+message PublishMessage {
 	required Identifier identity = 1;
 
 	required bytes message_id = 2;	

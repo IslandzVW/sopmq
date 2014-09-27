@@ -57,7 +57,7 @@ namespace sopmq {
                 
                 void handle_read_result(const net::network_operation_result& result);
                 
-                void handle_post_message(PostMessage_ptr message);
+                void handle_post_message(PublishMessage_ptr message);
             };
             
         }

@@ -68,8 +68,8 @@ namespace sopmq {
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
             void dispatch(Identifier_ptr identifier);
             void dispatch(NodeClock_ptr nodeClock);
-            void dispatch(PostMessage_ptr postMessage);
-            void dispatch(PostResponseMessage_ptr postResponseMessage);
+            void dispatch(PublishMessage_ptr publishMessage);
+            void dispatch(PublishResponseMessage_ptr publishResponseMessage);
             void dispatch(SubscribeQueueMessage_ptr subscribeQueueMessage);
             void dispatch(SubscribeResponseMessage_ptr subscribeResponseMessage);
             void dispatch(VectorClock_ptr vectorClock);
@@ -87,8 +87,8 @@ namespace sopmq {
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
             void set_handler(std::function<void(Identifier_ptr)> handler);
             void set_handler(std::function<void(NodeClock_ptr)> handler);
-            void set_handler(std::function<void(PostMessage_ptr)> handler);
-            void set_handler(std::function<void(PostResponseMessage_ptr)> handler);
+            void set_handler(std::function<void(PublishMessage_ptr)> handler);
+            void set_handler(std::function<void(PublishResponseMessage_ptr)> handler);
             void set_handler(std::function<void(SubscribeQueueMessage_ptr)> handler);
             void set_handler(std::function<void(SubscribeResponseMessage_ptr)> handler);
             void set_handler(std::function<void(VectorClock_ptr)> handler);
@@ -108,8 +108,8 @@ namespace sopmq {
             std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
             std::function<void(Identifier_ptr)> _identifierHandler;
             std::function<void(NodeClock_ptr)> _nodeClockHandler;
-            std::function<void(PostMessage_ptr)> _postMessageHandler;
-            std::function<void(PostResponseMessage_ptr)> _postResponseMessageHandler;
+            std::function<void(PublishMessage_ptr)> _publishMessageHandler;
+            std::function<void(PublishResponseMessage_ptr)> _publishResponseMessageHandler;
             std::function<void(SubscribeQueueMessage_ptr)> _subscribeQueueMessageHandler;
             std::function<void(SubscribeResponseMessage_ptr)> _subscribeResponseMessageHandler;
             std::function<void(VectorClock_ptr)> _vectorClockHandler;

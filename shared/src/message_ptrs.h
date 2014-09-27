@@ -64,11 +64,11 @@ typedef std::shared_ptr<Identifier> Identifier_ptr;
 class NodeClock;
 typedef std::shared_ptr<NodeClock> NodeClock_ptr;
 
-class PostMessage;
-typedef std::shared_ptr<PostMessage> PostMessage_ptr;
+class PublishMessage;
+typedef std::shared_ptr<PublishMessage> PublishMessage_ptr;
 
-class PostResponseMessage;
-typedef std::shared_ptr<PostResponseMessage> PostResponseMessage_ptr;
+class PublishResponseMessage;
+typedef std::shared_ptr<PublishResponseMessage> PublishResponseMessage_ptr;
 
 class SubscribeQueueMessage;
 typedef std::shared_ptr<SubscribeQueueMessage> SubscribeQueueMessage_ptr;

@@ -1,6 +1,6 @@
 import "Identifier.proto";
 
-message PostResponseMessage {
+message PublishResponseMessage {
 	required Identifier identity = 1;
 	enum Status {
 		PIPED = 1;

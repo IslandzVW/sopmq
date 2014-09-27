@@ -20,12 +20,20 @@ file(GLOB PROTO_FILES *.proto)
 execute_process(COMMAND protoc -I=${CMAKE_CURRENT_SOURCE_DIR} --cpp_out=cpp ${PROTO_FILES} 
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-#use cog to generate the message pointer types
-execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_ptrs.h)
+#find cog
+if (WIN32)
+	execute_process(COMMAND where cog.py OUTPUT_VARIABLE rv OUTPUT_STRIP_TRAILING_WHITESPACE)
+	set(COG_PREFIX python.exe)
+	set(COG_LOC ${rv}) 
+else (WIN32)
+	set(COG_LOC cog.py)
+endif (WIN32)
 
+#use cog to generate the message pointer types
+execute_process(COMMAND ${COG_PREFIX} ${COG_LOC} -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_ptrs.h)
 #also generate code for the message dispatcher
-execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.h)
-execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.cpp)
+execute_process(COMMAND ${COG_PREFIX} ${COG_LOC} -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.h)
+execute_process(COMMAND ${COG_PREFIX} ${COG_LOC} -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/message_dispatcher.cpp)
 
 #and messageutil
-execute_process(COMMAND cog.py -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/messageutil.cpp)
+execute_process(COMMAND ${COG_PREFIX} ${COG_LOC} -r ${CMAKE_CURRENT_SOURCE_DIR}/../shared/src/messageutil.cpp)

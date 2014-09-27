@@ -32,8 +32,8 @@ namespace sopmq {
             MT_CHALLENGE_RESPONSE,
             MT_ANSWER_CHALLENGE,
             MT_AUTH_ACK,
-            MT_POST,
-            MT_POST_RESPONSE,
+            MT_PUBLISH,
+            MT_PUBLISH_RESPONSE,
             MT_SUBSCRIBE_QUEUE,
             MT_SUBSCRIBE_RESPONSE,
             

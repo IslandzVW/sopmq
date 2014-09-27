@@ -46,8 +46,8 @@
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
-#include "PostMessage.pb.h"
-#include "PostResponseMessage.pb.h"
+#include "PublishMessage.pb.h"
+#include "PublishResponseMessage.pb.h"
 #include "SubscribeQueueMessage.pb.h"
 #include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
@@ -115,15 +115,15 @@ namespace sopmq {
         }
 
 
-        void message_dispatcher::dispatch(PostMessage_ptr postMessage)
+        void message_dispatcher::dispatch(PublishMessage_ptr publishMessage)
         {
-            do_dispatch(_postMessageHandler, postMessage);
+            do_dispatch(_publishMessageHandler, publishMessage);
         }
 
 
-        void message_dispatcher::dispatch(PostResponseMessage_ptr postResponseMessage)
+        void message_dispatcher::dispatch(PublishResponseMessage_ptr publishResponseMessage)
         {
-            do_dispatch(_postResponseMessageHandler, postResponseMessage);
+            do_dispatch(_publishResponseMessageHandler, publishResponseMessage);
         }
 
 
@@ -193,15 +193,15 @@ namespace sopmq {
         }
 
 
-        void message_dispatcher::set_handler(std::function<void(PostMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(PublishMessage_ptr)> handler)
         {
-            _postMessageHandler = handler;
+            _publishMessageHandler = handler;
         }
 
 
-        void message_dispatcher::set_handler(std::function<void(PostResponseMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler)
         {
-            _postResponseMessageHandler = handler;
+            _publishResponseMessageHandler = handler;
         }
 
 

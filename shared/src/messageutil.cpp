@@ -47,8 +47,8 @@
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
-#include "PostMessage.pb.h"
-#include "PostResponseMessage.pb.h"
+#include "PublishMessage.pb.h"
+#include "PublishResponseMessage.pb.h"
 #include "SubscribeQueueMessage.pb.h"
 #include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
@@ -218,12 +218,12 @@ namespace sopmq {
                     messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
                     break;
 
-                case MT_POST:
-                    messageutil::template_dispatch(ctx, std::make_shared<PostMessage>());
+                case MT_PUBLISH:
+                    messageutil::template_dispatch(ctx, std::make_shared<PublishMessage>());
                     break;
 
-                case MT_POST_RESPONSE:
-                    messageutil::template_dispatch(ctx, std::make_shared<PostResponseMessage>());
+                case MT_PUBLISH_RESPONSE:
+                    messageutil::template_dispatch(ctx, std::make_shared<PublishResponseMessage>());
                     break;
 
                 case MT_SUBSCRIBE_QUEUE:
