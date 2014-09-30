@@ -21,18 +21,24 @@
 #include "vector_clock.h"
 #include "node_clock.h"
 #include "util.h"
+#include "MurmurHash3/MurmurHash3.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 using namespace sopmq::node;
+namespace bmp = boost::multiprecision;
 
+using sopmq::shared::util;
 
+static const char* const QUEUE_NAME = "abcde";
+static const int QUEUE_LEN = 5;
 
 TEST(MessageQueueTest, MessageQueueBasicOrdering)
 {
-    message_queue3 mq("abcde");
+    message_queue3 mq( util::murmur_hash3(QUEUE_NAME, QUEUE_LEN) );
     
     node_clock a1 = {1, 1, 1};
     node_clock b1 = {2, 1, 0};
@@ -89,7 +95,7 @@ TEST(MessageQueueTest, MessageQueueBasicOrdering)
 
 TEST(MessageQueueTest, MessageQueueGenerationOrdering)
 {
-    message_queue3 mq("abcde");
+    message_queue3 mq( util::murmur_hash3(QUEUE_NAME, QUEUE_LEN) );
     
     node_clock a1 = {1, 1, 1}; //<<
     node_clock b1 = {2, 1, 0};
@@ -146,7 +152,7 @@ TEST(MessageQueueTest, MessageQueueGenerationOrdering)
 
 TEST(MessageQueueTest, ExpireUnstampedMessages)
 {
-    message_queue3 mq("abcde");
+    message_queue3 mq( util::murmur_hash3(QUEUE_NAME, QUEUE_LEN) );
     
     node_clock a1 = {1, 1, 1}; //<<
     node_clock b1 = {2, 1, 0};

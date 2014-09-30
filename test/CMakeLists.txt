@@ -1,3 +1,5 @@
+set(INCLUDES ${THIRDPARTY_DIR})
+
 find_package(Boost COMPONENTS system program_options log thread REQUIRED)
 
 find_package(Protobuf REQUIRED)

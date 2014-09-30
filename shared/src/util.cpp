@@ -17,12 +17,17 @@
 
 #include "util.h"
 
+#include "MurmurHash3/MurmurHash3.h"
+
 #include <cryptopp/hex.h>
 #include <cryptopp/filters.h>
 
 #include <random>
 #include <limits>
 #include <boost/uuid/uuid_generators.hpp>
+#include <boost/static_assert.hpp>
+
+#include <cassert>
 
 using namespace CryptoPP;
 
@@ -59,6 +64,17 @@ namespace sopmq {
         {
             boost::uuids::random_generator gen;
             return gen();
+        }
+
+        uint128 util::murmur_hash3(const void * key, int len)
+        {
+            const int SEED = -147483647;
+
+            uint128 hash;
+            BOOST_STATIC_ASSERT(sizeof(hash) == 16);
+            MurmurHash3_x64_128(key, len, SEED, &hash.lo);
+
+            return hash;
         }
 
         util::util()

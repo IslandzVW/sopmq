@@ -18,8 +18,11 @@
 #ifndef __sopmq__util__
 #define __sopmq__util__
 
+#include "uint128.h"
+
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 namespace sopmq {
     namespace shared {
@@ -46,6 +49,11 @@ namespace sopmq {
             ///
             static boost::uuids::uuid random_uuid();
             
+            ///
+            /// Returns the murmur hash of the given value
+            ///
+            static uint128 murmur_hash3(const void * key, int len);
+
         private:
             util();
             ~util();

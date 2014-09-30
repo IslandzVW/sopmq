@@ -21,10 +21,12 @@
 #include "queued_message.h"
 #include "message_not_found_error.h"
 #include "vector_clock.h"
+#include "uint128.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/chrono.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
 #include <string>
 #include <cstdint>
@@ -32,6 +34,8 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+
+namespace bmp = boost::multiprecision;
 
 namespace sopmq {
     namespace node {
@@ -80,7 +84,7 @@ namespace sopmq {
             /// \brief CTOR
             /// \param queueId The hex representation of the murmur hash of this queues name
             ///
-            message_queue(const std::string& queueId)
+            message_queue(const uint128& queueId)
                 : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _total_message_size(0),
                 _ttl_set(false), _ttl(0)
             {
@@ -90,7 +94,7 @@ namespace sopmq {
             ///
             /// \brief Returns the Hex representation of the Murmur hash for this queue name
             ///
-            const std::string& queue_id() const
+            const uint128& queue_id() const
             {
                 return _queue_id;
             }
@@ -246,9 +250,9 @@ namespace sopmq {
             
         private:
             ///
-            /// Hex representation of the Murmur hash for this queue name
+            /// Value of the Murmur hash for this queue
             ///
-            std::string _queue_id;
+            uint128 _queue_id;
 
             ///
             /// Time this queue was created
