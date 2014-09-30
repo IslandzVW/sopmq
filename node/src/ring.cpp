@@ -27,8 +27,6 @@
 
 using namespace std;
 
-namespace bmp = boost::multiprecision;
-
 using sopmq::error::range_conflict_error;
 using sopmq::error::id_conflict_error;
 
@@ -78,7 +76,7 @@ namespace sopmq {
             }
         }
         
-        node_ptr ring::find_primary_node_for_key(bmp::uint128_t key) const
+        node_ptr ring::find_primary_node_for_key(uint128 key) const
         {
             if (_ring_by_range.empty())
             {
@@ -93,7 +91,7 @@ namespace sopmq {
             return primaryIter->second;
         }
         
-        std::array<node_ptr, 3> ring::find_nodes_for_key(boost::multiprecision::uint128_t key) const
+        std::array<node_ptr, 3> ring::find_nodes_for_key(uint128 key) const
         {
             if (_ring_by_range.empty())
             {
@@ -117,7 +115,7 @@ namespace sopmq {
             return ret;
         }
         
-        ring::const_ring_iterator ring::find_secondary_node(boost::multiprecision::uint128_t key) const
+        ring::const_ring_iterator ring::find_secondary_node(uint128 key) const
         {
             auto iter = _ring_by_range.upper_bound(key); //find the secondary node
             

@@ -21,34 +21,25 @@
 #include "endpoint.h"
 #include "range_conflict_error.h"
 #include "id_conflict_error.h"
-
-#include <boost/multiprecision/random.hpp>
+#include "util.h"
 
 using namespace sopmq::node;
 using namespace sopmq::shared::net;
-using namespace boost::multiprecision;
-using namespace boost::random;
-
-typedef independent_bits_engine<mt19937, 128, uint128_t> generator_type;
-generator_type gen;
 
 TEST(RingTest, TestEmptyRingFind)
 {
     ring r;
-    uint128_t num = gen();
-    
-    ASSERT_EQ(r.find_primary_node_for_key(num), node_ptr()) ;
+    ASSERT_EQ(r.find_primary_node_for_key(9999), node_ptr()) ;
 }
 
 TEST(RingTest, TestSingleNodeRingFind)
 {
     ring r;
-    uint128_t num = gen();
-    
+
     node_ptr node(new sopmq::node::node(1, 0, endpoint("sopmq1://localhost:1")));
     r.add_node(node);
     
-    ASSERT_EQ(r.find_primary_node_for_key(num), node) ;
+    ASSERT_EQ(r.find_primary_node_for_key(1024579), node);
 }
 
 TEST(RingTest, TestSingleNodeRingFindWithSameKey)

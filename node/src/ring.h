@@ -18,14 +18,15 @@
 #ifndef __sopmq__ring__
 #define __sopmq__ring__
 
+#include "node.h"
+#include "endpoint.h"
+#include "uint128.h"
+
 #include <map>
 #include <unordered_map>
-#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/noncopyable.hpp>
 #include <array>
 
-#include "node.h"
-#include "endpoint.h"
 
 namespace sopmq {
     namespace node {
@@ -47,20 +48,20 @@ namespace sopmq {
             ///
             /// Finds the node that we believe to be primary for the given key
             ///
-            node_ptr find_primary_node_for_key(boost::multiprecision::uint128_t key) const;
+            node_ptr find_primary_node_for_key(uint128 key) const;
             
             ///
             /// Finds the primary and secondary nodes for the given key
             ///
-            std::array<node_ptr, 3> find_nodes_for_key(boost::multiprecision::uint128_t key) const;
+            std::array<node_ptr, 3> find_nodes_for_key(uint128 key) const;
             
         private:
-            typedef std::map<boost::multiprecision::uint128_t, node_ptr>::const_iterator const_ring_iterator;
+            typedef std::map<uint128, node_ptr>::const_iterator const_ring_iterator;
             
             ///
             /// Map to the ring, sorted by the range start of each node
             ///
-            std::map<boost::multiprecision::uint128_t, node_ptr> _ring_by_range;
+            std::map<uint128, node_ptr> _ring_by_range;
             
             ///
             /// Map between the node ID and the node
@@ -70,7 +71,7 @@ namespace sopmq {
             ///
             /// Finds the location of the secondary node on the ring
             ///
-            const_ring_iterator find_secondary_node(boost::multiprecision::uint128_t key) const;
+            const_ring_iterator find_secondary_node(uint128 key) const;
             
             ///
             /// Finds the location of the primary node on the ring

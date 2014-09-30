@@ -18,15 +18,16 @@
 #ifndef __sopmq__node__
 #define __sopmq__node__
 
+#include "endpoint.h"
+#include "uint128.h"
+
 #include <memory>
-#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/chrono.hpp>
 
 #include <string>
 #include <cstdint>
 
-#include "endpoint.h"
 
 namespace sopmq {
     namespace node {
@@ -38,7 +39,7 @@ namespace sopmq {
         class node : public boost::noncopyable
         {
         public:
-            node(std::uint32_t nodeId, boost::multiprecision::uint128_t rangeStart,
+            node(std::uint32_t nodeId, uint128 rangeStart,
                  shared::net::endpoint endPoint);
             
             virtual ~node();
@@ -51,7 +52,7 @@ namespace sopmq {
             ///
             /// Returns the beginning of the range we handle
             ///
-            boost::multiprecision::uint128_t range_start() const;
+            uint128 range_start() const;
             
             ///
             /// Returns the endpoint to reach this node
@@ -89,7 +90,7 @@ namespace sopmq {
             ///
             /// The beginning of the range that we handle
             ///
-            boost::multiprecision::uint128_t _range_start;
+            uint128 _range_start;
             
             ///
             /// The endpoint to contact this node at
