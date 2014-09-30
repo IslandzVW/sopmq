@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 
+#include "settings.h"
+#include "server.h"
+#include "uint128.h"
+
 #include <boost/program_options.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/asio.hpp>
 
@@ -25,10 +28,6 @@
 #include <fstream>
 #include <cstdint>
 
-#include "settings.h"
-#include "server.h"
-
-namespace bmp = boost::multiprecision;
 namespace po = boost::program_options;
 
 using namespace std;
@@ -49,7 +48,7 @@ bool process_options(int argc, char* argv[])
     desc.add_options()
         ("help,h", "produce help message")
         ("config_file", po::value<string>()->default_value(""), "path to configuration file")
-        ("range", po::value<bmp::uint128_t>(), "the start of the range for this node to handle")
+        ("range", po::value<string>(), "the start of the range for this node to handle")
         ("bind_addr", po::value<string>(), "address to bind to")
         ("port", po::value<uint16_t>()->default_value(DEFAULT_PORT), "port to listen on")
         ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
@@ -106,7 +105,7 @@ bool process_options(int argc, char* argv[])
             return false;
         }
         
-        settings::instance().range = vm["range"].as<bmp::uint128_t>();
+        settings::instance().range = uint128(vm["range"].as<std::string>());
         settings::instance().bindAddress = vm["bind_addr"].as<string>();
         settings::instance().port = vm["port"].as<unsigned short>();
         settings::instance().cassandraSeeds = vm["storage_nodes"].as<vector<string> >();

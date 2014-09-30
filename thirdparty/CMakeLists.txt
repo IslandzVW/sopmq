@@ -17,6 +17,10 @@ PROJECT( sopmq-thirdparty )
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-file(GLOB LIB_SRCS MurmurHash3/*.h MurmurHash3/*.cpp)
+find_package(Boost REQUIRED)
+set(INCLUDES ${INCLUDES} ${Boost_INCLUDE_DIR})
 
+file(GLOB LIB_SRCS src/*.h src/*.cpp src/MurmurHash3/*.h src/MurmurHash3/*.cpp)
+
+include_directories(${INCLUDES})
 add_library(sopmq-thirdparty ${LIB_SRCS})

@@ -18,14 +18,13 @@
 #ifndef __sopmq__settings__
 #define __sopmq__settings__
 
-#include <boost/multiprecision/cpp_int.hpp>
+#include "uint128.h"
+
 #include <boost/noncopyable.hpp>
 
 #include <string>
 #include <vector>
 #include <cstdint>
-
-namespace bmp = boost::multiprecision;
 
 ///
 /// SOPMQ
@@ -68,7 +67,7 @@ namespace sopmq {
             ///
             /// The beginning of the range we're in charge of
             ///
-            bmp::uint128_t range;
+            uint128 range;
             
             ///
             /// The IP address to bind to
