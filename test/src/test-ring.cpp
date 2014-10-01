@@ -22,6 +22,7 @@
 #include "range_conflict_error.h"
 #include "id_conflict_error.h"
 #include "util.h"
+#include "settings.h"
 
 using namespace sopmq::node;
 using namespace sopmq::shared::net;
@@ -257,4 +258,12 @@ TEST(RingTest, TestRangeConflict)
     r.add_node(node1);
     
     ASSERT_THROW(r.add_node(node2), sopmq::error::range_conflict_error);
+}
+
+TEST(RingTest, TestIsSelf)
+{
+    sopmq::node::settings::instance().nodeId = 1;
+    sopmq::node::node n(1, 10, endpoint("sopmq1://localhost:1"));
+    
+    ASSERT_TRUE(n.is_self());
 }
