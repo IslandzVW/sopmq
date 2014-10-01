@@ -55,6 +55,12 @@ typedef std::shared_ptr<AuthAckMessage> AuthAckMessage_ptr;
 class ChallengeResponseMessage;
 typedef std::shared_ptr<ChallengeResponseMessage> ChallengeResponseMessage_ptr;
 
+class ConsumeFromQueueMessage;
+typedef std::shared_ptr<ConsumeFromQueueMessage> ConsumeFromQueueMessage_ptr;
+
+class ConsumeResponseMessage;
+typedef std::shared_ptr<ConsumeResponseMessage> ConsumeResponseMessage_ptr;
+
 class GetChallengeMessage;
 typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 
@@ -69,12 +75,6 @@ typedef std::shared_ptr<PublishMessage> PublishMessage_ptr;
 
 class PublishResponseMessage;
 typedef std::shared_ptr<PublishResponseMessage> PublishResponseMessage_ptr;
-
-class SubscribeQueueMessage;
-typedef std::shared_ptr<SubscribeQueueMessage> SubscribeQueueMessage_ptr;
-
-class SubscribeResponseMessage;
-typedef std::shared_ptr<SubscribeResponseMessage> SubscribeResponseMessage_ptr;
 
 class VectorClock;
 typedef std::shared_ptr<VectorClock> VectorClock_ptr;

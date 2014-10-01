@@ -1,4 +1,4 @@
-Client to server messages
+﻿Client to server messages
 ----------------------------------------------------------------------------------
 
 All messages are prefixed with the type and length of the message as so:
@@ -41,9 +41,9 @@ Returns:
 Functionality
 ——————————--------------------------------------------
 
-SubscribeQueue
+ConsumeFromQueue
 ----------------
-Subscribe to a queue, and optionally peek or claim messages that it contains
+Consumes messages from a queue. peek or claim messages that it contains
 
 Parameters:
 	QueueID
@@ -51,7 +51,7 @@ Parameters:
 
 	DownloadType = None, ClaimStoredMessages, PeekStoredMessages
 		- None 
-			Do not download stored messages. Only subscribe to new messages coming in on the queue
+			Do not download stored messages. Only retrieve new messages coming in on the queue
 
 		- ClaimStoredMessages
 			Claim messages that are currently in persistent storage in the given queue
@@ -71,7 +71,7 @@ Parameters:
 			
 		- Claim
 			Claim messages that are sent to the queue thereby deleting them 
-			(this does not guarantee only once delivery when there are multiple consumers)
+			(this does __NOT__ guarantee only once delivery)
 
 Returns: SubscribeResponseMessage
 	OK + The queue data/empty message,
@@ -104,16 +104,3 @@ Returns: PostResponseMessage
 	NotAuth,
 	Unavailable
 		- The range is unavailable. The client must retry later 
-
-
-UnsubscribeQueue
-------------------
-Unsubscribes from a queue. Messages will no longer be piped
-
-Parameters:
-	QueueID
-		- User supplied identifier for the queue
-
-Returns:
-	OK,
-	NotAuth,

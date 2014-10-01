@@ -1,6 +1,6 @@
 import "Identifier.proto";
 
-message SubscribeResponseMessage {
+message ConsumeResponseMessage {
 	required Identifier identity = 1;
 	enum Status {
 		OK = 1;
@@ -8,5 +8,5 @@ message SubscribeResponseMessage {
 		UNAVAILABLE = 3;
 	}
 
-	required Status status  = 2;
+	required Status status = 2;
 }

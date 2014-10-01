@@ -34,8 +34,8 @@ namespace sopmq {
             MT_AUTH_ACK,
             MT_PUBLISH,
             MT_PUBLISH_RESPONSE,
-            MT_SUBSCRIBE_QUEUE,
-            MT_SUBSCRIBE_RESPONSE,
+            MT_CONSUME_FROM_QUEUE,
+            MT_CONSUME_RESPONSE,
             
             MT_INVALID_OUT_OF_RANGE
         };

@@ -44,13 +44,13 @@
 #include "AnswerChallengeMessage.pb.h"
 #include "AuthAckMessage.pb.h"
 #include "ChallengeResponseMessage.pb.h"
+#include "ConsumeFromQueueMessage.pb.h"
+#include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
-#include "SubscribeQueueMessage.pb.h"
-#include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
 //[[[end]]]
 
@@ -214,6 +214,14 @@ namespace sopmq {
                     messageutil::template_dispatch(ctx, std::make_shared<ChallengeResponseMessage>());
                     break;
 
+                case MT_CONSUME_FROM_QUEUE:
+                    messageutil::template_dispatch(ctx, std::make_shared<ConsumeFromQueueMessage>());
+                    break;
+
+                case MT_CONSUME_RESPONSE:
+                    messageutil::template_dispatch(ctx, std::make_shared<ConsumeResponseMessage>());
+                    break;
+
                 case MT_GET_CHALLENGE:
                     messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
                     break;
@@ -224,14 +232,6 @@ namespace sopmq {
 
                 case MT_PUBLISH_RESPONSE:
                     messageutil::template_dispatch(ctx, std::make_shared<PublishResponseMessage>());
-                    break;
-
-                case MT_SUBSCRIBE_QUEUE:
-                    messageutil::template_dispatch(ctx, std::make_shared<SubscribeQueueMessage>());
-                    break;
-
-                case MT_SUBSCRIBE_RESPONSE:
-                    messageutil::template_dispatch(ctx, std::make_shared<SubscribeResponseMessage>());
                     break;
 
                 //[[[end]]]

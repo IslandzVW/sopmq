@@ -43,13 +43,13 @@
 #include "AnswerChallengeMessage.pb.h"
 #include "AuthAckMessage.pb.h"
 #include "ChallengeResponseMessage.pb.h"
+#include "ConsumeFromQueueMessage.pb.h"
+#include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
-#include "SubscribeQueueMessage.pb.h"
-#include "SubscribeResponseMessage.pb.h"
 #include "VectorClock.pb.h"
 //[[[end]]]
 
@@ -97,6 +97,18 @@ namespace sopmq {
         }
 
 
+        void message_dispatcher::dispatch(ConsumeFromQueueMessage_ptr consumeFromQueueMessage)
+        {
+            do_dispatch(_consumeFromQueueMessageHandler, consumeFromQueueMessage);
+        }
+
+
+        void message_dispatcher::dispatch(ConsumeResponseMessage_ptr consumeResponseMessage)
+        {
+            do_dispatch(_consumeResponseMessageHandler, consumeResponseMessage);
+        }
+
+
         void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
         {
             do_dispatch(_getChallengeMessageHandler, getChallengeMessage);
@@ -124,18 +136,6 @@ namespace sopmq {
         void message_dispatcher::dispatch(PublishResponseMessage_ptr publishResponseMessage)
         {
             do_dispatch(_publishResponseMessageHandler, publishResponseMessage);
-        }
-
-
-        void message_dispatcher::dispatch(SubscribeQueueMessage_ptr subscribeQueueMessage)
-        {
-            do_dispatch(_subscribeQueueMessageHandler, subscribeQueueMessage);
-        }
-
-
-        void message_dispatcher::dispatch(SubscribeResponseMessage_ptr subscribeResponseMessage)
-        {
-            do_dispatch(_subscribeResponseMessageHandler, subscribeResponseMessage);
         }
 
 
@@ -175,6 +175,18 @@ namespace sopmq {
         }
 
 
+        void message_dispatcher::set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler)
+        {
+            _consumeFromQueueMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler)
+        {
+            _consumeResponseMessageHandler = handler;
+        }
+
+
         void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
         {
             _getChallengeMessageHandler = handler;
@@ -202,18 +214,6 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler)
         {
             _publishResponseMessageHandler = handler;
-        }
-
-
-        void message_dispatcher::set_handler(std::function<void(SubscribeQueueMessage_ptr)> handler)
-        {
-            _subscribeQueueMessageHandler = handler;
-        }
-
-
-        void message_dispatcher::set_handler(std::function<void(SubscribeResponseMessage_ptr)> handler)
-        {
-            _subscribeResponseMessageHandler = handler;
         }
 
 

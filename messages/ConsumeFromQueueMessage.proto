@@ -1,6 +1,6 @@
 import "Identifier.proto";
 
-message SubscribeQueueMessage {
+message ConsumeFromQueueMessage {
 	required Identifier identity = 1;
 
 	required string queue_id = 2;
