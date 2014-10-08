@@ -20,6 +20,7 @@
 
 #include "endpoint.h"
 #include "uint128.h"
+#include "failure_detector.h"
 
 #include <memory>
 #include <boost/noncopyable.hpp>
@@ -72,17 +73,6 @@ namespace sopmq {
             
         private:
             ///
-            /// Number of seconds between heartbeats
-            ///
-            static const unsigned short HEARTBEAT_INTERVAL_SECS;
-            
-            ///
-            /// Number of seconds before a node is considered dead
-            ///
-            static const unsigned short HEARTBEAT_TIMEOUT_SECS;
-            
-            
-            ///
             /// The unique identifier for this node
             ///
             std::uint32_t _node_id;
@@ -98,9 +88,9 @@ namespace sopmq {
             shared::net::endpoint _endpoint;
             
             ///
-            /// The last time we got a heartbeat from this node
+            /// Failure detector for this node
             ///
-            boost::chrono::time_point<boost::chrono::steady_clock> _lastHeartbeat;
+            failure_detector _failure_detector;
         };
         
         typedef std::shared_ptr<node> node_ptr;

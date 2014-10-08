@@ -38,6 +38,7 @@ const string& VERSION = "0.1";
 
 const uint16_t DEFAULT_PORT = 8481;
 const uint32_t DEFAULT_MAX_MESSAGE_SIZE = 10485760;
+const int DEFAULT_PHI_FAILURE_THRESHOLD = 7;
 
 const string required_options[] = {"range", "bind_addr", "port", "storage_nodes", "seed_nodes"};
 
@@ -54,6 +55,7 @@ bool process_options(int argc, char* argv[])
         ("storage_nodes", po::value<vector<string> >()->multitoken(), "list of cassandra nodes for data storage")
         ("seed_nodes", po::value<vector<string> >()->multitoken(), "list of seed nodes to get us into the ring")
         ("max_message_size", po::value<uint32_t>()->default_value(DEFAULT_MAX_MESSAGE_SIZE), "the maximum size of any message")
+        ("phi_failure_threshold", po::value<int>()->default_value(DEFAULT_PHI_FAILURE_THRESHOLD), "the default threshold at which we consider a node failed")
     ;
     
     try
@@ -111,6 +113,7 @@ bool process_options(int argc, char* argv[])
         settings::instance().cassandraSeeds = vm["storage_nodes"].as<vector<string> >();
         settings::instance().mqSeeds = vm["seed_nodes"].as<vector<string> >();
         settings::instance().maxMessageSize = vm["max_message_size"].as<uint32_t>();
+        settings::instance().phiFailureThreshold = vm["phi_failure_threshold"].as<int>();
     }
     catch (const po::error& e)
     {

@@ -59,9 +59,21 @@ namespace sopmq {
 
             ///
             /// Returns the failure state for the monitored node based on our
-            /// historical information
+            /// historical information and the current time
             ///
             state interpret() const;
+
+            ///
+            /// Returns the failure state for the monitored node based on our
+            /// historical information and the given time
+            ///
+            state interpret(boost::chrono::steady_clock::time_point interpTime) const;
+
+            ///
+            /// Returns the time of the last heartbeat
+            ///
+            boost::chrono::steady_clock::time_point last_heartbeat() const;
+
 
         private:
             ///
@@ -88,7 +100,7 @@ namespace sopmq {
             ///
             /// Calculates the PHI value from the given intervals, last heartbeat, and time now
             ///
-            float current_phi() const;
+            float current_phi(boost::chrono::steady_clock::time_point compareTo) const;
 
             ///
             /// Calculates the current average from the intervals
@@ -98,7 +110,7 @@ namespace sopmq {
             ///
             /// Calculates the current interval since the last heartbeat
             ///
-            boost::chrono::milliseconds current_interval() const;
+            boost::chrono::milliseconds current_interval(boost::chrono::steady_clock::time_point compareTo) const;
         };
 
     }

@@ -18,6 +18,7 @@
 #include "node.h"
 
 #include "settings.h"
+#include "gossiper.h"
 
 namespace bc = boost::chrono;
 
@@ -26,12 +27,10 @@ using sopmq::node::settings;
 namespace sopmq {
     namespace node {
         
-        const unsigned short node::HEARTBEAT_INTERVAL_SECS = 1;
-        const unsigned short node::HEARTBEAT_TIMEOUT_SECS = 15;
-        
         node::node(std::uint32_t nodeId, uint128 rangeStart,
                    shared::net::endpoint endPoint)
-        : _node_id(nodeId), _range_start(rangeStart), _endpoint(endPoint)
+        : _node_id(nodeId), _range_start(rangeStart), _endpoint(endPoint),
+        _failure_detector(settings::instance().phiFailureThreshold, bc::milliseconds(gossiper::GOSSIP_INTERVAL_MS))
         {
             
         }
@@ -58,15 +57,9 @@ namespace sopmq {
         
         bool node::is_alive() const
         {
-            auto duration = bc::steady_clock::now() - _lastHeartbeat;
-            auto diffSecs = bc::duration_cast<bc::seconds>(duration);
-            
-            if (diffSecs.count() > HEARTBEAT_TIMEOUT_SECS)
-            {
-                return false;
-            }
-            
-            return true;
+            if (is_self()) return true;
+
+            return _failure_detector.interpret() == failure_detector::UP;
         }
         
         bool node::is_self() const

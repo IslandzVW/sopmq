@@ -17,6 +17,7 @@
 
 #include "failure_detector.h"
 
+
 #include <numeric>
 
 namespace bc = boost::chrono;
@@ -38,15 +39,22 @@ namespace sopmq {
 
         void failure_detector::heartbeat()
         {
-            bc::milliseconds interval = this->current_interval();
-            _last_heartbeat = bc::steady_clock::now();
+            auto now = bc::steady_clock::now();
+
+            bc::milliseconds interval = this->current_interval(now);
+            _last_heartbeat = now;
 
             _intervals.push_back(interval.count());
         }
 
         failure_detector::state failure_detector::interpret() const
         {
-            if (this->current_phi() >= _failure_threshold)
+            return this->interpret(bc::steady_clock::now());
+        }
+
+        failure_detector::state failure_detector::interpret(bc::steady_clock::time_point compareTo) const
+        {
+            if (this->current_phi(compareTo) >= _failure_threshold)
             {
                 return DOWN;
             }
@@ -56,13 +64,13 @@ namespace sopmq {
             }
         }
 
-        float failure_detector::current_phi() const
+        float failure_detector::current_phi(bc::steady_clock::time_point compareTo) const
         {
             //based on the simplification in apache cassandra
             //PHI_FACTOR = 1.0 / Math.log(10.0)
             const float PHI_FACTOR = 0.43429448190f;
 
-            bc::milliseconds interval = this->current_interval();
+            bc::milliseconds interval = this->current_interval(compareTo);
             auto phi = interval.count() / this->current_interval_average();
 
             return PHI_FACTOR * phi;
@@ -70,12 +78,12 @@ namespace sopmq {
 
         float failure_detector::current_interval_average() const
         {
-            return std::accumulate(_intervals.begin(), _intervals.end(), 0) / SAMPLE_SIZE;
+            return std::accumulate(_intervals.begin(), _intervals.end(), 0) / (float) SAMPLE_SIZE;
         }
 
-        bc::milliseconds failure_detector::current_interval() const
+        bc::milliseconds failure_detector::current_interval(bc::steady_clock::time_point compareTo) const
         {
-            return bc::duration_cast<bc::milliseconds>(bc::steady_clock::now() - _last_heartbeat);
+            return bc::duration_cast<bc::milliseconds>(compareTo - _last_heartbeat);
         }
     }
 }

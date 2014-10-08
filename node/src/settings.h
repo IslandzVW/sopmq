@@ -99,6 +99,12 @@ namespace sopmq {
             /// The default operation timeout in seconds
             ///
             uint32_t defaultTimeout;
+
+            ///
+            /// The PHI threshold at which we consider nodes failed when we aren't receving 
+            /// heartbeats
+            ///
+            int phiFailureThreshold;
             
         private:
             settings();
