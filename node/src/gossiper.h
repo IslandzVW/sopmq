@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include "ring.h"
+
 #ifndef __sopmq__gossiper__
 #define __sopmq__gossiper__
 
@@ -32,6 +34,13 @@ namespace sopmq {
             /// How often we try to gossip with a random node
             ///
             static const int GOSSIP_INTERVAL_MS = 1000;
+
+        public:
+            gossiper(const ring& ring);
+            virtual ~gossiper();
+
+        private:
+            const ring& _ring;
         };
 
     }

@@ -14,3 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "gossiper.h"
+
+namespace sopmq {
+    namespace node {
+
+        gossiper::gossiper(const ring& ring)
+            : _ring(ring)
+        {
+        }
+
+        gossiper::~gossiper()
+        {
+        }
+
+    }
+}
