@@ -19,6 +19,8 @@
 
 namespace sopmq {
     namespace node {
+        
+        const int gossiper::GOSSIP_INTERVAL_MS;
 
         gossiper::gossiper(const ring& ring)
             : _ring(ring)
