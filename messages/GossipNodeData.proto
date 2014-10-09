@@ -1,0 +1,5 @@
+import "NodeClock.proto";
+
+message GossipNodeData {
+	required NodeClock clock = 1;
+}

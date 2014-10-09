@@ -64,6 +64,12 @@ typedef std::shared_ptr<ConsumeResponseMessage> ConsumeResponseMessage_ptr;
 class GetChallengeMessage;
 typedef std::shared_ptr<GetChallengeMessage> GetChallengeMessage_ptr;
 
+class GossipMessage;
+typedef std::shared_ptr<GossipMessage> GossipMessage_ptr;
+
+class GossipNodeData;
+typedef std::shared_ptr<GossipNodeData> GossipNodeData_ptr;
+
 class Identifier;
 typedef std::shared_ptr<Identifier> Identifier_ptr;
 

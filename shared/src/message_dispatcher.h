@@ -68,6 +68,8 @@ namespace sopmq {
             void dispatch(ConsumeFromQueueMessage_ptr consumeFromQueueMessage);
             void dispatch(ConsumeResponseMessage_ptr consumeResponseMessage);
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
+            void dispatch(GossipMessage_ptr gossipMessage);
+            void dispatch(GossipNodeData_ptr gossipNodeData);
             void dispatch(Identifier_ptr identifier);
             void dispatch(NodeClock_ptr nodeClock);
             void dispatch(PublishMessage_ptr publishMessage);
@@ -87,6 +89,8 @@ namespace sopmq {
             void set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler);
             void set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler);
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
+            void set_handler(std::function<void(GossipMessage_ptr)> handler);
+            void set_handler(std::function<void(GossipNodeData_ptr)> handler);
             void set_handler(std::function<void(Identifier_ptr)> handler);
             void set_handler(std::function<void(NodeClock_ptr)> handler);
             void set_handler(std::function<void(PublishMessage_ptr)> handler);
@@ -108,6 +112,8 @@ namespace sopmq {
             std::function<void(ConsumeFromQueueMessage_ptr)> _consumeFromQueueMessageHandler;
             std::function<void(ConsumeResponseMessage_ptr)> _consumeResponseMessageHandler;
             std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
+            std::function<void(GossipMessage_ptr)> _gossipMessageHandler;
+            std::function<void(GossipNodeData_ptr)> _gossipNodeDataHandler;
             std::function<void(Identifier_ptr)> _identifierHandler;
             std::function<void(NodeClock_ptr)> _nodeClockHandler;
             std::function<void(PublishMessage_ptr)> _publishMessageHandler;

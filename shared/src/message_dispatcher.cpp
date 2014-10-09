@@ -46,6 +46,8 @@
 #include "ConsumeFromQueueMessage.pb.h"
 #include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
+#include "GossipMessage.pb.h"
+#include "GossipNodeData.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
 #include "PublishMessage.pb.h"
@@ -112,6 +114,18 @@ namespace sopmq {
         void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
         {
             do_dispatch(_getChallengeMessageHandler, getChallengeMessage);
+        }
+
+
+        void message_dispatcher::dispatch(GossipMessage_ptr gossipMessage)
+        {
+            do_dispatch(_gossipMessageHandler, gossipMessage);
+        }
+
+
+        void message_dispatcher::dispatch(GossipNodeData_ptr gossipNodeData)
+        {
+            do_dispatch(_gossipNodeDataHandler, gossipNodeData);
         }
 
 
@@ -190,6 +204,18 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
         {
             _getChallengeMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(GossipMessage_ptr)> handler)
+        {
+            _gossipMessageHandler = handler;
+        }
+
+
+        void message_dispatcher::set_handler(std::function<void(GossipNodeData_ptr)> handler)
+        {
+            _gossipNodeDataHandler = handler;
         }
 
 

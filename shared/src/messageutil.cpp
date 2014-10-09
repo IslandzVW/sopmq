@@ -47,6 +47,8 @@
 #include "ConsumeFromQueueMessage.pb.h"
 #include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
+#include "GossipMessage.pb.h"
+#include "GossipNodeData.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
 #include "PublishMessage.pb.h"
@@ -224,6 +226,10 @@ namespace sopmq {
 
                 case MT_GET_CHALLENGE:
                     messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
+                    break;
+
+                case MT_GOSSIP:
+                    messageutil::template_dispatch(ctx, std::make_shared<GossipMessage>());
                     break;
 
                 case MT_PUBLISH:

@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+file(GLOB CPP_MESSAGE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/cpp/*.pb.*)
+
+if (CPP_MESSAGE_FILES)
+	file(REMOVE ${CPP_MESSAGE_FILES})
+endif()
+
 file(GLOB PROTO_FILES *.proto)
 
 #message(PROTO_FILES)

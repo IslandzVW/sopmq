@@ -15,33 +15,5 @@
  * limitations under the License.
  */
 
-#ifndef SHARED_MESSAGE_TYPES_H
-#define SHARED_MESSAGE_TYPES_H
+#include "inode_operations.h"
 
-namespace sopmq {
-    namespace message {
-        
-        ///
-        /// SOPMQ message types
-        ///
-        enum message_type
-        {
-            MT_INVALID = 0,
-            
-            MT_GET_CHALLENGE,
-            MT_CHALLENGE_RESPONSE,
-            MT_ANSWER_CHALLENGE,
-            MT_AUTH_ACK,
-            MT_PUBLISH,
-            MT_PUBLISH_RESPONSE,
-            MT_CONSUME_FROM_QUEUE,
-            MT_CONSUME_RESPONSE,
-            MT_GOSSIP,
-            
-            MT_INVALID_OUT_OF_RANGE
-        };
-        
-    }
-}
-
-#endif
