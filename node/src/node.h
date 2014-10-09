@@ -40,6 +40,9 @@ namespace sopmq {
         class node : public boost::noncopyable
         {
         public:
+            typedef std::shared_ptr<node> ptr;
+            
+        public:
             node(std::uint32_t nodeId, uint128 rangeStart,
                  shared::net::endpoint endPoint);
             
@@ -92,8 +95,6 @@ namespace sopmq {
             ///
             failure_detector _failure_detector;
         };
-        
-        typedef std::shared_ptr<node> node_ptr;
     }
 }
 

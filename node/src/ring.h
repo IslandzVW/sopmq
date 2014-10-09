@@ -43,30 +43,30 @@ namespace sopmq {
             ///
             /// Adds a new node to the ring
             ///
-            void add_node(node_ptr node);
+            void add_node(node::ptr node);
             
             ///
             /// Finds the node that we believe to be primary for the given key
             ///
-            node_ptr find_primary_node_for_key(uint128 key) const;
+            node::ptr find_primary_node_for_key(uint128 key) const;
             
             ///
             /// Finds the primary and secondary nodes for the given key
             ///
-            std::array<node_ptr, 3> find_nodes_for_key(uint128 key) const;
+            std::array<node::ptr, 3> find_nodes_for_key(uint128 key) const;
             
         private:
-            typedef std::map<uint128, node_ptr>::const_iterator const_ring_iterator;
+            typedef std::map<uint128, node::ptr>::const_iterator const_ring_iterator;
             
             ///
             /// Map to the ring, sorted by the range start of each node
             ///
-            std::map<uint128, node_ptr> _ring_by_range;
+            std::map<uint128, node::ptr> _ring_by_range;
             
             ///
             /// Map between the node ID and the node
             ///
-            std::unordered_map<std::uint32_t, node_ptr> _nodes_by_id;
+            std::unordered_map<std::uint32_t, node::ptr> _nodes_by_id;
             
             ///
             /// Finds the location of the secondary node on the ring
@@ -86,7 +86,7 @@ namespace sopmq {
             ///
             /// Checks to make sure adding this node doesn't conflict with any other node
             ///
-            void check_no_conflict(node_ptr newNode) const;
+            void check_no_conflict(node::ptr newNode) const;
         };
         
     }

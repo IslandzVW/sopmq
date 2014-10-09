@@ -25,6 +25,7 @@ namespace sopmq {
         gossiper::gossiper(const ring& ring)
             : _ring(ring)
         {
+            
         }
 
         gossiper::~gossiper()

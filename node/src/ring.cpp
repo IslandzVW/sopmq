@@ -43,7 +43,7 @@ namespace sopmq {
             
         }
         
-        void ring::add_node(node_ptr node)
+        void ring::add_node(node::ptr node)
         {
             this->check_no_conflict(node);
             
@@ -51,7 +51,7 @@ namespace sopmq {
             _nodes_by_id.emplace(node->node_id(), node);
         }
         
-        void ring::check_no_conflict(node_ptr newNode) const
+        void ring::check_no_conflict(node::ptr newNode) const
         {
             auto idIter = _nodes_by_id.find(newNode->node_id());
             if (idIter != _nodes_by_id.end())
@@ -76,7 +76,7 @@ namespace sopmq {
             }
         }
         
-        node_ptr ring::find_primary_node_for_key(uint128 key) const
+        node::ptr ring::find_primary_node_for_key(uint128 key) const
         {
             if (_ring_by_range.empty())
             {
@@ -91,11 +91,11 @@ namespace sopmq {
             return primaryIter->second;
         }
         
-        std::array<node_ptr, 3> ring::find_nodes_for_key(uint128 key) const
+        std::array<node::ptr, 3> ring::find_nodes_for_key(uint128 key) const
         {
             if (_ring_by_range.empty())
             {
-                return std::array<node_ptr, 3>();
+                return std::array<node::ptr, 3>();
             }
             
             const_ring_iterator secondaryIter = this->find_secondary_node(key);
@@ -106,7 +106,7 @@ namespace sopmq {
             BOOST_ASSERT(secondaryIter != _ring_by_range.end());
             BOOST_ASSERT(tertiaryIter != _ring_by_range.end());
             
-            auto ret = std::array<node_ptr, 3>();
+            auto ret = std::array<node::ptr, 3>();
             
 			ret[0] = primaryIter->second;
 			ret[1] = secondaryIter->second;
