@@ -22,6 +22,8 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
+#include <cstdint>
 
 //
 // ATTENTION: This file uses cog (http://nedbatchelder.com/code/cog/) for code
@@ -59,8 +61,9 @@ namespace sopmq {
             
             /*[[[cog
              for fn in fnames:
-               rawname = os.path.splitext(os.path.basename(fn))[0]
-               cog.outl("void dispatch(%s_ptr %s);" % (rawname,first_lower(rawname)))
+               if "Message" in fn:
+                 rawname = os.path.splitext(os.path.basename(fn))[0]
+                 cog.outl("void dispatch(%s_ptr %s);" % (rawname,first_lower(rawname)))
              ]]]*/
             void dispatch(AnswerChallengeMessage_ptr answerChallengeMessage);
             void dispatch(AuthAckMessage_ptr authAckMessage);
@@ -69,33 +72,46 @@ namespace sopmq {
             void dispatch(ConsumeResponseMessage_ptr consumeResponseMessage);
             void dispatch(GetChallengeMessage_ptr getChallengeMessage);
             void dispatch(GossipMessage_ptr gossipMessage);
-            void dispatch(GossipNodeData_ptr gossipNodeData);
-            void dispatch(Identifier_ptr identifier);
-            void dispatch(NodeClock_ptr nodeClock);
             void dispatch(PublishMessage_ptr publishMessage);
             void dispatch(PublishResponseMessage_ptr publishResponseMessage);
-            void dispatch(VectorClock_ptr vectorClock);
             //[[[end]]]
             
         public:
             /*[[[cog
              for fn in fnames:
-               rawname = os.path.splitext(os.path.basename(fn))[0]
-               cog.outl("void set_handler(std::function<void(%s_ptr)> handler);" % rawname)
+               if "Message" in fn:
+                 rawname = os.path.splitext(os.path.basename(fn))[0]
+                 cog.outl("void set_handler(std::function<void(%s_ptr)> handler);" % rawname)
+                 cog.outl("void set_handler(std::function<void(%s_ptr)> handler, std::uint32_t inReplyTo);" % rawname)
+                 cog.outl("")
              ]]]*/
             void set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler);
+            void set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(AuthAckMessage_ptr)> handler);
+            void set_handler(std::function<void(AuthAckMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler);
+            void set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler);
+            void set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler);
+            void set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(GetChallengeMessage_ptr)> handler);
+            void set_handler(std::function<void(GetChallengeMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(GossipMessage_ptr)> handler);
-            void set_handler(std::function<void(GossipNodeData_ptr)> handler);
-            void set_handler(std::function<void(Identifier_ptr)> handler);
-            void set_handler(std::function<void(NodeClock_ptr)> handler);
+            void set_handler(std::function<void(GossipMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(PublishMessage_ptr)> handler);
+            void set_handler(std::function<void(PublishMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(PublishResponseMessage_ptr)> handler);
-            void set_handler(std::function<void(VectorClock_ptr)> handler);
+            void set_handler(std::function<void(PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             //[[[end]]]
             
         private:
@@ -103,34 +119,39 @@ namespace sopmq {
             
             /*[[[cog
              for fn in fnames:
-               rawname = os.path.splitext(os.path.basename(fn))[0]
-               cog.outl("std::function<void(%s_ptr)> _%sHandler;" % (rawname,first_lower(rawname)))
+               if "Message" in fn:
+                 rawname = os.path.splitext(os.path.basename(fn))[0]
+                 cog.outl("std::unordered_map<std::uint32_t, std::function<void(%s_ptr)>> _%sHandlers;" % (rawname,first_lower(rawname)))
              ]]]*/
-            std::function<void(AnswerChallengeMessage_ptr)> _answerChallengeMessageHandler;
-            std::function<void(AuthAckMessage_ptr)> _authAckMessageHandler;
-            std::function<void(ChallengeResponseMessage_ptr)> _challengeResponseMessageHandler;
-            std::function<void(ConsumeFromQueueMessage_ptr)> _consumeFromQueueMessageHandler;
-            std::function<void(ConsumeResponseMessage_ptr)> _consumeResponseMessageHandler;
-            std::function<void(GetChallengeMessage_ptr)> _getChallengeMessageHandler;
-            std::function<void(GossipMessage_ptr)> _gossipMessageHandler;
-            std::function<void(GossipNodeData_ptr)> _gossipNodeDataHandler;
-            std::function<void(Identifier_ptr)> _identifierHandler;
-            std::function<void(NodeClock_ptr)> _nodeClockHandler;
-            std::function<void(PublishMessage_ptr)> _publishMessageHandler;
-            std::function<void(PublishResponseMessage_ptr)> _publishResponseMessageHandler;
-            std::function<void(VectorClock_ptr)> _vectorClockHandler;
+            std::unordered_map<std::uint32_t, std::function<void(AnswerChallengeMessage_ptr)>> _answerChallengeMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(AuthAckMessage_ptr)>> _authAckMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(ChallengeResponseMessage_ptr)>> _challengeResponseMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(ConsumeFromQueueMessage_ptr)>> _consumeFromQueueMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(ConsumeResponseMessage_ptr)>> _consumeResponseMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(GetChallengeMessage_ptr)>> _getChallengeMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(GossipMessage_ptr)>> _gossipMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(PublishMessage_ptr)>> _publishMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(PublishResponseMessage_ptr)>> _publishResponseMessageHandlers;
             //[[[end]]]
             
             ///
             /// Template function to execute the given handler if it is available, or
             /// the unhandled handler if it is not
             ///
-            template <typename handler, typename message>
-            void do_dispatch(handler h, message m)
+            template <typename hashmap, typename message>
+            void do_dispatch(hashmap h, message m)
             {
-                if (h)
+                auto id = m->identity().in_reply_to();
+                auto iter = h.find(id);
+                
+                if (iter != h.end())
                 {
-                    h(m);
+                    iter->second(m);
+                    
+                    if (id != 0)
+                    {
+                        h.erase(iter);
+                    }
                 }
                 else
                 {

@@ -2,7 +2,7 @@ import "GossipNodeData.proto";
 import "Identifier.proto";
 
 message GossipMessage {
-	required Identifier id = 1;
+	required Identifier identity = 1;
 	repeated GossipNodeData data = 2;
 }
 

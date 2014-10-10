@@ -37,8 +37,9 @@
 
 /*[[[cog
  for fn in fnames:
-   rawname = os.path.splitext(os.path.basename(fn))[0]
-   cog.outl("#include \"%s.pb.h\"" % rawname)
+   if "Message" in fn:
+     rawname = os.path.splitext(os.path.basename(fn))[0]
+     cog.outl("#include \"%s.pb.h\"" % rawname)
  ]]]*/
 #include "AnswerChallengeMessage.pb.h"
 #include "AuthAckMessage.pb.h"
@@ -47,12 +48,8 @@
 #include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "GossipMessage.pb.h"
-#include "GossipNodeData.pb.h"
-#include "Identifier.pb.h"
-#include "NodeClock.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
-#include "VectorClock.pb.h"
 //[[[end]]]
 
 namespace sopmq {
@@ -71,182 +68,195 @@ namespace sopmq {
         
         /*[[[cog
          for fn in fnames:
-           
-           rawname = os.path.splitext(os.path.basename(fn))[0]
-           cog.outl("")
-           cog.outl("void message_dispatcher::dispatch(%s_ptr %s)" % (rawname,first_lower(rawname)))
-           cog.outl("{")
-           cog.outl("    do_dispatch(_%sHandler, %s);" % (first_lower(rawname), first_lower(rawname)))
-           cog.outl("}")
-           cog.outl("")
+           if "Message" in fn:
+             rawname = os.path.splitext(os.path.basename(fn))[0]
+             cog.outl("")
+             cog.outl("void message_dispatcher::dispatch(%s_ptr %s)" % (rawname,first_lower(rawname)))
+             cog.outl("{")
+             cog.outl("    do_dispatch(_%sHandlers, %s);" % (first_lower(rawname), first_lower(rawname)))
+             cog.outl("}")
+             cog.outl("")
          ]]]*/
 
         void message_dispatcher::dispatch(AnswerChallengeMessage_ptr answerChallengeMessage)
         {
-            do_dispatch(_answerChallengeMessageHandler, answerChallengeMessage);
+            do_dispatch(_answerChallengeMessageHandlers, answerChallengeMessage);
         }
 
 
         void message_dispatcher::dispatch(AuthAckMessage_ptr authAckMessage)
         {
-            do_dispatch(_authAckMessageHandler, authAckMessage);
+            do_dispatch(_authAckMessageHandlers, authAckMessage);
         }
 
 
         void message_dispatcher::dispatch(ChallengeResponseMessage_ptr challengeResponseMessage)
         {
-            do_dispatch(_challengeResponseMessageHandler, challengeResponseMessage);
+            do_dispatch(_challengeResponseMessageHandlers, challengeResponseMessage);
         }
 
 
         void message_dispatcher::dispatch(ConsumeFromQueueMessage_ptr consumeFromQueueMessage)
         {
-            do_dispatch(_consumeFromQueueMessageHandler, consumeFromQueueMessage);
+            do_dispatch(_consumeFromQueueMessageHandlers, consumeFromQueueMessage);
         }
 
 
         void message_dispatcher::dispatch(ConsumeResponseMessage_ptr consumeResponseMessage)
         {
-            do_dispatch(_consumeResponseMessageHandler, consumeResponseMessage);
+            do_dispatch(_consumeResponseMessageHandlers, consumeResponseMessage);
         }
 
 
         void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
         {
-            do_dispatch(_getChallengeMessageHandler, getChallengeMessage);
+            do_dispatch(_getChallengeMessageHandlers, getChallengeMessage);
         }
 
 
         void message_dispatcher::dispatch(GossipMessage_ptr gossipMessage)
         {
-            do_dispatch(_gossipMessageHandler, gossipMessage);
-        }
-
-
-        void message_dispatcher::dispatch(GossipNodeData_ptr gossipNodeData)
-        {
-            do_dispatch(_gossipNodeDataHandler, gossipNodeData);
-        }
-
-
-        void message_dispatcher::dispatch(Identifier_ptr identifier)
-        {
-            do_dispatch(_identifierHandler, identifier);
-        }
-
-
-        void message_dispatcher::dispatch(NodeClock_ptr nodeClock)
-        {
-            do_dispatch(_nodeClockHandler, nodeClock);
+            do_dispatch(_gossipMessageHandlers, gossipMessage);
         }
 
 
         void message_dispatcher::dispatch(PublishMessage_ptr publishMessage)
         {
-            do_dispatch(_publishMessageHandler, publishMessage);
+            do_dispatch(_publishMessageHandlers, publishMessage);
         }
 
 
         void message_dispatcher::dispatch(PublishResponseMessage_ptr publishResponseMessage)
         {
-            do_dispatch(_publishResponseMessageHandler, publishResponseMessage);
-        }
-
-
-        void message_dispatcher::dispatch(VectorClock_ptr vectorClock)
-        {
-            do_dispatch(_vectorClockHandler, vectorClock);
+            do_dispatch(_publishResponseMessageHandlers, publishResponseMessage);
         }
 
         //[[[end]]]
         
         /*[[[cog
          for fn in fnames:
-           rawname = os.path.splitext(os.path.basename(fn))[0]
-           cog.outl("")
-           cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler)" % rawname)
-           cog.outl("{")
-           cog.outl("    _%sHandler = handler;" % first_lower(rawname))
-           cog.outl("}")
-           cog.outl("")
+           if "Message" in fn:
+             rawname = os.path.splitext(os.path.basename(fn))[0]
+             cog.outl("")
+             cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler)" % rawname)
+             cog.outl("{")
+             cog.outl("    _%sHandlers[0] = handler;" % first_lower(rawname))
+             cog.outl("}")
+             cog.outl("")
+             cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler, std::uint32_t inReplyTo)" % rawname)
+             cog.outl("{")
+             cog.outl("    _%sHandlers[inReplyTo] = handler;" % first_lower(rawname))
+             cog.outl("}")
+             cog.outl("")
+             cog.outl("")
          ]]]*/
 
         void message_dispatcher::set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler)
         {
-            _answerChallengeMessageHandler = handler;
+            _answerChallengeMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _answerChallengeMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(AuthAckMessage_ptr)> handler)
         {
-            _authAckMessageHandler = handler;
+            _authAckMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(AuthAckMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _authAckMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler)
         {
-            _challengeResponseMessageHandler = handler;
+            _challengeResponseMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _challengeResponseMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler)
         {
-            _consumeFromQueueMessageHandler = handler;
+            _consumeFromQueueMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _consumeFromQueueMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler)
         {
-            _consumeResponseMessageHandler = handler;
+            _consumeResponseMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _consumeResponseMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
         {
-            _getChallengeMessageHandler = handler;
+            _getChallengeMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _getChallengeMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(GossipMessage_ptr)> handler)
         {
-            _gossipMessageHandler = handler;
+            _gossipMessageHandlers[0] = handler;
         }
 
-
-        void message_dispatcher::set_handler(std::function<void(GossipNodeData_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(GossipMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
-            _gossipNodeDataHandler = handler;
+            _gossipMessageHandlers[inReplyTo] = handler;
         }
 
-
-        void message_dispatcher::set_handler(std::function<void(Identifier_ptr)> handler)
-        {
-            _identifierHandler = handler;
-        }
-
-
-        void message_dispatcher::set_handler(std::function<void(NodeClock_ptr)> handler)
-        {
-            _nodeClockHandler = handler;
-        }
 
 
         void message_dispatcher::set_handler(std::function<void(PublishMessage_ptr)> handler)
         {
-            _publishMessageHandler = handler;
+            _publishMessageHandlers[0] = handler;
         }
+
+        void message_dispatcher::set_handler(std::function<void(PublishMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _publishMessageHandlers[inReplyTo] = handler;
+        }
+
 
 
         void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler)
         {
-            _publishResponseMessageHandler = handler;
+            _publishResponseMessageHandlers[0] = handler;
         }
 
-
-        void message_dispatcher::set_handler(std::function<void(VectorClock_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
-            _vectorClockHandler = handler;
+            _publishResponseMessageHandlers[inReplyTo] = handler;
         }
+
 
         //[[[end]]]
     }
