@@ -16,3 +16,30 @@
  */
 
 #include "local_node_operations.h"
+
+#include <stdexcept>
+
+namespace sopmq {
+    namespace node {
+        namespace intra {
+            
+            local_node_operations::local_node_operations()
+            {
+                
+            }
+            
+            local_node_operations::~local_node_operations()
+            {
+                
+            }
+            
+            void local_node_operations::send_gossip(GossipMessage_ptr message,
+                                                    return_message_callback_t<GossipMessage_ptr>::type responseCallback)
+            {
+                throw std::logic_error("Refusing to gossip to self");
+            }
+            
+            
+        }
+    }
+}

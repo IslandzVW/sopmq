@@ -32,6 +32,9 @@ namespace sopmq {
     namespace node {
         namespace connection {
             
+            ///
+            /// An authenticated connection from either a client or another node
+            ///
             class csauthenticated : public iconnection_state,
                                     public boost::noncopyable,
                                     public std::enable_shared_from_this<csauthenticated>
