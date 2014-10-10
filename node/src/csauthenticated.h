@@ -20,7 +20,7 @@
 
 #include "iconnection_state.h"
 
-#include "connection.h"
+#include "connection_in.h"
 #include "message_dispatcher.h"
 #include "network_operation_result.h"
 #include "message_ptrs.h"
@@ -40,7 +40,7 @@ namespace sopmq {
                                     public std::enable_shared_from_this<csauthenticated>
             {
             public:
-                csauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
+                csauthenticated(boost::asio::io_service& ioService, connection_in::wptr conn);
                 virtual ~csauthenticated();
                 
                 //iconnection_state
@@ -50,13 +50,13 @@ namespace sopmq {
             
             private:
                 boost::asio::io_service& _ioService;
-                connection::wptr _conn;
+                connection_in::wptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
                 
                 
                 void unhandled_message(Message_ptr message);
                 
-                void read_next_message(connection::ptr conn);
+                void read_next_message(connection_in::ptr conn);
                 
                 void handle_read_result(const net::network_operation_result& result);
                 

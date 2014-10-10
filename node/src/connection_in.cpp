@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "connection.h"
+#include "connection_in.h"
 
 #include "server.h"
 #include "logging.h"
@@ -34,22 +34,22 @@ namespace sopmq {
     namespace node {
         namespace connection {
             
-            connection::connection(ba::io_service& ioService)
+            connection_in::connection_in(ba::io_service& ioService)
             : _ioService(ioService), _conn(_ioService), _next_id(0)
             {
                 
             }
             
-            connection::~connection()
+            connection_in::~connection_in()
             {
             }
             
-            ba::ip::tcp::socket& connection::get_socket()
+            ba::ip::tcp::socket& connection_in::get_socket()
             {
                 return _conn;
             }
             
-            void connection::start(server* server)
+            void connection_in::start(server* server)
             {
                 _server = server;
                 _server->connection_started(shared_from_this());
@@ -67,14 +67,14 @@ namespace sopmq {
                 _state->start();
             }
             
-            void connection::handle_error(const network_error& e)
+            void connection_in::handle_error(const network_error& e)
             {
                 LOG_SRC(error) << "network error: " << e.what() << ". closing connection";
                 
                 this->close();
             }
             
-            void connection::close()
+            void connection_in::close()
             {
                 //we really don't care about errors here
                 boost::system::error_code ec;
@@ -83,19 +83,19 @@ namespace sopmq {
                 _server->connection_terminated(shared_from_this());
             }
             
-            std::uint32_t connection::get_next_id()
+            std::uint32_t connection_in::get_next_id()
             {
                 return ++_next_id;
             }
             
-            void connection::send_message(message_type type, Message_ptr message,
+            void connection_in::send_message(message_type type, Message_ptr message,
                                           network_status_callback statusCb)
             {
                 messageutil::write_message(type, message, _ioService, _conn,
                                            statusCb);
             }
             
-            void connection::change_state(iconnection_state::ptr newState)
+            void connection_in::change_state(iconnection_state::ptr newState)
             {
                 _state = newState;
                 _state->start();

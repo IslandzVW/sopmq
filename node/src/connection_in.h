@@ -46,18 +46,18 @@ namespace sopmq {
         namespace connection {
         
             ///
-            /// Connections from clients or other servers to this server
+            /// Connections from clients or other servers into to this server
             ///
-            class connection :  public boost::noncopyable,
-                                public std::enable_shared_from_this<connection>
+            class connection_in :   public boost::noncopyable,
+                                    public std::enable_shared_from_this<connection_in>
             {
             public:
-                typedef std::shared_ptr<connection> ptr;
-                typedef std::weak_ptr<connection> wptr;
+                typedef std::shared_ptr<connection_in> ptr;
+                typedef std::weak_ptr<connection_in> wptr;
                 
             public:
-                connection(boost::asio::io_service& ioService);
-                virtual ~connection();
+                connection_in(boost::asio::io_service& ioService);
+                virtual ~connection_in();
                 
                 ///
                 /// Returns the TCP socket associated with this connection

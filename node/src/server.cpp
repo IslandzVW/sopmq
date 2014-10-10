@@ -17,7 +17,7 @@
 
 #include "server.h"
 
-#include "connection.h"
+#include "connection_in.h"
 
 #include <boost/bind.hpp>
 #include <boost/log/trivial.hpp>
@@ -47,7 +47,7 @@ namespace sopmq {
         
         void server::accept_new()
         {
-            connection::connection::ptr conn(std::make_shared<connection::connection>(_ioService));
+            connection::connection_in::ptr conn(std::make_shared<connection::connection_in>(_ioService));
             
             _acceptor.async_accept(conn->get_socket(),
                                    boost::bind(&server::handle_accept, this, conn,
@@ -60,7 +60,7 @@ namespace sopmq {
             _acceptor.close();
         }
         
-        void server::handle_accept(connection::connection::ptr conn, const boost::system::error_code& error)
+        void server::handle_accept(connection::connection_in::ptr conn, const boost::system::error_code& error)
         {
             if (_stopping) return;
 
@@ -83,12 +83,12 @@ namespace sopmq {
             }
         }
         
-        void server::connection_started(connection::connection::ptr conn)
+        void server::connection_started(connection::connection_in::ptr conn)
         {
             _connections.insert(conn);
         }
         
-        void server::connection_terminated(connection::connection::ptr conn)
+        void server::connection_terminated(connection::connection_in::ptr conn)
         {
             _connections.erase(conn);
         }

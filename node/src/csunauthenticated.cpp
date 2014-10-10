@@ -46,7 +46,7 @@ namespace sopmq {
             
             const int csunauthenticated::CHALLENGE_SIZE = 1024;
             
-            csunauthenticated::csunauthenticated(ba::io_service& ioService, connection::wptr conn)
+            csunauthenticated::csunauthenticated(ba::io_service& ioService, connection_in::wptr conn)
             : _ioService(ioService), _conn(conn),
             _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1)),
             _closeAfterTransmission(false)
@@ -85,7 +85,7 @@ namespace sopmq {
                 }
             }
             
-            void csunauthenticated::generate_challenge_response(connection::ptr conn, std::uint32_t replyTo)
+            void csunauthenticated::generate_challenge_response(connection_in::ptr conn, std::uint32_t replyTo)
             {
                 ChallengeResponseMessage_ptr response = messageutil::make_message<ChallengeResponseMessage>(conn->get_next_id(), replyTo);
                 
@@ -196,7 +196,7 @@ namespace sopmq {
                 return "unauthenticated";
             }
             
-            void csunauthenticated::read_next_message(connection::ptr conn)
+            void csunauthenticated::read_next_message(connection_in::ptr conn)
             {
                 //read a message from the network
                 messageutil::read_message(_ioService, conn->get_socket(),

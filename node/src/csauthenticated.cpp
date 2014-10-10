@@ -34,7 +34,7 @@ namespace sopmq {
     namespace node {
         namespace connection {
             
-            csauthenticated::csauthenticated(boost::asio::io_service& ioService, connection::wptr conn)
+            csauthenticated::csauthenticated(boost::asio::io_service& ioService, connection_in::wptr conn)
             : _ioService(ioService), _conn(conn),
             _dispatcher(std::bind(&csauthenticated::unhandled_message, this, _1))
             {
@@ -68,7 +68,7 @@ namespace sopmq {
                 }
             }
             
-            void csauthenticated::read_next_message(connection::ptr conn)
+            void csauthenticated::read_next_message(connection_in::ptr conn)
             {
                 messageutil::read_message(_ioService, conn->get_socket(),
                                           std::bind(&csauthenticated::handle_read_result, shared_from_this(), _1),

@@ -19,7 +19,7 @@
 #define __sopmq__csunauthenticated__
 
 #include "iconnection_state.h"
-#include "connection.h"
+#include "connection_in.h"
 #include "message_dispatcher.h"
 #include "message_ptrs.h"
 #include "network_operation_result.h"
@@ -44,7 +44,7 @@ namespace sopmq {
                                         public std::enable_shared_from_this<csunauthenticated>
             {
             public:
-                csunauthenticated(boost::asio::io_service& ioService, connection::wptr conn);
+                csunauthenticated(boost::asio::io_service& ioService, connection_in::wptr conn);
                 virtual ~csunauthenticated();
                 
 
@@ -61,7 +61,7 @@ namespace sopmq {
                 
                 
                 boost::asio::io_service& _ioService;
-                connection::wptr _conn;
+                connection_in::wptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
                 GetChallengeMessage_Type _authType;
                 
@@ -75,9 +75,9 @@ namespace sopmq {
                 
                 void handle_read_result(const net::network_operation_result& result);
                 
-                void generate_challenge_response(connection::ptr conn, std::uint32_t replyTo);
+                void generate_challenge_response(connection_in::ptr conn, std::uint32_t replyTo);
                 
-                void read_next_message(connection::ptr conn);
+                void read_next_message(connection_in::ptr conn);
                 
                 void handle_answer_challenge_message(AnswerChallengeMessage_ptr message);
                 

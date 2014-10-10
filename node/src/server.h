@@ -18,7 +18,7 @@
 #ifndef __sopmq__server__
 #define __sopmq__server__
 
-#include "connection.h"
+#include "connection_in.h"
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -48,24 +48,24 @@ namespace sopmq {
             ///
             /// Called when a connection has been started and is alive
             ///
-            void connection_started(connection::connection::ptr conn);
+            void connection_started(connection::connection_in::ptr conn);
             
             ///
             /// Called when a connection has been terminated either locally or remotely
             ///
-            void connection_terminated(connection::connection::ptr conn);
+            void connection_terminated(connection::connection_in::ptr conn);
             
         private:
             boost::asio::io_service& _ioService;
             unsigned short _port;
             boost::asio::ip::tcp::endpoint _endpoint;
             boost::asio::ip::tcp::acceptor _acceptor;
-            std::set<connection::connection::ptr> _connections;
+            std::set<connection::connection_in::ptr> _connections;
             bool _stopping;
             
             
             void accept_new();
-            void handle_accept(connection::connection::ptr conn, const boost::system::error_code& error);
+            void handle_accept(connection::connection_in::ptr conn, const boost::system::error_code& error);
         };
         
     }
