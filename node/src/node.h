@@ -21,6 +21,7 @@
 #include "endpoint.h"
 #include "uint128.h"
 #include "failure_detector.h"
+#include "inode_operations.h"
 
 #include <memory>
 #include <boost/noncopyable.hpp>
@@ -72,6 +73,12 @@ namespace sopmq {
             /// Whether or not this node represents the current executing node
             ///
             bool is_self() const;
+
+            
+            ///
+            /// Returns an interface to operations that can be performed on this node
+            ///
+            intra::inode_operations& operations();
             
             
         private:
@@ -94,6 +101,11 @@ namespace sopmq {
             /// Failure detector for this node
             ///
             failure_detector _failure_detector;
+            
+            ///
+            /// The handler for operations sent to this node
+            ///
+            intra::inode_operations::ptr _operations_handler;
         };
     }
 }

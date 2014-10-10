@@ -23,6 +23,7 @@
 namespace bc = boost::chrono;
 
 using sopmq::node::settings;
+using sopmq::node::intra::inode_operations;
 
 namespace sopmq {
     namespace node {
@@ -65,6 +66,23 @@ namespace sopmq {
         bool node::is_self() const
         {
             return _node_id == settings::instance().nodeId;
+        }
+        
+        sopmq::node::intra::inode_operations& node::operations()
+        {
+            if (_operations_handler)
+            {
+                return *_operations_handler;
+            }
+            else
+            {
+                //we dont have a handler yet to make calls.
+                //determine the type of handler we need and create it
+                if (is_self())
+                {
+                    //_operations_handler = std::unique_ptr<<#class _Tp#>>
+                }
+            }
         }
     }
 }

@@ -19,9 +19,21 @@
 #ifndef __sopmq__inode_operations__
 #define __sopmq__inode_operations__
 
+#include "message_ptrs.h"
+#include "operation_result.h"
+
+#include <functional>
+#include <memory>
+
 namespace sopmq {
     namespace node {
         namespace intra {
+            
+            template <typename ReturnMessageType>
+            struct return_message_callback_t
+            {
+                typedef std::function<void(operation_result<ReturnMessageType>)> type;
+            };
             
             ///
             /// Interface to intranode operations. Used to simplify the implementation of
@@ -30,8 +42,15 @@ namespace sopmq {
             class inode_operations
             {
             public:
+                typedef std::unique_ptr<inode_operations> ptr;
                 
-                //virtual void gossip(
+            public:
+                
+                ///
+                /// Sends a gossip message to this node and registers for a callback when the node returns it
+                ///
+                virtual void send_gossip(GossipMessage_ptr message,
+                                         return_message_callback_t<GossipMessage_ptr>::type responseCallback) = 0;
                 
                 inode_operations();
                 virtual ~inode_operations();
