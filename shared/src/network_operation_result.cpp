@@ -71,5 +71,12 @@ namespace sopmq {
         {
             return _error;
         }
+        
+        void network_operation_result::rethrow() const
+        {
+            if (_et == error_type::ET_NONE) return;
+            
+            throw _error;
+        }
     }
 }

@@ -21,6 +21,7 @@
 #include "logging.h"
 #include "csunauthenticated.h"
 #include "server.h"
+#include "settings.h"
 
 #include <string>
 
@@ -29,13 +30,17 @@ using sopmq::error::network_error;
 using sopmq::message::message_type;
 using sopmq::message::network_status_callback;
 using sopmq::message::messageutil;
+using sopmq::shared::net::connection_base;
+using sopmq::node::settings;
+using sopmq::shared::net::endpoint;
 
 namespace sopmq {
     namespace node {
         namespace connection {
             
             connection_in::connection_in(ba::io_service& ioService)
-            : _ioService(ioService), _conn(_ioService), _next_id(0)
+            : connection_base(ioService, settings::instance().maxMessageSize),
+            _io_service(ioService)
             {
                 
             }
@@ -44,26 +49,14 @@ namespace sopmq {
             {
             }
             
-            ba::ip::tcp::socket& connection_in::get_socket()
-            {
-                return _conn;
-            }
-            
             void connection_in::start(server* server)
             {
+                this->resolve_connected_endpoint();
+                
                 _server = server;
                 _server->connection_started(shared_from_this());
                 
-                try {
-                    _ep = _conn.remote_endpoint();
-                    LOG_SRC(debug) << "new connection from " << _ep.address().to_string();
-                    
-                } catch (const boost::system::system_error& e) {
-                    //remote_endpoint() can throw if the socket is disconnected
-                    throw network_error(std::string("connection startup error") + e.what());
-                }
-                
-                _state = std::make_shared<csunauthenticated>(_ioService, shared_from_this());
+                _state = std::make_shared<csunauthenticated>(_io_service, shared_from_this());
                 _state->start();
             }
             
@@ -72,27 +65,6 @@ namespace sopmq {
                 LOG_SRC(error) << "network error: " << e.what() << ". closing connection";
                 
                 this->close();
-            }
-            
-            void connection_in::close()
-            {
-                //we really don't care about errors here
-                boost::system::error_code ec;
-                _conn.close(ec);
-                
-                _server->connection_terminated(shared_from_this());
-            }
-            
-            std::uint32_t connection_in::get_next_id()
-            {
-                return ++_next_id;
-            }
-            
-            void connection_in::send_message(message_type type, Message_ptr message,
-                                          network_status_callback statusCb)
-            {
-                messageutil::write_message(type, message, _ioService, _conn,
-                                           statusCb);
             }
             
             void connection_in::change_state(iconnection_state::ptr newState)

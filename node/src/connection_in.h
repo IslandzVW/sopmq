@@ -23,6 +23,7 @@
 #include "message_ptrs.h"
 #include "message_types.h"
 #include "messageutil.h"
+#include "connection_base.h"
 
 #include <boost/weak_ptr.hpp>
 #include <boost/noncopyable.hpp>
@@ -49,6 +50,7 @@ namespace sopmq {
             /// Connections from clients or other servers into to this server
             ///
             class connection_in :   public boost::noncopyable,
+                                    public sopmq::shared::net::connection_base,
                                     public std::enable_shared_from_this<connection_in>
             {
             public:
@@ -58,11 +60,6 @@ namespace sopmq {
             public:
                 connection_in(boost::asio::io_service& ioService);
                 virtual ~connection_in();
-                
-                ///
-                /// Returns the TCP socket associated with this connection
-                ///
-                boost::asio::ip::tcp::socket& get_socket();
                 
                 ///
                 /// Starts this connection and informs our server we're alive
@@ -75,34 +72,14 @@ namespace sopmq {
                 void handle_error(const sopmq::error::network_error& e);
                 
                 ///
-                /// Closes this connection and tells our server it has been closed
-                ///
-                void close();
-                
-                ///
-                /// Returns the next message identifier on this connection
-                ///
-                std::uint32_t get_next_id();
-                
-                ///
-                /// Sends a message over this connection
-                ///
-                void send_message(sopmq::message::message_type type, Message_ptr message,
-                                  sopmq::message::network_status_callback statusCb);
-                
-                ///
                 /// Changes to the given connection state
                 ///
                 void change_state(iconnection_state::ptr newState);
                 
             private:
-                boost::asio::io_service& _ioService;
-                boost::asio::ip::tcp::socket _conn;
+                boost::asio::io_service& _io_service;
                 server* _server;
-                boost::asio::ip::tcp::endpoint _ep;
                 iconnection_state::ptr _state;
-                
-                std::uint32_t _next_id;
             };
         
         

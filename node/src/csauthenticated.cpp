@@ -70,9 +70,7 @@ namespace sopmq {
             
             void csauthenticated::read_next_message(connection_in::ptr conn)
             {
-                messageutil::read_message(_ioService, conn->get_socket(),
-                                          std::bind(&csauthenticated::handle_read_result, shared_from_this(), _1),
-                                          _dispatcher, settings::instance().maxMessageSize);
+                conn->read_message(_dispatcher, std::bind(&csauthenticated::handle_read_result, shared_from_this(), _1));
             }
             
             void csauthenticated::handle_read_result(const net::network_operation_result& result)

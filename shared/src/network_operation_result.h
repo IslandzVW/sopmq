@@ -102,6 +102,11 @@ namespace sopmq {
             ///
             const error::network_error& get_error() const;
             
+            ///
+            /// If there was an error, it is rethrown here, otherwise does nothing
+            ///
+            void rethrow() const;
+            
         private:
             network_operation_result();
             

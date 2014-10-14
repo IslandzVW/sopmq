@@ -18,6 +18,8 @@
 #ifndef __sopmq__endpoint__
 #define __sopmq__endpoint__
 
+#include <boost/asio.hpp>
+
 #include <string>
 #include <exception>
 #include <ostream>
@@ -37,6 +39,7 @@ namespace sopmq {
                 ///
                 enum endpoint_proto
                 {
+                    SOPMQvUNKNOWN,
                     SOPMQv1
                 };
                 
@@ -44,9 +47,20 @@ namespace sopmq {
                 //endpoint() = default;
                 
                 ///
+                /// Constructs an endpoint with an as of yet unknown address
+                ///
+                endpoint();
+                
+                ///
                 /// Constructs an endpoint by parsing a uri
                 ///
-                endpoint(const std::string& uri);
+                explicit endpoint(const std::string& uri);
+                
+                ///
+                /// Constructs an endpoint from a boost endpoint
+                /// (assumes protocol v1)
+                ///
+                explicit endpoint(const boost::asio::ip::tcp::endpoint& ep);
                 
                 ///
                 /// dtor

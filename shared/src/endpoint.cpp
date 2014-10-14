@@ -17,24 +17,39 @@
 
 #include "endpoint.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <vector>
 #include <string>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 using std::vector;
 using std::string;
 using std::stringstream;
 
+namespace ba_ip = boost::asio::ip;
+
 namespace sopmq {
     namespace shared {
         namespace net {
+            
+            endpoint::endpoint()
+            {
+                
+            }
             
             endpoint::endpoint(const std::string& uri)
             {
                 this->parse_uri(uri);
                 _stringUri = uri;
+            }
+            
+            endpoint::endpoint(const ba_ip::tcp::endpoint& ep)
+            {
+                _hostname = ep.address().to_string();
+                _port = ep.port();
+                _proto = SOPMQv1;
             }
 
             endpoint::~endpoint()

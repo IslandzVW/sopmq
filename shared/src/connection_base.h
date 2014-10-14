@@ -19,8 +19,13 @@
 #define __sopmq__connection_base__
 
 #include "endpoint.h"
+#include "message_types.h"
+#include "message_ptrs.h"
+#include "messageutil.h"
+#include "message_dispatcher.h"
 
 #include <boost/asio.hpp>
+#include <cstdint>
 
 namespace sopmq {
     namespace shared {
@@ -32,22 +37,59 @@ namespace sopmq {
             class connection_base
             {
             public:
+                ///
+                /// Constructor for an outbound connection
+                ///
                 connection_base(boost::asio::io_service& ioService,
-                                const shared::net::endpoint& ep);
+                                const shared::net::endpoint& ep,
+                                uint32_t maxMessageSize);
                 
+                ///
+                /// Constructor for an inbound connection
+                ///
                 connection_base(boost::asio::io_service& ioService,
-                                boost::asio::ip::tcp::socket socket);
+                                uint32_t maxMessageSize);
                 
                 virtual ~connection_base();
+                
+                ///
+                /// Returns the TCP socket associated with this connection
+                ///
+                boost::asio::ip::tcp::socket& get_socket();
+                
+                ///
+                /// Returns the next message identifier on this connection
+                ///
+                std::uint32_t get_next_id();
+                
+                ///
+                /// Resolves our endpoint from the connected socket
+                ///
+                void resolve_connected_endpoint();
+                
+                ///
+                /// Sends a message over this connection
+                ///
+                void send_message(sopmq::message::message_type type, Message_ptr message,
+                                  sopmq::message::network_status_callback statusCb);
+                
+                ///
+                /// Reads a message from this connection
+                ///
+                void read_message(sopmq::message::message_dispatcher& dispatcher,
+                                  sopmq::message::network_status_callback callback);
+                
+                ///
+                /// Closes the connection
+                ///
+                void close();
                 
             private:
                 boost::asio::io_service& _ioService;
                 shared::net::endpoint _endpoint;
-                boost::asio::ip::tcp::resolver _resolver;
-                boost::asio::ip::tcp::resolver::query _query;
                 boost::asio::ip::tcp::socket _socket;
-                
-                
+                std::uint32_t _next_id;
+                uint32_t _max_message_size;
             };
             
         }
