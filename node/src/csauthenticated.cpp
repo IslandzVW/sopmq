@@ -73,7 +73,7 @@ namespace sopmq {
                 conn->read_message(_dispatcher, std::bind(&csauthenticated::handle_read_result, shared_from_this(), _1));
             }
             
-            void csauthenticated::handle_read_result(const net::network_operation_result& result)
+            void csauthenticated::handle_read_result(const shared::net::network_operation_result& result)
             {
                 
             }

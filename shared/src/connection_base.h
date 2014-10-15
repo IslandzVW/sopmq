@@ -25,7 +25,9 @@
 #include "message_dispatcher.h"
 
 #include <boost/asio.hpp>
+
 #include <cstdint>
+#include <memory>
 
 namespace sopmq {
     namespace shared {
@@ -63,9 +65,19 @@ namespace sopmq {
                 std::uint32_t get_next_id();
                 
                 ///
+                /// Returns the endpoint this socket is connected to
+                ///
+                const shared::net::endpoint& endpoint() const;
+                
+                ///
                 /// Resolves our endpoint from the connected socket
                 ///
                 void resolve_connected_endpoint();
+                
+                ///
+                /// Begins an async connect to the enpoint provided in the ctor
+                ///
+                void connect(sopmq::message::network_status_callback ccb);
                 
                 ///
                 /// Sends a message over this connection
@@ -85,6 +97,15 @@ namespace sopmq {
                 void close();
                 
             private:
+                void after_resolve(const boost::system::error_code& err,
+                                   boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
+                                   message::network_status_callback ccb,
+                                   std::shared_ptr<boost::asio::ip::tcp::resolver> resolver,
+                                   std::shared_ptr<boost::asio::ip::tcp::resolver::query> query);
+                
+                void after_connect(const boost::system::error_code& err,
+                                   message::network_status_callback ccb);
+                
                 boost::asio::io_service& _ioService;
                 shared::net::endpoint _endpoint;
                 boost::asio::ip::tcp::socket _socket;

@@ -66,7 +66,7 @@ namespace sopmq {
             conn->connect(std::bind(&cluster::connection_result, this, _1, ctx));
         }
         
-        void cluster::connection_result(const net::network_operation_result& result,
+        void cluster::connection_result(const shared::net::network_operation_result& result,
                                         connect_context ctx)
         {
             if (result.was_successful())

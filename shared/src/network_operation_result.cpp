@@ -18,65 +18,67 @@
 #include "network_operation_result.h"
 
 namespace sopmq {
-    namespace net {
-    
-        network_operation_result::network_operation_result(error_type et,
-                                                           const error::network_error& error)
-        : _et(et), _error(error)
-        {
+    namespace shared {
+        namespace net {
+        
+            network_operation_result::network_operation_result(error_type et,
+                                                               const error::network_error& error)
+            : _et(et), _error(error)
+            {
+                
+            }
             
-        }
-        
-        network_operation_result::network_operation_result(error_type et)
-        : _et(et), _error(error::network_error())
-        {
+            network_operation_result::network_operation_result(error_type et)
+            : _et(et), _error(error::network_error())
+            {
+                
+            }
             
-        }
-        
-        network_operation_result::~network_operation_result()
-        {
-        
-        }
-        
-        const network_operation_result& network_operation_result::success()
-        {
-            static network_operation_result successResult(ET_NONE,
-                                                          error::network_error());
+            network_operation_result::~network_operation_result()
+            {
             
-            return successResult;
-        }
-        
-        network_operation_result network_operation_result::from_error_code(const boost::system::error_code &e)
-        {
-            return network_operation_result(ET_NETWORK, error::network_error(e));
-        }
-        
-        network_operation_result network_operation_result::from_error_code(const std::string& info,
-                                                                           const boost::system::error_code &e)
-        {
-            return network_operation_result(ET_NETWORK, error::network_error(info + ": " + e.message()));
-        }
-        
-        bool network_operation_result::was_successful() const
-        {
-            return _et == error_type::ET_NONE;
-        }
-        
-        error_type network_operation_result::get_error_type() const
-        {
-            return _et;
-        }
-        
-        const error::network_error& network_operation_result::get_error() const
-        {
-            return _error;
-        }
-        
-        void network_operation_result::rethrow() const
-        {
-            if (_et == error_type::ET_NONE) return;
+            }
             
-            throw _error;
+            const network_operation_result& network_operation_result::success()
+            {
+                static network_operation_result successResult(ET_NONE,
+                                                              error::network_error());
+                
+                return successResult;
+            }
+            
+            network_operation_result network_operation_result::from_error_code(const boost::system::error_code &e)
+            {
+                return network_operation_result(ET_NETWORK, error::network_error(e));
+            }
+            
+            network_operation_result network_operation_result::from_error_code(const std::string& info,
+                                                                               const boost::system::error_code &e)
+            {
+                return network_operation_result(ET_NETWORK, error::network_error(info + ": " + e.message()));
+            }
+            
+            bool network_operation_result::was_successful() const
+            {
+                return _et == error_type::ET_NONE;
+            }
+            
+            error_type network_operation_result::get_error_type() const
+            {
+                return _et;
+            }
+            
+            const error::network_error& network_operation_result::get_error() const
+            {
+                return _error;
+            }
+            
+            void network_operation_result::rethrow() const
+            {
+                if (_et == error_type::ET_NONE) return;
+                
+                throw _error;
+            }
         }
     }
 }

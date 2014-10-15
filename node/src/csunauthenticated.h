@@ -73,7 +73,7 @@ namespace sopmq {
                 
                 void handle_get_challenge_message(GetChallengeMessage_ptr message);
                 
-                void handle_read_result(const net::network_operation_result& result);
+                void handle_read_result(const shared::net::network_operation_result& result);
                 
                 void generate_challenge_response(connection_in::ptr conn, std::uint32_t replyTo);
                 
@@ -81,7 +81,7 @@ namespace sopmq {
                 
                 void handle_answer_challenge_message(AnswerChallengeMessage_ptr message);
                 
-                void handle_write_result(const net::network_operation_result& result);
+                void handle_write_result(const shared::net::network_operation_result& result);
                 
             };
         }

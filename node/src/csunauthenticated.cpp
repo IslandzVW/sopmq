@@ -150,7 +150,7 @@ namespace sopmq {
                 user_account::is_authorized(message->uname_hash(), _challenge, message->challenge_response(), authCallback);
             }
             
-            void csunauthenticated::handle_read_result(const net::network_operation_result& result)
+            void csunauthenticated::handle_read_result(const shared::net::network_operation_result& result)
             {
                 if (auto connptr = _conn.lock())
                 {
@@ -161,7 +161,7 @@ namespace sopmq {
                 }
             }
                                    
-            void csunauthenticated::handle_write_result(const net::network_operation_result& result)
+            void csunauthenticated::handle_write_result(const shared::net::network_operation_result& result)
             {
                 auto connptr = _conn.lock();
                 if (connptr)

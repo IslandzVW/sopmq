@@ -24,6 +24,7 @@
 #include "message_ptrs.h"
 #include "message_types.h"
 #include "messageutil.h"
+#include "connection_base.h"
 
 #include <boost/asio.hpp>
 #include <functional>
@@ -37,7 +38,7 @@ namespace sopmq {
         ///
         /// An open connection to a coordinator node in the sopmq cluster
         ///
-        class cluster_connection
+        class cluster_connection : public sopmq::shared::net::connection_base
         {
         public:
             typedef std::shared_ptr<cluster_connection> ptr;
@@ -47,60 +48,9 @@ namespace sopmq {
                                boost::asio::io_service& ioService);
             virtual ~cluster_connection();
             
-            ///
-            /// Begins an async connect to the enpoint provided in the ctor
-            ///
-            void connect(message::network_status_callback ccb);
-            
-            ///
-            /// Sets the message dispatcher for this connection
-            ///
-            void set_dispatcher(sopmq::message::message_dispatcher* dispatcher);
-            
-            ///
-            /// Sends a message through this connection
-            ///
-            void send_message(sopmq::message::message_type type, Message_ptr message,
-                              sopmq::message::network_status_callback statusCb);
-            
-            ///
-            /// Closes this connection. No further messages can be sent or received from it
-            ///
-            void close();
-            
-            ///
-            /// Returns the endpoint that this connection is established with
-            ///
-            const shared::net::endpoint& network_endpoint() const;
-            
-            ///
-            /// Returns the next message identifier for this connection
-            ///
-            std::uint32_t get_next_id();
-            
-            ///
-            /// Listens for the next message from the wire and dispatches it to the assigned dispatcher
-            ///
-            void get_next_message(message::network_status_callback statusCb);
             
                          
         private:
-            void after_resolve(const boost::system::error_code& err,
-                               boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
-                               message::network_status_callback ccb);
-            
-            void after_connect(const boost::system::error_code& err,
-                               message::network_status_callback ccb);
-            
-            cluster_endpoint::ptr _endpoint;
-            boost::asio::io_service& _ioService;
-            boost::asio::ip::tcp::resolver _resolver;
-            boost::asio::ip::tcp::resolver::query _query;
-            boost::asio::ip::tcp::socket _socket;
-            
-            sopmq::message::message_dispatcher* _dispatcher;
-            
-            std::uint32_t _next_id;
         };
         
     }

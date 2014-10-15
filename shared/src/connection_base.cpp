@@ -17,9 +17,14 @@
 
 #include "connection_base.h"
 
+#include "network_operation_result.h"
 
+#include <boost/lexical_cast.hpp>
 
 using namespace sopmq::message;
+using namespace std::placeholders;
+using sopmq::shared::net::network_operation_result;
+namespace ba_ip = boost::asio::ip;
 
 namespace sopmq {
     namespace shared {
@@ -55,6 +60,60 @@ namespace sopmq {
             std::uint32_t connection_base::get_next_id()
             {
                 return ++_next_id;
+            }
+            
+            const shared::net::endpoint& connection_base::endpoint() const
+            {
+                return _endpoint;
+            }
+            
+            void connection_base::connect(network_status_callback ccb)
+            {
+                std::shared_ptr<ba_ip::tcp::resolver> resolver
+                    = std::make_shared<ba_ip::tcp::resolver>(_ioService);
+                
+                std::shared_ptr<ba_ip::tcp::resolver::query> query
+                    = std::make_shared<ba_ip::tcp::resolver::query>(_endpoint.host_name(),
+                                                                    boost::lexical_cast<std::string>(_endpoint.port()));
+                
+                resolver->async_resolve(*query,
+                                        std::bind(&connection_base::after_resolve,
+                                                  this, _1, _2, ccb, resolver, query));
+            }
+            
+            void connection_base::after_resolve(const boost::system::error_code& err,
+                                                ba_ip::tcp::resolver::iterator endpoint_iterator,
+                                                network_status_callback ccb,
+                                                std::shared_ptr<ba_ip::tcp::resolver> resolver,
+                                                std::shared_ptr<ba_ip::tcp::resolver::query> query)
+            {
+                if (!err)
+                {
+                    //we have an endpoint, let's try a connect
+                    _socket.async_connect(*endpoint_iterator,
+                                          std::bind(&connection_base::after_connect,
+                                                    this, _1, ccb));
+                }
+                else
+                {
+                    //resolution failed
+                    ccb(network_operation_result::from_error_code("name resolution failed", err));
+                }
+            }
+            
+            void connection_base::after_connect(const boost::system::error_code& err,
+                                                   network_status_callback ccb)
+            {
+                if (!err)
+                {
+                    //connection is good, tell our callback
+                    ccb(network_operation_result::success());
+                }
+                else
+                {
+                    //connection failed
+                    ccb(network_operation_result::from_error_code("connect failed", err));
+                }
             }
             
             void connection_base::send_message(message_type type, Message_ptr message,

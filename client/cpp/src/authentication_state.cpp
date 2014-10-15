@@ -46,8 +46,6 @@ namespace sopmq {
                 _dispatcher =
                     std::make_shared<message_dispatcher>(std::bind(&authentication_state::on_unhandled_message,
                                                                    this, _1, _2));
-                
-                _connection->set_dispatcher(_dispatcher.get());
             }
             
             authentication_state::~authentication_state()
@@ -71,15 +69,15 @@ namespace sopmq {
                 _connection->send_message(message::MT_GET_CHALLENGE, gcm,
                                           std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
                 
-                _connection->get_next_message(std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
+                _connection->read_message(*_dispatcher, std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
             }
             
-            void authentication_state::on_message_sent(const net::network_operation_result& result)
+            void authentication_state::on_message_sent(const shared::net::network_operation_result& result)
             {
                 if (!result.was_successful())
                 {
                     //auth failed
-                    LOG_SRC(error) << _connection->network_endpoint()
+                    LOG_SRC(error) << _connection->endpoint()
                         << " network error during session authorization: "
                         << result.get_error().what();
                     
@@ -87,12 +85,12 @@ namespace sopmq {
                 }
             }
             
-            void authentication_state::on_message_received(const net::network_operation_result& result)
+            void authentication_state::on_message_received(const shared::net::network_operation_result& result)
             {
                 if (!result.was_successful())
                 {
                     //auth failed
-                    LOG_SRC(error) << _connection->network_endpoint()
+                    LOG_SRC(error) << _connection->endpoint()
                         << " network error during session authorization: "
                         << result.get_error().what();
                     
@@ -102,7 +100,7 @@ namespace sopmq {
             
             void authentication_state::on_unhandled_message(Message_ptr message, const std::string& typeName)
             {
-                LOG_SRC(error) << _connection->network_endpoint()
+                LOG_SRC(error) << _connection->endpoint()
                     << " protocol violation: unexpected message: "
                     << typeName;
                 
@@ -152,7 +150,7 @@ namespace sopmq {
                 _connection->send_message(message::MT_ANSWER_CHALLENGE, acm,
                                           std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
                 
-                _connection->get_next_message(std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
+                _connection->read_message(*_dispatcher, std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
             }
             
             void authentication_state::on_auth_ack(AuthAckMessage_ptr response)
@@ -164,7 +162,7 @@ namespace sopmq {
                 else
                 {
                     //auth failed
-                    LOG_SRC(error) << _connection->network_endpoint() << " session authorization denied";
+                    LOG_SRC(error) << _connection->endpoint() << " session authorization denied";
                     _authCallback(false);
                 }
             }

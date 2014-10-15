@@ -97,7 +97,7 @@ namespace sopmq {
             ///
             /// Called when a connection has been made or failed
             ///
-            void connection_result(const net::network_operation_result& result, connect_context ctx);
+            void connection_result(const shared::net::network_operation_result& result, connect_context ctx);
             
             ///
             /// Endpoints that we either know to be good, or haven't tried to connect to yet

@@ -42,7 +42,7 @@ namespace sopmq {
         ///
         /// Callback that will be fired after the completion of a network operation
         ///
-        typedef std::function<void(const sopmq::net::network_operation_result&)> network_status_callback;
+        typedef std::function<void(const shared::net::network_operation_result&)> network_status_callback;
         
         ///
         /// Context for read_message
@@ -203,12 +203,12 @@ namespace sopmq {
                                                          + " message corrupted?");
                     
                     //error
-                    ctx->status_callback(net::network_operation_result(net::ET_NETWORK, e));
+                    ctx->status_callback(shared::net::network_operation_result(shared::net::ET_NETWORK, e));
                 }
                 else
                 {
                     //dispatch
-                    ctx->status_callback(net::network_operation_result::success());
+                    ctx->status_callback(shared::net::network_operation_result::success());
                     ctx->dispatcher.dispatch(message);
                 }
             }

@@ -58,7 +58,7 @@ namespace sopmq {
                 
                 void read_next_message(connection_in::ptr conn);
                 
-                void handle_read_result(const net::network_operation_result& result);
+                void handle_read_result(const shared::net::network_operation_result& result);
                 
                 void handle_post_message(PublishMessage_ptr message);
             };

@@ -54,9 +54,9 @@ namespace sopmq {
                 
                 void on_auth_ack(AuthAckMessage_ptr response);
                 
-                void on_message_sent(const net::network_operation_result& result);
+                void on_message_sent(const shared::net::network_operation_result& result);
                 
-                void on_message_received(const net::network_operation_result& result);
+                void on_message_received(const shared::net::network_operation_result& result);
                 
                 cluster_connection::ptr _connection;
                 std::weak_ptr<session> _session;

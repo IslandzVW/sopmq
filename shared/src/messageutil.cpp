@@ -100,14 +100,14 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(net::network_operation_result::from_error_code(error));
+                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
             //validate the message
             if (messageType <= sopmq::message::MT_INVALID || messageType >= sopmq::message::MT_INVALID_OUT_OF_RANGE)
             {
-                ctx->status_callback(net::network_operation_result(net::ET_INVALID_TYPE,
+                ctx->status_callback(shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
                                                                    network_error("Message type "
                                                                                  + boost::lexical_cast<std::string>(messageType)
                                                                                  + " is invalid")));
@@ -131,7 +131,7 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(net::network_operation_result::from_error_code(error));
+                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
@@ -140,7 +140,7 @@ namespace sopmq {
             {
                 LOG_SRC(error) << "message is too large (" << messageSize / 1024 << " MB)";
                 
-                ctx->status_callback(net::network_operation_result(net::ET_INVALID_TYPE,
+                ctx->status_callback(shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
                                                                    network_error("Message was too large")));
                 return;
             }
@@ -168,7 +168,7 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(net::network_operation_result::from_error_code(error));
+                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
@@ -296,11 +296,11 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(net::network_operation_result::from_error_code(error));
+                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
             }
             else
             {
-                ctx->status_callback(net::network_operation_result::success());
+                ctx->status_callback(shared::net::network_operation_result::success());
             }
         }
         
