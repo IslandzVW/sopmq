@@ -63,7 +63,7 @@ namespace sopmq {
                 std::string _username;
                 std::string _password;
                 std::function<void(bool)> _authCallback;
-                sopmq::message::message_dispatcher::ptr _dispatcher;
+                sopmq::message::message_dispatcher _dispatcher;
             };
             
         }

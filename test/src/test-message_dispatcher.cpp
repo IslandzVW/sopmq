@@ -55,3 +55,26 @@ TEST(MessageDispatcherTest, TestRegisteredHandler)
     ASSERT_FALSE(unhandled);
 
 }
+
+TEST(MessageDispatcherTest, TestRegisteredHandlerWithReplyTo)
+{
+    const uint32_t replyTo = 2;
+    
+    bool unhandled = true;
+    bool called = false;
+    
+    
+    message_dispatcher md([&](Message_ptr msg, const std::string&) { unhandled = true; });
+    
+    std::function<void(GetChallengeMessage_ptr)> func = [&](GetChallengeMessage_ptr msg) { unhandled = false; called = true; };
+    md.set_handler(func, replyTo);
+    
+    GetChallengeMessage_ptr gcm = std::make_shared<GetChallengeMessage>();
+    gcm->mutable_identity()->set_in_reply_to(replyTo);
+    
+    md.dispatch(gcm);
+    
+    ASSERT_TRUE(called);
+    ASSERT_FALSE(unhandled);
+    
+}

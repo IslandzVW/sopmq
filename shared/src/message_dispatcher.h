@@ -56,6 +56,7 @@ namespace sopmq {
             typedef std::weak_ptr<message_dispatcher> wptr;
             
         public:
+            message_dispatcher();
             message_dispatcher(std::function<void(Message_ptr, const std::string&)> unhandledHandler);
             virtual ~message_dispatcher();
             
@@ -77,6 +78,8 @@ namespace sopmq {
             //[[[end]]]
             
         public:
+            void set_unhandled_handler(std::function<void(Message_ptr, const std::string&)> unhandledHandler);
+            
             /*[[[cog
              for fn in fnames:
                if "Message" in fn:

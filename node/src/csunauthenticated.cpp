@@ -100,7 +100,7 @@ namespace sopmq {
                 std::function<void(AnswerChallengeMessage_ptr)> func
                     = std::bind(&csunauthenticated::handle_answer_challenge_message, this, _1);
                 
-                _dispatcher.set_handler(func);
+                _dispatcher.set_handler(func, response->identity().id());
                 
                 conn->send_message(message::MT_CHALLENGE_RESPONSE, response,
                                    std::bind(&csunauthenticated::handle_write_result, shared_from_this(), _1));
