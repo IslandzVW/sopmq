@@ -22,6 +22,7 @@
 #include "message_dispatcher.h"
 #include "message_ptrs.h"
 #include "isession_state.h"
+#include "responses.h"
 
 #include <boost/noncopyable.hpp>
 #include <memory>
@@ -45,6 +46,7 @@ namespace sopmq {
             typedef std::weak_ptr<session> wptr;
             
             typedef std::function<void(bool)> authenticate_callback;
+            typedef std::function<void(sopmq::shared::message::PublishMessageResponse)> publish_message_callback;
             
         
         public:
@@ -60,6 +62,17 @@ namespace sopmq {
             ///
             void authenticate(const std::string& username, const std::string& password,
                               authenticate_callback authCallback);
+            
+            ///
+            /// Posts a message to the given message queue
+            /// \param queueId The queue to post the message to
+            /// \param storeIfCantPipe Whether or not the message should be stored if it couldn't
+            /// be piped to a consumer within its TTL
+            /// \param ttl The time to live in seconds for this message
+            /// \param data The message data
+            /// \param callback The function that will be called after the publish operation completess
+            void publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                 const std::string& data, publish_message_callback callback);
             
             ///
             /// Indicates a protocol violation happened. Disconnects the connection
