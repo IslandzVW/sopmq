@@ -20,7 +20,7 @@
 #include "cluster.h"
 #include "GetChallengeMessage.pb.h"
 #include "logging.h"
-#include "authentication_state.h"
+#include "unauthenticated_state.h"
 #include "messageutil.h"
 #include "logging.h"
 
@@ -51,9 +51,29 @@ namespace sopmq {
             _username = username;
             _password = password;
             
-            _session_state = std::make_shared<authentication_state>(_connection, shared_from_this(),
-                                                                    username, password, authCallback);
+            _session_state = std::make_shared<unauthenticated_state>(_connection, shared_from_this(),
+                                                                     username, password,
+                                                                     [=] (bool authd) {
+                                                                         //chain to our callback
+                                                                         this->on_auth_status(authd);
+                                                                         //and the registered one
+                                                                         authCallback(authd);
+                                                                     });
             _session_state->state_entry();
+        }
+        
+        void session::on_auth_status(bool authd)
+        {
+            if (authd)
+            {
+                //_session_state =
+            }
+        }
+        
+        void session::publish_message(const std::string &queueId, bool storeIfCantPipe, int ttl,
+                                      const std::string &data, publish_message_callback callback)
+        {
+            
         }
         
         void session::protocol_violation()

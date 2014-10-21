@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "authentication_state.h"
+#include "unauthenticated_state.h"
 #include "session.h"
 #include "logging.h"
 #include "ChallengeResponseMessage.pb.h"
@@ -38,23 +38,23 @@ namespace sopmq {
     namespace client {
         namespace impl {
             
-            authentication_state::authentication_state(cluster_connection::ptr conn, session::wptr session,
-                                                       const std::string& username, const std::string& password,
-                                                       std::function<void(bool)> authCallback)
+            unauthenticated_state::unauthenticated_state(cluster_connection::ptr conn, session::wptr session,
+                                                         const std::string& username, const std::string& password,
+                                                         std::function<void(bool)> authCallback)
             : _connection(conn), _session(session), _username(username), _password(password), _authCallback(authCallback)
             {
             }
             
-            authentication_state::~authentication_state()
+            unauthenticated_state::~unauthenticated_state()
             {
                 LOG_SRC(debug) << "~authentication_state()";
             }
             
-            void authentication_state::state_entry()
+            void unauthenticated_state::state_entry()
             {
                 LOG_SRC(debug) << "authentication_state::state_entry()";
                 
-                _dispatcher.set_unhandled_handler(std::bind(&authentication_state::on_unhandled_message,
+                _dispatcher.set_unhandled_handler(std::bind(&unauthenticated_state::on_unhandled_message,
                                                             shared_from_this(), _1, _2));
                 
                 //send a request to the server to get an auth challenge
@@ -63,17 +63,17 @@ namespace sopmq {
                 
                 //set the dispatcher to catch the reply
                 std::function<void(ChallengeResponseMessage_ptr)> func
-                    = std::bind(&authentication_state::on_challenge_response, shared_from_this(), _1);
+                    = std::bind(&unauthenticated_state::on_challenge_response, shared_from_this(), _1);
                 
                 _dispatcher.set_handler(func, gcm->identity().id());
                 
                 _connection->send_message(message::MT_GET_CHALLENGE, gcm,
-                                          std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
+                                          std::bind(&unauthenticated_state::on_message_sent, shared_from_this(), _1));
                 
-                _connection->read_message(_dispatcher, std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
+                _connection->read_message(_dispatcher, std::bind(&unauthenticated_state::on_message_received, shared_from_this(), _1));
             }
             
-            void authentication_state::on_message_sent(const shared::net::network_operation_result& result)
+            void unauthenticated_state::on_message_sent(const shared::net::network_operation_result& result)
             {
                 if (!result.was_successful())
                 {
@@ -86,7 +86,7 @@ namespace sopmq {
                 }
             }
             
-            void authentication_state::on_message_received(const shared::net::network_operation_result& result)
+            void unauthenticated_state::on_message_received(const shared::net::network_operation_result& result)
             {
                 if (!result.was_successful())
                 {
@@ -99,7 +99,7 @@ namespace sopmq {
                 }
             }
             
-            void authentication_state::on_unhandled_message(Message_ptr message, const std::string& typeName)
+            void unauthenticated_state::on_unhandled_message(Message_ptr message, const std::string& typeName)
             {
                 LOG_SRC(error) << _connection->endpoint()
                     << " protocol violation: unexpected message: "
@@ -111,7 +111,7 @@ namespace sopmq {
                 }
             }
             
-            void authentication_state::on_challenge_response(ChallengeResponseMessage_ptr response)
+            void unauthenticated_state::on_challenge_response(ChallengeResponseMessage_ptr response)
             {
                 BOOST_ASSERT(response->has_challenge());
                 
@@ -146,17 +146,17 @@ namespace sopmq {
                 acm->set_challenge_response(result);
                 
                 //set the handler for the AuthAck
-                std::function<void(AuthAckMessage_ptr)> func = std::bind(&authentication_state::on_auth_ack, this, _1);
+                std::function<void(AuthAckMessage_ptr)> func = std::bind(&unauthenticated_state::on_auth_ack, this, _1);
                 _dispatcher.set_handler(func, acm->identity().id());
                 
                 
                 _connection->send_message(message::MT_ANSWER_CHALLENGE, acm,
-                                          std::bind(&authentication_state::on_message_sent, shared_from_this(), _1));
+                                          std::bind(&unauthenticated_state::on_message_sent, shared_from_this(), _1));
                 
-                _connection->read_message(_dispatcher, std::bind(&authentication_state::on_message_received, shared_from_this(), _1));
+                _connection->read_message(_dispatcher, std::bind(&unauthenticated_state::on_message_received, shared_from_this(), _1));
             }
             
-            void authentication_state::on_auth_ack(AuthAckMessage_ptr response)
+            void unauthenticated_state::on_auth_ack(AuthAckMessage_ptr response)
             {
                 if (response->has_authorized() && response->authorized())
                 {

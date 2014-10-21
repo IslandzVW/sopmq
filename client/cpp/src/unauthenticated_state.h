@@ -37,13 +37,13 @@ namespace sopmq {
             /// Client session state before the client has been authorized
             /// by a SOPMQ node
             ///
-            class authentication_state : public isession_state, public std::enable_shared_from_this<authentication_state>
+            class unauthenticated_state : public isession_state, public std::enable_shared_from_this<unauthenticated_state>
             {
             public:
-                authentication_state(cluster_connection::ptr conn, std::weak_ptr<session> session,
+                unauthenticated_state(cluster_connection::ptr conn, std::weak_ptr<session> session,
                                      const std::string& username, const std::string& password,
                                      std::function<void(bool)> authCallback);
-                virtual ~authentication_state();
+                virtual ~unauthenticated_state();
                 
                 virtual void state_entry();
                 

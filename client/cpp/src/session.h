@@ -81,6 +81,7 @@ namespace sopmq {
             
         private:
             void invalidate();
+            void on_auth_status(bool authd);
             
             std::weak_ptr<cluster> _cluster;
             cluster_connection::ptr _connection;
