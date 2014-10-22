@@ -18,12 +18,17 @@
 #ifndef __sopmq__isession_state__
 #define __sopmq__isession_state__
 
+#include "session_callbacks.h"
+
 #include <memory>
 
 namespace sopmq {
     namespace client {
         namespace impl {
             
+            ///
+            /// Interface to a state that a client session can be in
+            ///
             class isession_state
             {
             public:
@@ -34,6 +39,9 @@ namespace sopmq {
                 virtual ~isession_state();
                 
                 virtual void state_entry() = 0;
+                
+                virtual void publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                             const std::string& data, publish_message_callback callback) = 0;
             };
             
         }

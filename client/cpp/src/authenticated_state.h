@@ -19,17 +19,38 @@
 #define __sopmq__authenticated_state__
 
 #include "isession_state.h"
+#include "cluster_connection.h"
+#include "message_dispatcher.h"
+#include "message_ptrs.h"
+
 #include <memory>
 
 namespace sopmq {
     namespace client {
+        
+        class session; //fwd
+        
         namespace impl {
             
             class authenticated_state : public isession_state,
                                         public std::enable_shared_from_this<authenticated_state>
             {
             public:
+                authenticated_state(cluster_connection::ptr conn, std::weak_ptr<session> session);
+                virtual ~authenticated_state();
                 
+                virtual void state_entry();
+                
+                virtual void publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                             const std::string& data, publish_message_callback callback);
+                
+            private:
+                void on_unhandled_message(Message_ptr message, const std::string& typeName);
+                
+                cluster_connection::ptr _conn;
+                std::weak_ptr<session> _session;
+                
+                sopmq::message::message_dispatcher _dispatcher;
             };
             
         }

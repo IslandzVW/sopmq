@@ -110,7 +110,7 @@ namespace sopmq {
             void csunauthenticated::handle_answer_challenge_message(AnswerChallengeMessage_ptr message)
             {
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
-                auto t = shared_from_this();
+                auto self(shared_from_this());
 
                 std::function<void(bool)> authCallback = [=](bool authd) {
                     //remember this is coming back from the libuv stuff inside the cassandra
@@ -120,13 +120,13 @@ namespace sopmq {
                     {
                         //user is good to go
                         _ioService.post([=] {
-                            auto connptr = _conn.lock();
+                            auto connptr = self->_conn.lock();
                             if (connptr == nullptr) return;
                             
                             AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
                             response->set_authorized(true);
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            this->shared_from_this(), _1));
+                                                                                            self, _1));
                             csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
                             connptr->change_state(authstate);
                         });
@@ -142,7 +142,7 @@ namespace sopmq {
                             AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
                             response->set_authorized(false);
                             connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            this->shared_from_this(), _1));
+                                                                                            self, _1));
                         });
                     }
                 };

@@ -23,6 +23,7 @@
 #include "message_ptrs.h"
 #include "isession_state.h"
 #include "responses.h"
+#include "network_operation_result.h"
 
 #include <boost/noncopyable.hpp>
 #include <memory>
@@ -44,9 +45,6 @@ namespace sopmq {
         public:
             typedef std::shared_ptr<session> ptr;
             typedef std::weak_ptr<session> wptr;
-            
-            typedef std::function<void(bool)> authenticate_callback;
-            typedef std::function<void(sopmq::shared::message::PublishMessageResponse)> publish_message_callback;
             
         
         public:
@@ -78,6 +76,11 @@ namespace sopmq {
             /// Indicates a protocol violation happened. Disconnects the connection
             ///
             void protocol_violation();
+            
+            ///
+            /// Indicates there was an issue when sending or receiving data from a connection
+            ///
+            void connection_error(const sopmq::shared::net::network_operation_result& result);
             
         private:
             void invalidate();

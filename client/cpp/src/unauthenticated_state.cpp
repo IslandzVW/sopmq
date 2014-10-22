@@ -41,7 +41,9 @@ namespace sopmq {
             unauthenticated_state::unauthenticated_state(cluster_connection::ptr conn, session::wptr session,
                                                          const std::string& username, const std::string& password,
                                                          std::function<void(bool)> authCallback)
-            : _connection(conn), _session(session), _username(username), _password(password), _authCallback(authCallback)
+            : _connection(conn), _session(session), _username(username), _password(password), _authCallback(authCallback),
+            _dispatcher(std::bind(&unauthenticated_state::on_unhandled_message,
+                                  this, _1, _2))
             {
             }
             
@@ -54,16 +56,13 @@ namespace sopmq {
             {
                 LOG_SRC(debug) << "authentication_state::state_entry()";
                 
-                _dispatcher.set_unhandled_handler(std::bind(&unauthenticated_state::on_unhandled_message,
-                                                            shared_from_this(), _1, _2));
-                
                 //send a request to the server to get an auth challenge
                 GetChallengeMessage_ptr gcm = messageutil::make_message<GetChallengeMessage>(_connection->get_next_id(), 0);
                 gcm->set_type(GetChallengeMessage::CLIENT);
                 
                 //set the dispatcher to catch the reply
                 std::function<void(ChallengeResponseMessage_ptr)> func
-                    = std::bind(&unauthenticated_state::on_challenge_response, shared_from_this(), _1);
+                    = std::bind(&unauthenticated_state::on_challenge_response, this, _1);
                 
                 _dispatcher.set_handler(func, gcm->identity().id());
                 
@@ -168,6 +167,12 @@ namespace sopmq {
                     LOG_SRC(error) << _connection->endpoint() << " session authorization denied";
                     _authCallback(false);
                 }
+            }
+            
+            void unauthenticated_state::publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                                        const std::string& data, publish_message_callback callback)
+            {
+                throw std::logic_error("Call to publish_message() is invalid when the session is unauthenticated");
             }
             
         }

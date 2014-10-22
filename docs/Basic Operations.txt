@@ -80,7 +80,7 @@ Returns: SubscribeResponseMessage
 		- The range is unavailable for subscriptions. The client must retry later 
 
 
-PostMessage
+PublishMessage
 -----------------
 Posts a message to a queue optionally storing it if a subscriber could not be reached
 
@@ -97,7 +97,7 @@ Parameters:
 	Message
 		- Binary blob
 
-Returns: PostResponseMessage
+Returns: PublishResponseMessage
 	MessagePiped,
 	MessageStored,
 	Dropped,

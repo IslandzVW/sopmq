@@ -43,9 +43,13 @@ namespace sopmq {
                 unauthenticated_state(cluster_connection::ptr conn, std::weak_ptr<session> session,
                                      const std::string& username, const std::string& password,
                                      std::function<void(bool)> authCallback);
+                
                 virtual ~unauthenticated_state();
                 
                 virtual void state_entry();
+                
+                virtual void publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                             const std::string& data, publish_message_callback callback);
                 
             private:
                 void on_unhandled_message(Message_ptr message, const std::string& typeName);

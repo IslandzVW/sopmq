@@ -1,6 +1,10 @@
 import "Identifier.proto";
 
 message PublishMessage {
+	enum Flags {
+		STORE_IF_PIPE_FAILS = 0x01;
+	}
+
 	required Identifier identity = 1;
 
 	required bytes message_id = 2;	

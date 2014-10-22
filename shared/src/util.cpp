@@ -76,6 +76,11 @@ namespace sopmq {
 
             return hash;
         }
+        
+        std::string* util::uuid_to_bytes(const boost::uuids::uuid& id)
+        {
+            return new std::string(id.begin(), id.end());
+        }
 
         util::util()
         {

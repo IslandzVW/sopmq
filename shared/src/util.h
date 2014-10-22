@@ -53,6 +53,13 @@ namespace sopmq {
             /// Returns the murmur hash of the given value
             ///
             static uint128 murmur_hash3(const void * key, int len);
+            
+            ///
+            /// Extracts the raw bytes from a uuid. The string must be freed by the caller.
+            /// Useful for inserting UUIDs into network messages
+            ///
+            static std::string* uuid_to_bytes(const boost::uuids::uuid& id);
+            
 
         private:
             util();

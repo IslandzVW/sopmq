@@ -99,12 +99,12 @@ namespace sopmq {
             private:
                 void after_resolve(const boost::system::error_code& err,
                                    boost::asio::ip::tcp::resolver::iterator endpoint_iterator,
-                                   message::network_status_callback ccb,
+                                   ::sopmq::message::network_status_callback ccb,
                                    std::shared_ptr<boost::asio::ip::tcp::resolver> resolver,
                                    std::shared_ptr<boost::asio::ip::tcp::resolver::query> query);
                 
                 void after_connect(const boost::system::error_code& err,
-                                   message::network_status_callback ccb);
+                                   ::sopmq::message::network_status_callback ccb);
                 
                 boost::asio::io_service& _ioService;
                 shared::net::endpoint _endpoint;

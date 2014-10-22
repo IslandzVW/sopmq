@@ -21,6 +21,7 @@
 #include "GetChallengeMessage.pb.h"
 #include "logging.h"
 #include "unauthenticated_state.h"
+#include "authenticated_state.h"
 #include "messageutil.h"
 #include "logging.h"
 
@@ -66,20 +67,28 @@ namespace sopmq {
         {
             if (authd)
             {
-                //_session_state =
+                _session_state = std::make_shared<authenticated_state>(_connection, shared_from_this());
+                _session_state->state_entry();
             }
         }
         
-        void session::publish_message(const std::string &queueId, bool storeIfCantPipe, int ttl,
-                                      const std::string &data, publish_message_callback callback)
+        void session::publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
+                                      const std::string& data, publish_message_callback callback)
         {
-            
+            _session_state->publish_message(queueId, storeIfCantPipe, ttl, data, callback);
         }
         
         void session::protocol_violation()
         {
             LOG_SRC(error) << "protocol violation";
             this->invalidate();
+        }
+        
+        void session::connection_error(const sopmq::shared::net::network_operation_result& result)
+        {
+            LOG_SRC(error) << "connection error: "
+                << _connection->endpoint() << ": "
+                << result.get_error().what();
         }
         
         void session::invalidate()
