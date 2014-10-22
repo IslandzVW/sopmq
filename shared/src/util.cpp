@@ -21,6 +21,7 @@
 
 #include <cryptopp/hex.h>
 #include <cryptopp/filters.h>
+#include <cryptopp/sha.h>
 
 #include <random>
 #include <limits>
@@ -82,6 +83,15 @@ namespace sopmq {
             return new std::string(id.begin(), id.end());
         }
 
+        std::string util::sha256_hex_string(const std::string& data)
+        {
+            unsigned char hashResult[CryptoPP::SHA256::DIGESTSIZE];
+            CryptoPP::SHA256 sha;
+            sha.CalculateDigest(&hashResult[0], (unsigned char*)data.c_str(), data.length());
+            
+            return util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
+        }
+        
         util::util()
         {
             

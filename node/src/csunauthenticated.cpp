@@ -151,6 +151,24 @@ namespace sopmq {
                     }
                 };
                 
+                //short circuit for unit tests
+                if (! settings::instance().unitTestUsername.empty())
+                {
+                    //check that the user trying to log in is using the unittest username
+                    if (message->uname_hash() == util::sha256_hex_string(settings::instance().unitTestUsername))
+                    {
+                        auto connptr = self->_conn.lock();
+                        if (connptr == nullptr) return;
+                        
+                        AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
+                        response->set_authorized(true);
+                        connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                                        self, _1));
+                        csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
+                        connptr->change_state(authstate);
+                    }
+                }
+                
                 user_account::is_authorized(message->uname_hash(), _challenge, message->challenge_response(), authCallback);
             }
             

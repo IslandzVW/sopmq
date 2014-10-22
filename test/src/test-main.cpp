@@ -23,6 +23,9 @@ int main(int argc, char **argv) {
         }
     }
     
+    const char* const USERNAME = "unittest";
+    settings::instance().unitTestUsername = USERNAME;
+    
     return RUN_ALL_TESTS();
 }
 

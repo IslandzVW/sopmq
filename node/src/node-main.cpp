@@ -56,6 +56,7 @@ bool process_options(int argc, char* argv[])
         ("seed_nodes", po::value<vector<string> >()->multitoken(), "list of seed nodes to get us into the ring")
         ("max_message_size", po::value<uint32_t>()->default_value(DEFAULT_MAX_MESSAGE_SIZE), "the maximum size of any message")
         ("phi_failure_threshold", po::value<int>()->default_value(DEFAULT_PHI_FAILURE_THRESHOLD), "the default threshold at which we consider a node failed")
+        ("unit_test_username", po::value<string>()->default_value(""), "Username that will be allowed to log in unconditionally to perform unit testing")
     ;
     
     try
@@ -114,6 +115,7 @@ bool process_options(int argc, char* argv[])
         settings::instance().mqSeeds = vm["seed_nodes"].as<vector<string> >();
         settings::instance().maxMessageSize = vm["max_message_size"].as<uint32_t>();
         settings::instance().phiFailureThreshold = vm["phi_failure_threshold"].as<int>();
+        settings::instance().unitTestUsername = vm["unit_test_username"].as<string>();
     }
     catch (const po::error& e)
     {

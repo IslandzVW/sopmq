@@ -60,6 +60,12 @@ namespace sopmq {
             ///
             static std::string* uuid_to_bytes(const boost::uuids::uuid& id);
             
+            ///
+            /// Computes the sha256 of the given data and returns a human readable hex string
+            /// result
+            ///
+            static std::string sha256_hex_string(const std::string& data);
+            
 
         private:
             util();

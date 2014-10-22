@@ -106,6 +106,14 @@ namespace sopmq {
             ///
             int phiFailureThreshold;
             
+            ///
+            /// A username that can be used to log in to perform unit tests without needing
+            /// a backing cassandra store
+            ///
+            /// WARNING: THIS SHOULD BE LEFT BLANK FOR PRODUCTION SYSTEMS.
+            ///
+            std::string unitTestUsername;
+            
         private:
             settings();
             ~settings();
