@@ -54,9 +54,9 @@ namespace sopmq {
             private:
                 void on_unhandled_message(Message_ptr message, const std::string& typeName);
                 
-                void on_challenge_response(ChallengeResponseMessage_ptr response);
+                void on_challenge_response(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr response);
                 
-                void on_auth_ack(AuthAckMessage_ptr response);
+                void on_auth_ack(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr response);
                 
                 void on_message_sent(const shared::net::network_operation_result& result);
                 

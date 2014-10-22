@@ -24,6 +24,7 @@
 #include "GetChallengeMessage.pb.h"
 #include "util.h"
 #include "messageutil.h"
+#include "network_operation_result.h"
 
 #include <functional>
 #include <boost/assert.hpp>
@@ -61,8 +62,8 @@ namespace sopmq {
                 gcm->set_type(GetChallengeMessage::CLIENT);
                 
                 //set the dispatcher to catch the reply
-                std::function<void(ChallengeResponseMessage_ptr)> func
-                    = std::bind(&unauthenticated_state::on_challenge_response, this, _1);
+                std::function<void(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr)> func
+                    = std::bind(&unauthenticated_state::on_challenge_response, this, _1, _2);
                 
                 _dispatcher.set_handler(func, gcm->identity().id());
                 
@@ -110,8 +111,10 @@ namespace sopmq {
                 }
             }
             
-            void unauthenticated_state::on_challenge_response(ChallengeResponseMessage_ptr response)
+            void unauthenticated_state::on_challenge_response(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr response)
             {
+                if (!response) return; //error
+                
                 BOOST_ASSERT(response->has_challenge());
                 
                 //respond to the challenge with:
@@ -137,7 +140,7 @@ namespace sopmq {
                 std::string result = util::hex_encode(hashResult, CryptoPP::SHA256::DIGESTSIZE);
                 
                 //clear the handler for the challenge response since we're not looking for that anymore
-                _dispatcher.set_handler(std::function<void(ChallengeResponseMessage_ptr)>());
+                _dispatcher.set_handler(std::function<void(const sopmq::shared::net::network_operation_result&,ChallengeResponseMessage_ptr)>());
 
                 //generate the answer
                 AnswerChallengeMessage_ptr acm = messageutil::make_message<AnswerChallengeMessage>(_connection->get_next_id(), response->identity().id());
@@ -145,7 +148,8 @@ namespace sopmq {
                 acm->set_challenge_response(result);
                 
                 //set the handler for the AuthAck
-                std::function<void(AuthAckMessage_ptr)> func = std::bind(&unauthenticated_state::on_auth_ack, this, _1);
+                std::function<void(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr)> func
+                    = std::bind(&unauthenticated_state::on_auth_ack, this, _1, _2);
                 _dispatcher.set_handler(func, acm->identity().id());
                 
                 
@@ -155,8 +159,10 @@ namespace sopmq {
                 _connection->read_message(_dispatcher, std::bind(&unauthenticated_state::on_message_received, shared_from_this(), _1));
             }
             
-            void unauthenticated_state::on_auth_ack(AuthAckMessage_ptr response)
+            void unauthenticated_state::on_auth_ack(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr response)
             {
+                if (!response) return; //error
+                
                 if (response->has_authorized() && response->authorized())
                 {
                     _authCallback(true);

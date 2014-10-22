@@ -188,13 +188,13 @@ namespace sopmq {
             ///
             /// Decodes the message and then dispatches it
             ///
-            static void switch_dispatch(message_context_ptr ctx);
+            static void switch_dispatch(message_context_ptr ctx, const shared::net::network_operation_result& result);
             
             ///
             /// After the message type is decoded, we do the rest of the work here
             ///
-            template <typename T>
-            static void template_dispatch(message_context_ptr ctx, T message)
+            template <typename R, typename T>
+            static void template_dispatch(message_context_ptr ctx, R networkResult, T message)
             {
                 if (! message->ParseFromArray(ctx->message_buffer.get(), ctx->message_size))
                 {
@@ -209,9 +209,21 @@ namespace sopmq {
                 {
                     //dispatch
                     ctx->status_callback(shared::net::network_operation_result::success());
-                    ctx->dispatcher.dispatch(message);
+                    ctx->dispatcher.dispatch(networkResult, message);
                 }
             }
+            
+            ///
+            /// If there is a network error during a read, this function is called. It does two things:
+            /// - calls ctx->status_callback with the error information
+            /// - calls all callbacks waiting on a dispatch with the error information
+            ///
+            static void on_read_error(message_context_ptr ctx, const shared::net::network_operation_result& error);
+            
+            ///
+            /// Cancels all callbacks waiting on a dispatch with an error
+            ///
+            static void cancel_all_with_error(message::message_dispatcher& dispatcher, const shared::net::network_operation_result& error);
         };
         
     }

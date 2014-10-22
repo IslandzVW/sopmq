@@ -49,7 +49,13 @@ namespace sopmq {
                 ///
                 /// The nodes that handle this range were not available
                 ///
-                PMR_UNAVAILABLE = 5
+                PMR_UNAVAILABLE = 5,
+                
+                ///
+                /// There was a network error while reading or writing to the node.
+                /// The operation should be retried
+                ///
+                PMR_NETWORK_ERROR = 6
             };
             
         }

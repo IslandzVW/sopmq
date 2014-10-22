@@ -66,8 +66,10 @@ namespace sopmq {
                 }
             }
             
-            void csunauthenticated::handle_get_challenge_message(GetChallengeMessage_ptr message)
+            void csunauthenticated::handle_get_challenge_message(const shared::net::network_operation_result&, GetChallengeMessage_ptr message)
             {
+                if (!message) return;
+                
                 LOG_SRC(debug) << "handle_get_challenge_message()";
                 
                 auto connptr = _conn.lock();
@@ -94,11 +96,11 @@ namespace sopmq {
                 response->set_challenge(_challenge);
                 
                 // clear the challenge handler.
-                _dispatcher.set_handler(std::function<void(GetChallengeMessage_ptr)>());
+                _dispatcher.set_handler(std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)>());
                 
                 // set the new handler for the client answer
-                std::function<void(AnswerChallengeMessage_ptr)> func
-                    = std::bind(&csunauthenticated::handle_answer_challenge_message, this, _1);
+                std::function<void(const shared::net::network_operation_result&, AnswerChallengeMessage_ptr)> func
+                    = std::bind(&csunauthenticated::handle_answer_challenge_message, this, _1, _2);
                 
                 _dispatcher.set_handler(func, response->identity().id());
                 
@@ -107,8 +109,10 @@ namespace sopmq {
                 this->read_next_message(conn);
             }
             
-            void csunauthenticated::handle_answer_challenge_message(AnswerChallengeMessage_ptr message)
+            void csunauthenticated::handle_answer_challenge_message(const shared::net::network_operation_result&, AnswerChallengeMessage_ptr message)
             {
+                if (!message) return; //error
+                
                 LOG_SRC(debug) << "handle_answer_challenge_message()";
                 auto self(shared_from_this());
 
@@ -180,8 +184,8 @@ namespace sopmq {
             
             void csunauthenticated::start()
             {
-                std::function<void(GetChallengeMessage_ptr)> func
-                    = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1);
+                std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)> func
+                    = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1, _2);
                 
                 _dispatcher.set_handler(func);
                 

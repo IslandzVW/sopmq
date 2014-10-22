@@ -60,7 +60,7 @@ namespace sopmq {
                 
                 void handle_read_result(const shared::net::network_operation_result& result);
                 
-                void handle_post_message(PublishMessage_ptr message);
+                void handle_post_message(const shared::net::network_operation_result& result, PublishMessage_ptr message);
             };
             
         }

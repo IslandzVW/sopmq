@@ -76,69 +76,127 @@ namespace sopmq {
             _unhandledHandler = unhandledHandler;
         }
         
+        void message_dispatcher::cancel_all_with_error(const sopmq::shared::net::network_operation_result &result)
+        {
+            /*[[[cog
+             for fn in fnames:
+                if "Message" in fn:
+                    rawname = os.path.splitext(os.path.basename(fn))[0]
+                    cog.outl("for (auto handler : _%sHandlers)\n{" % first_lower(rawname))
+                    cog.outl("  handler.second(result, nullptr);")
+                    cog.outl("}\n");
+             ]]]*/
+            for (auto handler : _answerChallengeMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _authAckMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _challengeResponseMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _consumeFromQueueMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _consumeResponseMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _getChallengeMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _gossipMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _publishMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _publishResponseMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            //[[[end]]]
+        }
+        
         /*[[[cog
          for fn in fnames:
            if "Message" in fn:
              rawname = os.path.splitext(os.path.basename(fn))[0]
              cog.outl("")
-             cog.outl("void message_dispatcher::dispatch(%s_ptr %s)" % (rawname,first_lower(rawname)))
+             cog.outl("void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, %s_ptr %s)" % (rawname,first_lower(rawname)))
              cog.outl("{")
-             cog.outl("    do_dispatch(_%sHandlers, %s);" % (first_lower(rawname), first_lower(rawname)))
+             cog.outl("    do_dispatch(_%sHandlers, result, %s);" % (first_lower(rawname), first_lower(rawname)))
              cog.outl("}")
              cog.outl("")
          ]]]*/
 
-        void message_dispatcher::dispatch(AnswerChallengeMessage_ptr answerChallengeMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, AnswerChallengeMessage_ptr answerChallengeMessage)
         {
-            do_dispatch(_answerChallengeMessageHandlers, answerChallengeMessage);
+            do_dispatch(_answerChallengeMessageHandlers, result, answerChallengeMessage);
         }
 
 
-        void message_dispatcher::dispatch(AuthAckMessage_ptr authAckMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, AuthAckMessage_ptr authAckMessage)
         {
-            do_dispatch(_authAckMessageHandlers, authAckMessage);
+            do_dispatch(_authAckMessageHandlers, result, authAckMessage);
         }
 
 
-        void message_dispatcher::dispatch(ChallengeResponseMessage_ptr challengeResponseMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, ChallengeResponseMessage_ptr challengeResponseMessage)
         {
-            do_dispatch(_challengeResponseMessageHandlers, challengeResponseMessage);
+            do_dispatch(_challengeResponseMessageHandlers, result, challengeResponseMessage);
         }
 
 
-        void message_dispatcher::dispatch(ConsumeFromQueueMessage_ptr consumeFromQueueMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, ConsumeFromQueueMessage_ptr consumeFromQueueMessage)
         {
-            do_dispatch(_consumeFromQueueMessageHandlers, consumeFromQueueMessage);
+            do_dispatch(_consumeFromQueueMessageHandlers, result, consumeFromQueueMessage);
         }
 
 
-        void message_dispatcher::dispatch(ConsumeResponseMessage_ptr consumeResponseMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, ConsumeResponseMessage_ptr consumeResponseMessage)
         {
-            do_dispatch(_consumeResponseMessageHandlers, consumeResponseMessage);
+            do_dispatch(_consumeResponseMessageHandlers, result, consumeResponseMessage);
         }
 
 
-        void message_dispatcher::dispatch(GetChallengeMessage_ptr getChallengeMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, GetChallengeMessage_ptr getChallengeMessage)
         {
-            do_dispatch(_getChallengeMessageHandlers, getChallengeMessage);
+            do_dispatch(_getChallengeMessageHandlers, result, getChallengeMessage);
         }
 
 
-        void message_dispatcher::dispatch(GossipMessage_ptr gossipMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, GossipMessage_ptr gossipMessage)
         {
-            do_dispatch(_gossipMessageHandlers, gossipMessage);
+            do_dispatch(_gossipMessageHandlers, result, gossipMessage);
         }
 
 
-        void message_dispatcher::dispatch(PublishMessage_ptr publishMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, PublishMessage_ptr publishMessage)
         {
-            do_dispatch(_publishMessageHandlers, publishMessage);
+            do_dispatch(_publishMessageHandlers, result, publishMessage);
         }
 
 
-        void message_dispatcher::dispatch(PublishResponseMessage_ptr publishResponseMessage)
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, PublishResponseMessage_ptr publishResponseMessage)
         {
-            do_dispatch(_publishResponseMessageHandlers, publishResponseMessage);
+            do_dispatch(_publishResponseMessageHandlers, result, publishResponseMessage);
         }
 
         //[[[end]]]
@@ -148,12 +206,12 @@ namespace sopmq {
            if "Message" in fn:
              rawname = os.path.splitext(os.path.basename(fn))[0]
              cog.outl("")
-             cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler)" % rawname)
+             cog.outl("void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, %s_ptr)> handler)" % rawname)
              cog.outl("{")
              cog.outl("    _%sHandlers[0] = handler;" % first_lower(rawname))
              cog.outl("}")
              cog.outl("")
-             cog.outl("void message_dispatcher::set_handler(std::function<void(%s_ptr)> handler, std::uint32_t inReplyTo)" % rawname)
+             cog.outl("void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, %s_ptr)> handler, std::uint32_t inReplyTo)" % rawname)
              cog.outl("{")
              cog.outl("    _%sHandlers[inReplyTo] = handler;" % first_lower(rawname))
              cog.outl("}")
@@ -161,108 +219,108 @@ namespace sopmq {
              cog.outl("")
          ]]]*/
 
-        void message_dispatcher::set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AnswerChallengeMessage_ptr)> handler)
         {
             _answerChallengeMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(AnswerChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AnswerChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _answerChallengeMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(AuthAckMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr)> handler)
         {
             _authAckMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(AuthAckMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _authAckMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr)> handler)
         {
             _challengeResponseMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(ChallengeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _challengeResponseMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeFromQueueMessage_ptr)> handler)
         {
             _consumeFromQueueMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(ConsumeFromQueueMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeFromQueueMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _consumeFromQueueMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeResponseMessage_ptr)> handler)
         {
             _consumeResponseMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(ConsumeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _consumeResponseMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GetChallengeMessage_ptr)> handler)
         {
             _getChallengeMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(GetChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GetChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _getChallengeMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(GossipMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler)
         {
             _gossipMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(GossipMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _gossipMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(PublishMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler)
         {
             _publishMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(PublishMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _publishMessageHandlers[inReplyTo] = handler;
         }
 
 
 
-        void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler)
         {
             _publishResponseMessageHandlers[0] = handler;
         }
 
-        void message_dispatcher::set_handler(std::function<void(PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _publishResponseMessageHandlers[inReplyTo] = handler;
         }

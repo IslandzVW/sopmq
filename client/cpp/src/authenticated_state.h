@@ -46,6 +46,7 @@ namespace sopmq {
                 
             private:
                 void on_unhandled_message(Message_ptr message, const std::string& typeName);
+                void read_next();
                 
                 cluster_connection::ptr _conn;
                 std::weak_ptr<session> _session;

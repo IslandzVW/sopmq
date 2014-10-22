@@ -100,17 +100,17 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
+                on_read_error(ctx, shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
             //validate the message
             if (messageType <= sopmq::message::MT_INVALID || messageType >= sopmq::message::MT_INVALID_OUT_OF_RANGE)
             {
-                ctx->status_callback(shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
-                                                                   network_error("Message type "
-                                                                                 + boost::lexical_cast<std::string>(messageType)
-                                                                                 + " is invalid")));
+                on_read_error(ctx, shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
+                                                                         network_error("Message type "
+                                                                                       + boost::lexical_cast<std::string>(messageType)
+                                                                                       + " is invalid")));
                 return;
             }
             
@@ -131,7 +131,7 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
+                on_read_error(ctx, shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
@@ -140,8 +140,9 @@ namespace sopmq {
             {
                 LOG_SRC(error) << "message is too large (" << messageSize / 1024 << " MB)";
                 
-                ctx->status_callback(shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
-                                                                   network_error("Message was too large")));
+                on_read_error(ctx, shared::net::network_operation_result(shared::net::ET_INVALID_TYPE,
+                                                                         network_error("Message was too large")));
+                
                 return;
             }
             
@@ -168,17 +169,17 @@ namespace sopmq {
         {
             if (error)
             {
-                ctx->status_callback(shared::net::network_operation_result::from_error_code(error));
+                on_read_error(ctx, shared::net::network_operation_result::from_error_code(error));
                 return;
             }
             
             BOOST_ASSERT(bytes_transferred == ctx->message_size);
             
             //we have a message, decode it
-            messageutil::switch_dispatch(ctx);
+            messageutil::switch_dispatch(ctx, shared::net::network_operation_result::success());
         }
         
-        void messageutil::switch_dispatch(message_context_ptr ctx)
+        void messageutil::switch_dispatch(message_context_ptr ctx, const shared::net::network_operation_result& result)
         {
             switch (ctx->type)
             {
@@ -200,44 +201,44 @@ namespace sopmq {
                     enumName = underscore(enumName)
                  
                     cog.outl("case MT_%s:" % enumName)
-                    cog.outl("    messageutil::template_dispatch(ctx, std::make_shared<%s>());" % rawname)
+                    cog.outl("    messageutil::template_dispatch(ctx, result, std::make_shared<%s>());" % rawname)
                     cog.outl("    break;");
                     cog.outl("");
                  ]]]*/
                 case MT_ANSWER_CHALLENGE:
-                    messageutil::template_dispatch(ctx, std::make_shared<AnswerChallengeMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<AnswerChallengeMessage>());
                     break;
 
                 case MT_AUTH_ACK:
-                    messageutil::template_dispatch(ctx, std::make_shared<AuthAckMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<AuthAckMessage>());
                     break;
 
                 case MT_CHALLENGE_RESPONSE:
-                    messageutil::template_dispatch(ctx, std::make_shared<ChallengeResponseMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<ChallengeResponseMessage>());
                     break;
 
                 case MT_CONSUME_FROM_QUEUE:
-                    messageutil::template_dispatch(ctx, std::make_shared<ConsumeFromQueueMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<ConsumeFromQueueMessage>());
                     break;
 
                 case MT_CONSUME_RESPONSE:
-                    messageutil::template_dispatch(ctx, std::make_shared<ConsumeResponseMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<ConsumeResponseMessage>());
                     break;
 
                 case MT_GET_CHALLENGE:
-                    messageutil::template_dispatch(ctx, std::make_shared<GetChallengeMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<GetChallengeMessage>());
                     break;
 
                 case MT_GOSSIP:
-                    messageutil::template_dispatch(ctx, std::make_shared<GossipMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<GossipMessage>());
                     break;
 
                 case MT_PUBLISH:
-                    messageutil::template_dispatch(ctx, std::make_shared<PublishMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<PublishMessage>());
                     break;
 
                 case MT_PUBLISH_RESPONSE:
-                    messageutil::template_dispatch(ctx, std::make_shared<PublishResponseMessage>());
+                    messageutil::template_dispatch(ctx, result, std::make_shared<PublishResponseMessage>());
                     break;
 
                 //[[[end]]]
@@ -310,6 +311,17 @@ namespace sopmq {
             {
                 s_mem_pool.free(mem);
             }
+        }
+        
+        void messageutil::on_read_error(message_context_ptr ctx, const shared::net::network_operation_result& error)
+        {
+            ctx->status_callback(error);
+            cancel_all_with_error(ctx->dispatcher, error);
+        }
+        
+        void messageutil::cancel_all_with_error(message_dispatcher& dispatcher, const shared::net::network_operation_result& error)
+        {
+            dispatcher.cancel_all_with_error(error);
         }
     }
 }

@@ -49,8 +49,8 @@ namespace sopmq {
             void csauthenticated::start()
             {
                 //set us up to handle any messages that clients should be sending to us
-                std::function<void(PublishMessage_ptr)> func
-                    = std::bind(&csauthenticated::handle_post_message, this, _1);
+                std::function<void(const shared::net::network_operation_result&,PublishMessage_ptr)> func
+                    = std::bind(&csauthenticated::handle_post_message, this, _1, _2);
                 
                 _dispatcher.set_handler(func);
                 
@@ -78,7 +78,7 @@ namespace sopmq {
                 
             }
             
-            void csauthenticated::handle_post_message(PublishMessage_ptr message)
+            void csauthenticated::handle_post_message(const shared::net::network_operation_result& result, PublishMessage_ptr message)
             {
                 
             }

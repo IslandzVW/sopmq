@@ -63,7 +63,25 @@ namespace sopmq {
             
             void authenticated_state::state_entry()
             {
+                this->read_next();
+            }
+            
+            void authenticated_state::read_next()
+            {
+                auto self(shared_from_this());
                 
+                //start the read loop
+                self->_conn->read_message(_dispatcher,
+                                          [=] (const shared::net::network_operation_result& result)
+                                          {
+                                              if (! result.was_successful())
+                                              {
+                                                  if (auto session = self->_session.lock())
+                                                  {
+                                                      session->connection_error(result);
+                                                  }
+                                              }
+                                          });
             }
             
             void authenticated_state::publish_message(const std::string& queueId, bool storeIfCantPipe, int ttl,
@@ -85,26 +103,21 @@ namespace sopmq {
                                     {
                                         if (result.was_successful())
                                         {
-                                            std::function<void(PublishResponseMessage_ptr)> responseHandler =
-                                                [=] (PublishResponseMessage_ptr response)
+                                            std::function<void(const shared::net::network_operation_result&, PublishResponseMessage_ptr)> responseHandler =
+                                                [=] (const shared::net::network_operation_result& result, PublishResponseMessage_ptr response)
                                                 {
                                                     //we have a response
-                                                    callback((PublishMessageResponse) response->status());
+                                                    if (result.was_successful())
+                                                    {
+                                                        callback((PublishMessageResponse) response->status());
+                                                    }
+                                                    else
+                                                    {
+                                                        callback(sopmq::shared::message::PMR_NETWORK_ERROR);
+                                                    }
                                                 };
                                             
                                             _dispatcher.set_handler(responseHandler, message->identity().id());
-                                            
-                                            self->_conn->read_message(_dispatcher,
-                                                                      [=] (const shared::net::network_operation_result& result)
-                                                                      {
-                                                                          if (! result.was_successful())
-                                                                          {
-                                                                              if (auto session = self->_session.lock())
-                                                                              {
-                                                                                  session->connection_error(result);
-                                                                              }
-                                                                          }
-                                                                      });
                                         }
                                         else
                                         {
