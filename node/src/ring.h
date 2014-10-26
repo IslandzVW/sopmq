@@ -51,9 +51,15 @@ namespace sopmq {
             node::ptr find_primary_node_for_key(uint128 key) const;
             
             ///
-            /// Finds the primary and secondary nodes for the given key
+            /// Finds the primary, secondary, and tertiary nodes for the given key
             ///
             std::array<node::ptr, 3> find_nodes_for_key(uint128 key) const;
+            
+            ///
+            /// Finds a quorum of up nodes to fulfil a request for the given key
+            /// \throws unavailable_error If a quorum for this key is not known to be up
+            ///
+            std::array<node::ptr, 2> find_quorum_for_operation(uint128 key) const;
             
         private:
             typedef std::map<uint128, node::ptr>::const_iterator const_ring_iterator;

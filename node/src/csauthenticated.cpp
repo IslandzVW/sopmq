@@ -75,11 +75,20 @@ namespace sopmq {
             
             void csauthenticated::handle_read_result(const shared::net::network_operation_result& result)
             {
-                
+                if (!result.was_successful())
+                {
+                    if (auto connptr = _conn.lock())
+                    {
+                        connptr->handle_error(result.get_error());
+                    }
+                }
             }
             
             void csauthenticated::handle_post_message(const shared::net::network_operation_result& result, PublishMessage_ptr message)
             {
+                LOG_SRC(debug) << "handle_post_message(): result: " << (result.was_successful() ? "true" : "false");
+                if (! result.was_successful()) return;
+                
                 
             }
             

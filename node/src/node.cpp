@@ -31,7 +31,8 @@ namespace sopmq {
         node::node(std::uint32_t nodeId, uint128 rangeStart,
                    shared::net::endpoint endPoint)
         : _node_id(nodeId), _range_start(rangeStart), _endpoint(endPoint),
-        _failure_detector(settings::instance().phiFailureThreshold, bc::milliseconds(gossiper::GOSSIP_INTERVAL_MS))
+        _failure_detector(settings::instance().phiFailureThreshold, bc::milliseconds(gossiper::GOSSIP_INTERVAL_MS)),
+        _forced_failure(false)
         {
             
         }
@@ -59,6 +60,7 @@ namespace sopmq {
         bool node::is_alive() const
         {
             if (is_self()) return true;
+            if (_forced_failure) return false;
 
             return _failure_detector.interpret() == failure_detector::UP;
         }
@@ -66,6 +68,16 @@ namespace sopmq {
         bool node::is_self() const
         {
             return _node_id == settings::instance().nodeId;
+        }
+        
+        void node::heartbeat()
+        {
+            _failure_detector.heartbeat();
+        }
+        
+        void node::set_failed()
+        {
+            _forced_failure = true;
         }
         
         sopmq::node::intra::inode_operations& node::operations()

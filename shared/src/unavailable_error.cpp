@@ -15,35 +15,21 @@
  * limitations under the License.
  */
 
-#include "settings.h"
+#include "unavailable_error.h"
 
 namespace sopmq {
-    namespace node {
-
-        const uint32_t settings::DEFAULT_MAX_MESSAGE_SIZE;
-        const uint32_t settings::DEFAULT_OPERATION_TIMEOUT;
-        const float settings::DEFAULT_PHI_FAILURE_THRESHOLD = 8.0f;
+    namespace error {
         
-        
-        settings::settings()
-        {
-            maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE;
-            defaultTimeout = DEFAULT_OPERATION_TIMEOUT;
-            phiFailureThreshold = DEFAULT_PHI_FAILURE_THRESHOLD;
-        }
-        
-        settings::~settings()
+        unavailable_error::unavailable_error(const std::string& what)
+        : std::runtime_error(what)
         {
             
         }
         
-        settings& settings::instance()
+        unavailable_error::~unavailable_error()
         {
-            static settings inst;
-            return inst;
+            
         }
         
     }
 }
-
-

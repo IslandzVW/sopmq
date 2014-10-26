@@ -60,6 +60,9 @@ namespace sopmq {
                 
                 void handle_read_result(const shared::net::network_operation_result& result);
                 
+                ///
+                /// Called when the client is requesting to post a message to the ring.
+                ///
                 void handle_post_message(const shared::net::network_operation_result& result, PublishMessage_ptr message);
             };
             

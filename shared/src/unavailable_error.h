@@ -15,35 +15,27 @@
  * limitations under the License.
  */
 
-#include "settings.h"
+#ifndef __sopmq__unavailable_error__
+#define __sopmq__unavailable_error__
+
+#include <stdexcept>
 
 namespace sopmq {
-    namespace node {
-
-        const uint32_t settings::DEFAULT_MAX_MESSAGE_SIZE;
-        const uint32_t settings::DEFAULT_OPERATION_TIMEOUT;
-        const float settings::DEFAULT_PHI_FAILURE_THRESHOLD = 8.0f;
+    namespace error {
         
-        
-        settings::settings()
+        ///
+        /// Exception thrown when an operation can't be handled because the
+        /// node or nodes that would handle it are not reachable
+        ///
+        class unavailable_error : public std::runtime_error
         {
-            maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE;
-            defaultTimeout = DEFAULT_OPERATION_TIMEOUT;
-            phiFailureThreshold = DEFAULT_PHI_FAILURE_THRESHOLD;
-        }
-        
-        settings::~settings()
-        {
+        public:
+            explicit unavailable_error(const std::string& what);
             
-        }
-        
-        settings& settings::instance()
-        {
-            static settings inst;
-            return inst;
-        }
+            virtual ~unavailable_error();
+        };
         
     }
 }
 
-
+#endif /* defined(__sopmq__unavailable_error__) */

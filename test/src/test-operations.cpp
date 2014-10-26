@@ -153,8 +153,6 @@ TEST_F(OperationsTest, TestAuthenticationFailure)
 
 TEST_F(OperationsTest, TestUnitTestAuthentication)
 {
-    
-    
     boost::asio::io_service clientIoService;
     cluster_builder builder;
     builder.add_endpoint(endpoint("sopmq1://127.0.0.1:8481"));
@@ -187,3 +185,44 @@ TEST_F(OperationsTest, TestUnitTestAuthentication)
     
     ASSERT_TRUE(authRan);
 }
+/*
+TEST_F(OperationsTest, TestEnqueueMessage)
+{
+    boost::asio::io_service clientIoService;
+    cluster_builder builder;
+    builder.add_endpoint(endpoint("sopmq1://127.0.0.1:8481"));
+    
+    auto clstr = builder.build();
+    
+    bool authRan = false;
+    
+    session::ptr mSession;
+    auto publishCb = [&](sopmq::shared::message::PublishMessageResponse pmr)
+    {
+        clientIoService.stop();
+        authRan = true;
+    };
+    
+    auto authCb = [&](bool authd)
+    {
+        ASSERT_TRUE(authd);
+        
+        mSession->publish_message("queue", false, 10, "Data", publishCb);
+    };
+    
+    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    {
+        ASSERT_TRUE(session != nullptr) << e.what();
+        
+        //make sure session stays in scope for the tests
+        mSession = session;
+        session->authenticate(settings::instance().unitTestUsername, "", authCb);
+    };
+    
+    clstr->connect(clientIoService, connHandler);
+    
+    boost::asio::io_service::work work(clientIoService);
+    clientIoService.run();
+    
+    ASSERT_TRUE(authRan);
+}*/

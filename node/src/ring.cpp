@@ -19,16 +19,21 @@
 
 #include "range_conflict_error.h"
 #include "id_conflict_error.h"
+#include "unavailable_error.h"
 
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <string>
+#include <algorithm>
+#include <chrono>
+#include <random>
 
 using namespace std;
 
 using sopmq::error::range_conflict_error;
 using sopmq::error::id_conflict_error;
+using sopmq::error::unavailable_error;
 
 namespace sopmq {
     namespace node {
@@ -113,6 +118,36 @@ namespace sopmq {
 			ret[2] = tertiaryIter->second;
 
             return ret;
+        }
+        
+        std::array<node::ptr, 2> ring::find_quorum_for_operation(uint128 key) const
+        {
+            auto nodes = this->find_nodes_for_key(key);
+            
+            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            
+            shuffle(nodes.begin(), nodes.end(), std::default_random_engine(seed));
+            
+            //add nodes until we reach a quorum
+            std::array<node::ptr, 2> outNodes;
+            int i = 0;
+            for (auto node : nodes)
+            {
+                if (node->is_alive())
+                {
+                    outNodes[i++] = node;
+                }
+                
+                if (i == 2) break;
+            }
+            
+            if (i < 2)
+            {
+                throw unavailable_error("No quorum of nodes is up and available for key "
+                                        + boost::lexical_cast<std::string>(key));
+            }
+            
+            return outNodes;
         }
         
         ring::const_ring_iterator ring::find_secondary_node(uint128 key) const

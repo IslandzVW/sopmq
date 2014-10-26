@@ -73,7 +73,18 @@ namespace sopmq {
             /// Whether or not this node represents the current executing node
             ///
             bool is_self() const;
-
+            
+            ///
+            /// Indicates that this node has received a heartbeat and we should update
+            /// the failure detector
+            ///
+            void heartbeat();
+            
+            ///
+            /// Indicates we have actively seen a definite failure and this node should
+            /// be marked down until we see the next heartbeat
+            ///
+            void set_failed();
             
             ///
             /// Returns an interface to operations that can be performed on this node
@@ -106,6 +117,11 @@ namespace sopmq {
             /// The handler for operations sent to this node
             ///
             intra::inode_operations::ptr _operations_handler;
+            
+            ///
+            /// Whether or not this node has been forced into down status
+            ///
+            bool _forced_failure;
         };
     }
 }

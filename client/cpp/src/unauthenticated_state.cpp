@@ -50,12 +50,12 @@ namespace sopmq {
             
             unauthenticated_state::~unauthenticated_state()
             {
-                LOG_SRC(debug) << "~authentication_state()";
+                LOG_SRC(debug) << "~unauthenticated_state()";
             }
             
             void unauthenticated_state::state_entry()
             {
-                LOG_SRC(debug) << "authentication_state::state_entry()";
+                LOG_SRC(debug) << "unauthenticated_state::state_entry()";
                 
                 //send a request to the server to get an auth challenge
                 GetChallengeMessage_ptr gcm = messageutil::make_message<GetChallengeMessage>(_connection->get_next_id(), 0);

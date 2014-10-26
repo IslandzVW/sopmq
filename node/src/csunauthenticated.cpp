@@ -166,6 +166,7 @@ namespace sopmq {
                                                                                         self, _1));
                         csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
                         connptr->change_state(authstate);
+                        return;
                     }
                 }
                 

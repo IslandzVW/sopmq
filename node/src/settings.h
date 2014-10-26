@@ -45,12 +45,18 @@ namespace sopmq {
             ///
             /// The default maximum message size
             ///
-            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE;
+            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE = 10485760;
             
             ///
             /// The default operation timeout in seconds
             ///
-            static const uint32_t DEFAULT_OPERATION_TIMEOUT;
+            static const uint32_t DEFAULT_OPERATION_TIMEOUT = 5;
+            
+            ///
+            /// The default PHI for the failure detector before we consider the node
+            /// failed
+            ///
+            static const float DEFAULT_PHI_FAILURE_THRESHOLD;
             
             ///
             /// Returns our singleton instance

@@ -21,6 +21,7 @@
 #include "endpoint.h"
 #include "range_conflict_error.h"
 #include "id_conflict_error.h"
+#include "unavailable_error.h"
 #include "util.h"
 #include "settings.h"
 
@@ -262,8 +263,42 @@ TEST(RingTest, TestRangeConflict)
 
 TEST(RingTest, TestIsSelf)
 {
-    sopmq::node::settings::instance().nodeId = 1;
-    sopmq::node::node n(1, 10, endpoint("sopmq1://localhost:1"));
+    sopmq::node::node n(0, 10, endpoint("sopmq1://localhost:1"));
     
     ASSERT_TRUE(n.is_self());
+}
+
+TEST(RingTest, TestAvailableQuorum)
+{
+    ring r;
+    
+    node::ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node::ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
+    node::ptr node3(new sopmq::node::node(3, 30, endpoint("sopmq1://localhost:3")));
+    r.add_node(node1);
+    r.add_node(node2);
+    r.add_node(node3);
+    
+    auto quorum = r.find_quorum_for_operation(40);
+    ASSERT_TRUE(quorum[0] == node1 || quorum[0] == node2 || quorum[0] == node3);
+    ASSERT_TRUE(quorum[0] != nullptr);
+    ASSERT_TRUE(quorum[1] != nullptr);
+    ASSERT_TRUE(quorum[0] != quorum[1]);
+}
+
+TEST(RingTest, TestUnavailableQuorum)
+{
+    ring r;
+    
+    node::ptr node1(new sopmq::node::node(1, 10, endpoint("sopmq1://localhost:1")));
+    node::ptr node2(new sopmq::node::node(2, 20, endpoint("sopmq1://localhost:2")));
+    node::ptr node3(new sopmq::node::node(3, 30, endpoint("sopmq1://localhost:3")));
+    r.add_node(node1);
+    r.add_node(node2);
+    r.add_node(node3);
+    
+    node1->set_failed();
+    node2->set_failed();
+    
+    ASSERT_THROW(r.find_quorum_for_operation(40), sopmq::error::unavailable_error);
 }
