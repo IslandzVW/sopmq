@@ -203,13 +203,13 @@ namespace sopmq {
             
             void csunauthenticated::start()
             {
-                std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)> func
-                    = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1, _2);
-                
-                _dispatcher.set_handler(func);
-                
                 if (auto connptr = _conn.lock())
                 {
+                    std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)> func
+                        = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1, _2);
+                
+                    _dispatcher.set_handler(func);
+
                     this->read_next_message(connptr);
                 }
             }

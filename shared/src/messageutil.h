@@ -208,7 +208,7 @@ namespace sopmq {
                 else
                 {
                     //dispatch
-                    ctx->status_callback(shared::net::network_operation_result::success());
+                    ctx->status_callback(networkResult);
                     ctx->dispatcher.dispatch(networkResult, message);
                 }
             }

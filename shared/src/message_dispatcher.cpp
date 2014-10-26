@@ -208,7 +208,14 @@ namespace sopmq {
              cog.outl("")
              cog.outl("void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, %s_ptr)> handler)" % rawname)
              cog.outl("{")
-             cog.outl("    _%sHandlers[0] = handler;" % first_lower(rawname))
+             cog.outl("    if (handler)")
+             cog.outl("    {")
+             cog.outl("        _%sHandlers[0] = handler;" % first_lower(rawname))
+             cog.outl("    }")
+             cog.outl("    else")
+             cog.outl("    {")
+             cog.outl("        _%sHandlers.erase(0);" % first_lower(rawname))
+             cog.outl("    }")
              cog.outl("}")
              cog.outl("")
              cog.outl("void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, %s_ptr)> handler, std::uint32_t inReplyTo)" % rawname)
@@ -221,7 +228,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AnswerChallengeMessage_ptr)> handler)
         {
-            _answerChallengeMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _answerChallengeMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _answerChallengeMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AnswerChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -233,7 +247,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr)> handler)
         {
-            _authAckMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _authAckMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _authAckMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, AuthAckMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -245,7 +266,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr)> handler)
         {
-            _challengeResponseMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _challengeResponseMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _challengeResponseMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ChallengeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -257,7 +285,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeFromQueueMessage_ptr)> handler)
         {
-            _consumeFromQueueMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _consumeFromQueueMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _consumeFromQueueMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeFromQueueMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -269,7 +304,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeResponseMessage_ptr)> handler)
         {
-            _consumeResponseMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _consumeResponseMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _consumeResponseMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -281,7 +323,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GetChallengeMessage_ptr)> handler)
         {
-            _getChallengeMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _getChallengeMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _getChallengeMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GetChallengeMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -293,7 +342,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler)
         {
-            _gossipMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _gossipMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _gossipMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -305,7 +361,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler)
         {
-            _publishMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _publishMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _publishMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler, std::uint32_t inReplyTo)
@@ -317,7 +380,14 @@ namespace sopmq {
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler)
         {
-            _publishResponseMessageHandlers[0] = handler;
+            if (handler)
+            {
+                _publishResponseMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _publishResponseMessageHandlers.erase(0);
+            }
         }
 
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
