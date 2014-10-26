@@ -20,8 +20,8 @@
 namespace sopmq {
     namespace node {
 
-        const uint32_t settings::DEFAULT_MAX_MESSAGE_SIZE;
-        const uint32_t settings::DEFAULT_OPERATION_TIMEOUT;
+        const uint32_t settings::DEFAULT_MAX_MESSAGE_SIZE = 10485760;
+        const uint32_t settings::DEFAULT_OPERATION_TIMEOUT = 5;
         const float settings::DEFAULT_PHI_FAILURE_THRESHOLD = 8.0f;
         
         

@@ -45,12 +45,12 @@ namespace sopmq {
             ///
             /// The default maximum message size
             ///
-            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE = 10485760;
+            static const uint32_t DEFAULT_MAX_MESSAGE_SIZE;
             
             ///
             /// The default operation timeout in seconds
             ///
-            static const uint32_t DEFAULT_OPERATION_TIMEOUT = 5;
+            static const uint32_t DEFAULT_OPERATION_TIMEOUT;
             
             ///
             /// The default PHI for the failure detector before we consider the node
