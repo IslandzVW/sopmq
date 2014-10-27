@@ -41,6 +41,7 @@ namespace sopmq {
             
             StringSource ss(input, inputSize, true, new HexEncoder(new StringSink(encoded)));
             
+            
             return encoded;
         }
         
