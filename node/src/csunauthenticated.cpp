@@ -46,8 +46,9 @@ namespace sopmq {
             
             const int csunauthenticated::CHALLENGE_SIZE = 1024;
             
-            csunauthenticated::csunauthenticated(ba::io_service& ioService, connection_in::wptr conn)
-            : _ioService(ioService), _conn(conn),
+            csunauthenticated::csunauthenticated(ba::io_service& ioService, connection_in::ptr conn,
+                const ring& ring)
+            : _ioService(ioService), _conn(conn), _ring(ring),
             _dispatcher(std::bind(&csunauthenticated::unhandled_message, this, _1)),
             _closeAfterTransmission(false)
             {
@@ -60,10 +61,7 @@ namespace sopmq {
             
             void csunauthenticated::unhandled_message(Message_ptr message)
             {
-                if (auto connptr = _conn.lock())
-                {
-                    connptr->handle_error(network_error("Unexpected message received during authentication"));
-                }
+                _conn->handle_error(network_error("Unexpected message received during authentication"));
             }
             
             void csunauthenticated::handle_get_challenge_message(const shared::net::network_operation_result&, GetChallengeMessage_ptr message)
@@ -72,18 +70,14 @@ namespace sopmq {
                 
                 LOG_SRC(debug) << "handle_get_challenge_message()";
                 
-                auto connptr = _conn.lock();
-                if (connptr == nullptr) return;
-                
                 if (message->has_type())
                 {
                     _authType = message->type();
-                    
-                    this->generate_challenge_response(connptr, message->identity().id());
+                    this->generate_challenge_response(_conn, message->identity().id());
                 }
                 else
                 {
-                    connptr->handle_error(network_error("GetChallengeMessage had no type specified"));
+                    _conn->handle_error(network_error("GetChallengeMessage had no type specified"));
                 }
             }
             
@@ -106,7 +100,7 @@ namespace sopmq {
                 
                 conn->send_message(message::MT_CHALLENGE_RESPONSE, response,
                                    std::bind(&csunauthenticated::handle_write_result, shared_from_this(), _1));
-                this->read_next_message(conn);
+                _conn->read_message(_dispatcher, std::bind(&csunauthenticated::handle_read_result, shared_from_this(), _1));
             }
             
             void csunauthenticated::handle_answer_challenge_message(const shared::net::network_operation_result&, AnswerChallengeMessage_ptr message)
@@ -124,29 +118,23 @@ namespace sopmq {
                     {
                         //user is good to go
                         _ioService.post([=] {
-                            auto connptr = self->_conn.lock();
-                            if (connptr == nullptr) return;
-                            
-                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
+                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
                             response->set_authorized(true);
-                            connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                            self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
                                                                                             self, _1));
-                            csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
-                            connptr->change_state(authstate);
+                            csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, self->_conn, self->_ring);
+                            self->_conn->change_state(authstate);
                         });
                     }
                     else
                     {
                         //no good
                         _ioService.post([=] {
-                            auto connptr = _conn.lock();
-                            if (connptr == nullptr) return;
-                            
                             _closeAfterTransmission = true;
-                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
+                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
                             response->set_authorized(false);
-                            connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            self, _1));
+                            self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                                                self, _1));
                         });
                     }
                 };
@@ -157,15 +145,12 @@ namespace sopmq {
                     //check that the user trying to log in is using the unittest username
                     if (message->uname_hash() == util::sha256_hex_string(settings::instance().unitTestUsername))
                     {
-                        auto connptr = self->_conn.lock();
-                        if (connptr == nullptr) return;
-                        
-                        AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(connptr->get_next_id(), message->identity().id());
+                        AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
                         response->set_authorized(true);
-                        connptr->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                        self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
                                                                                         self, _1));
-                        csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, connptr);
-                        connptr->change_state(authstate);
+                        csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, self->_conn, self->_ring);
+                        self->_conn->change_state(authstate);
                         return;
                     }
                 }
@@ -175,53 +160,38 @@ namespace sopmq {
             
             void csunauthenticated::handle_read_result(const shared::net::network_operation_result& result)
             {
-                if (auto connptr = _conn.lock())
+                if (! result.was_successful())
                 {
-                    if (! result.was_successful())
-                    {
-                        connptr->handle_error(result.get_error());
-                    }
+                    _conn->handle_error(result.get_error());
                 }
             }
                                    
             void csunauthenticated::handle_write_result(const shared::net::network_operation_result& result)
             {
-                auto connptr = _conn.lock();
-                if (connptr)
+                if (!result.was_successful())
                 {
-                    if (!result.was_successful())
-                    {
-                        connptr->handle_error(result.get_error());
-                    }
+                    _conn->handle_error(result.get_error());
+                }
                     
-                    if (_closeAfterTransmission)
-                    {
-                        connptr->handle_error(sopmq::error::network_error("connection forced closed by authentication"));
-                    }
+                if (_closeAfterTransmission)
+                {
+                    _conn->handle_error(sopmq::error::network_error("connection forced closed by authentication"));
                 }
             }
             
             void csunauthenticated::start()
             {
-                if (auto connptr = _conn.lock())
-                {
-                    std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)> func
+                std::function<void(const shared::net::network_operation_result&, GetChallengeMessage_ptr)> func
                         = std::bind(&csunauthenticated::handle_get_challenge_message, this, _1, _2);
                 
-                    _dispatcher.set_handler(func);
+                _dispatcher.set_handler(func);
 
-                    this->read_next_message(connptr);
-                }
+                _conn->read_message(_dispatcher, std::bind(&csunauthenticated::handle_read_result, shared_from_this(), _1));
             }
             
             std::string csunauthenticated::get_description() const
             {
                 return "unauthenticated";
-            }
-            
-            void csunauthenticated::read_next_message(connection_in::ptr conn)
-            {
-                conn->read_message(_dispatcher, std::bind(&csunauthenticated::handle_read_result, shared_from_this(), _1));
             }
         }
     }

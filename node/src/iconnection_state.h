@@ -32,6 +32,7 @@ namespace sopmq {
             {
             public:
                 typedef std::shared_ptr<iconnection_state> ptr;
+                typedef std::weak_ptr<iconnection_state> wptr;
                 
             public:
                 iconnection_state();

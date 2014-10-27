@@ -38,9 +38,9 @@ namespace sopmq {
     namespace node {
         namespace connection {
             
-            connection_in::connection_in(ba::io_service& ioService)
+            connection_in::connection_in(ba::io_service& ioService, const ring& ring)
             : connection_base(ioService, settings::instance().maxMessageSize),
-            _io_service(ioService)
+            _io_service(ioService), _ring(ring)
             {
                 
             }
@@ -56,21 +56,26 @@ namespace sopmq {
                 _server = server;
                 _server->connection_started(shared_from_this());
                 
-                _state = std::make_shared<csunauthenticated>(_io_service, shared_from_this());
-                _state->start();
+                auto state = std::make_shared<csunauthenticated>(_io_service, shared_from_this(), _ring);
+                state->start();
+
+                //though we are creating it we do NOT own the state, the connection does. 
+                //additionally, the state owns us since it needs us to stick around during ops
+                _state = state;
             }
             
             void connection_in::handle_error(const network_error& e)
             {
                 LOG_SRC(error) << "network error: " << e.what() << ". closing connection";
-                
                 this->close();
             }
             
             void connection_in::change_state(iconnection_state::ptr newState)
             {
+                auto state = newState;
+                state->start();
+
                 _state = newState;
-                _state->start();
             }
         }
     }

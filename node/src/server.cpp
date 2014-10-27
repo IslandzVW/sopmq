@@ -37,7 +37,6 @@ namespace sopmq {
         _acceptor(_ioService, _endpoint), _stopping(false)
         {
             BOOST_LOG_TRIVIAL(info) << "starting mq services on TCP/" << _port;
-            
         }
         
         void server::start()
@@ -47,7 +46,7 @@ namespace sopmq {
         
         void server::accept_new()
         {
-            connection::connection_in::ptr conn(std::make_shared<connection::connection_in>(_ioService));
+            connection::connection_in::ptr conn = std::make_shared<connection::connection_in>(_ioService, _ring);
             
             _acceptor.async_accept(conn->get_socket(),
                                    boost::bind(&server::handle_accept, this, conn,

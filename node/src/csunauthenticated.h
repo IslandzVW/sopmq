@@ -23,6 +23,8 @@
 #include "message_dispatcher.h"
 #include "message_ptrs.h"
 #include "network_operation_result.h"
+#include "ring.h"
+
 #include "GetChallengeMessage.pb.h"
 
 #include <boost/asio.hpp>
@@ -44,7 +46,8 @@ namespace sopmq {
                                         public std::enable_shared_from_this<csunauthenticated>
             {
             public:
-                csunauthenticated(boost::asio::io_service& ioService, connection_in::wptr conn);
+                csunauthenticated(boost::asio::io_service& ioService, connection_in::ptr conn,
+                    const ring& ring);
                 virtual ~csunauthenticated();
                 
 
@@ -61,8 +64,9 @@ namespace sopmq {
                 
                 
                 boost::asio::io_service& _ioService;
-                connection_in::wptr _conn;
+                connection_in::ptr _conn;
                 sopmq::message::message_dispatcher _dispatcher;
+                const ring& _ring;
                 GetChallengeMessage_Type _authType;
                 
                 std::string _challenge;
@@ -76,8 +80,6 @@ namespace sopmq {
                 void handle_read_result(const shared::net::network_operation_result& result);
                 
                 void generate_challenge_response(connection_in::ptr conn, std::uint32_t replyTo);
-                
-                void read_next_message(connection_in::ptr conn);
                 
                 void handle_answer_challenge_message(const shared::net::network_operation_result&, AnswerChallengeMessage_ptr message);
                 

@@ -185,7 +185,7 @@ TEST_F(OperationsTest, TestUnitTestAuthentication)
     
     ASSERT_TRUE(authRan);
 }
-/*
+
 TEST_F(OperationsTest, TestEnqueueMessage)
 {
     boost::asio::io_service clientIoService;
@@ -225,4 +225,4 @@ TEST_F(OperationsTest, TestEnqueueMessage)
     clientIoService.run();
     
     ASSERT_TRUE(authRan);
-}*/
+}

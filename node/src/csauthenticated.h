@@ -24,6 +24,7 @@
 #include "message_dispatcher.h"
 #include "network_operation_result.h"
 #include "message_ptrs.h"
+#include "ring.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -40,7 +41,8 @@ namespace sopmq {
                                     public std::enable_shared_from_this<csauthenticated>
             {
             public:
-                csauthenticated(boost::asio::io_service& ioService, connection_in::wptr conn);
+                csauthenticated(boost::asio::io_service& ioService, connection_in::ptr conn,
+                    const ring& ring);
                 virtual ~csauthenticated();
                 
                 //iconnection_state
@@ -50,15 +52,15 @@ namespace sopmq {
             
             private:
                 boost::asio::io_service& _ioService;
-                connection_in::wptr _conn;
+                connection_in::ptr _conn;
+                const ring& _ring;
                 sopmq::message::message_dispatcher _dispatcher;
                 
                 
                 void unhandled_message(Message_ptr message);
                 
-                void read_next_message(connection_in::ptr conn);
-                
                 void handle_read_result(const shared::net::network_operation_result& result);
+                void handle_write_result(const shared::net::network_operation_result& result);
                 
                 ///
                 /// Called when the client is requesting to post a message to the ring.

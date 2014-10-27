@@ -24,6 +24,7 @@
 #include "message_types.h"
 #include "messageutil.h"
 #include "connection_base.h"
+#include "ring.h"
 
 #include <boost/weak_ptr.hpp>
 #include <boost/noncopyable.hpp>
@@ -58,7 +59,7 @@ namespace sopmq {
                 typedef std::weak_ptr<connection_in> wptr;
                 
             public:
-                connection_in(boost::asio::io_service& ioService);
+                connection_in(boost::asio::io_service& ioService, const ring& ring);
                 virtual ~connection_in();
                 
                 ///
@@ -78,8 +79,9 @@ namespace sopmq {
                 
             private:
                 boost::asio::io_service& _io_service;
+                const ring& _ring;
                 server* _server;
-                iconnection_state::ptr _state;
+                iconnection_state::wptr _state;
             };
         
         

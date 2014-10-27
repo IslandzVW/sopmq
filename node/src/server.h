@@ -19,6 +19,7 @@
 #define __sopmq__server__
 
 #include "connection_in.h"
+#include "ring.h"
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
@@ -62,6 +63,7 @@ namespace sopmq {
             boost::asio::ip::tcp::acceptor _acceptor;
             std::set<connection::connection_in::ptr> _connections;
             bool _stopping;
+            ring _ring;
             
             
             void accept_new();
