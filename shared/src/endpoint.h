@@ -63,6 +63,11 @@ namespace sopmq {
                 explicit endpoint(const boost::asio::ip::tcp::endpoint& ep);
                 
                 ///
+                /// Constructs an endpoint given a hostname and a port
+                ///
+                endpoint(const std::string& hostName, unsigned short port);
+                
+                ///
                 /// dtor
                 ///
                 virtual ~endpoint();

@@ -20,6 +20,8 @@
 #include "settings.h"
 #include "gossiper.h"
 
+#include <memory>
+
 namespace bc = boost::chrono;
 
 using sopmq::node::settings;
@@ -95,6 +97,15 @@ namespace sopmq {
                     //_operations_handler = std::unique_ptr<<#class _Tp#>>
                 }
             }
+        }
+        
+        node::ptr node::get_self()
+        {
+            static node::ptr self
+                = std::make_shared<node>(settings::instance().nodeId, settings::instance().range,
+                                         shared::net::endpoint(settings::instance().bindAddress, settings::instance().port));
+            
+            return self;
         }
     }
 }

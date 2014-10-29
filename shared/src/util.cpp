@@ -79,6 +79,11 @@ namespace sopmq {
             return hash;
         }
         
+        uint128 util::murmur_hash3(const std::string &value)
+        {
+            return murmur_hash3(value.c_str(), value.length());
+        }
+        
         std::string* util::uuid_to_bytes(const boost::uuids::uuid& id)
         {
             return new std::string(id.begin(), id.end());

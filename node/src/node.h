@@ -91,6 +91,11 @@ namespace sopmq {
             ///
             intra::inode_operations& operations();
             
+            ///
+            /// Returns a reference to the self "this" node
+            ///
+            static node::ptr get_self();
+            
             
         private:
             ///

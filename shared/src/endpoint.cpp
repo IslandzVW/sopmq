@@ -46,10 +46,14 @@ namespace sopmq {
             }
             
             endpoint::endpoint(const ba_ip::tcp::endpoint& ep)
+            : _hostname(ep.address().to_string()), _port(ep.port()), _proto(SOPMQv1)
             {
-                _hostname = ep.address().to_string();
-                _port = ep.port();
-                _proto = SOPMQv1;
+            }
+            
+            endpoint::endpoint(const std::string& hostName, unsigned short port)
+            : _hostname(hostName), _port(port), _proto(SOPMQv1)
+            {
+                
             }
 
             endpoint::~endpoint()

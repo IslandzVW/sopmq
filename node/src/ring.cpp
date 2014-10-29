@@ -85,7 +85,7 @@ namespace sopmq {
         {
             if (_ring_by_range.empty())
             {
-                return nullptr;
+                throw unavailable_error("There are no nodes in the ring");
             }
             
             const_ring_iterator secondaryIter = this->find_secondary_node(key);
@@ -100,7 +100,7 @@ namespace sopmq {
         {
             if (_ring_by_range.empty())
             {
-                return std::array<node::ptr, 3>();
+                throw unavailable_error("There are no nodes in the ring");
             }
             
             const_ring_iterator secondaryIter = this->find_secondary_node(key);

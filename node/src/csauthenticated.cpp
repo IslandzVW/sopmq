@@ -23,6 +23,7 @@
 #include "logging.h"
 #include "unavailable_error.h"
 #include "message_types.h"
+#include "util.h"
 
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
@@ -96,7 +97,7 @@ namespace sopmq {
                 
                 try
                 {
-                    //_ring.find_quorum_for_operation(
+                    _ring.find_quorum_for_operation(sopmq::shared::util::murmur_hash3(message->queue_id()));
                 }
                 catch (const unavailable_error& e)
                 {
