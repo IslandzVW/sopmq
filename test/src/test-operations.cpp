@@ -22,6 +22,7 @@
 #include "endpoint.h"
 #include "settings.h"
 #include "user_account.h"
+#include "session.h"
 
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
@@ -92,8 +93,8 @@ TEST_F(OperationsTest, TestAuthentication)
         ASSERT_TRUE(authd);
     };
     
-    session::ptr mSession;
-    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    sopmq::client::session::ptr mSession;
+    auto connHandler = [&](sopmq::client::session::ptr session, const sopmq::error::connection_error& e)
     {
         ASSERT_TRUE(session != nullptr) << e.what();
         
@@ -133,8 +134,8 @@ TEST_F(OperationsTest, TestAuthenticationFailure)
         ASSERT_FALSE(authd);
     };
     
-    session::ptr mSession;
-    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    sopmq::client::session::ptr mSession;
+    auto connHandler = [&](sopmq::client::session::ptr session, const sopmq::error::connection_error& e)
     {
         ASSERT_TRUE(session != nullptr) << e.what();
         
@@ -168,8 +169,8 @@ TEST_F(OperationsTest, TestUnitTestAuthentication)
         ASSERT_TRUE(authd);
     };
     
-    session::ptr mSession;
-    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    sopmq::client::session::ptr mSession;
+    auto connHandler = [&](sopmq::client::session::ptr session, const sopmq::error::connection_error& e)
     {
         ASSERT_TRUE(session != nullptr) << e.what();
         
@@ -196,7 +197,7 @@ TEST_F(OperationsTest, TestEnqueueMessage)
     
     bool authRan = false;
     
-    session::ptr mSession;
+    sopmq::client::session::ptr mSession;
     auto publishCb = [&](sopmq::shared::message::PublishMessageResponse pmr)
     {
         clientIoService.stop();
@@ -210,7 +211,7 @@ TEST_F(OperationsTest, TestEnqueueMessage)
         mSession->publish_message("queue", false, 10, "Data", publishCb);
     };
     
-    auto connHandler = [&](session::ptr session, const sopmq::error::connection_error& e)
+    auto connHandler = [&](sopmq::client::session::ptr session, const sopmq::error::connection_error& e)
     {
         ASSERT_TRUE(session != nullptr) << e.what();
         
