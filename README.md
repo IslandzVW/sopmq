@@ -1,7 +1,7 @@
 sopmq
 =====
 
-Scalable optionally persistent message queue
+Scalable optionally persistent distributed message queue
 
 This project is in the very early stages of development and is not yet functional
 
