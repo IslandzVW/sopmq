@@ -48,6 +48,8 @@
 #include "ConsumeResponseMessage.pb.h"
 #include "GetChallengeMessage.pb.h"
 #include "GossipMessage.pb.h"
+#include "ProxyPublishMessage.pb.h"
+#include "ProxyPublishResponseMessage.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
 //[[[end]]]
@@ -121,6 +123,16 @@ namespace sopmq {
               handler.second(result, nullptr);
             }
 
+            for (auto handler : _proxyPublishMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
+            for (auto handler : _proxyPublishResponseMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
             for (auto handler : _publishMessageHandlers)
             {
               handler.second(result, nullptr);
@@ -185,6 +197,18 @@ namespace sopmq {
         void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, GossipMessage_ptr gossipMessage)
         {
             do_dispatch(_gossipMessageHandlers, result, gossipMessage);
+        }
+
+
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, ProxyPublishMessage_ptr proxyPublishMessage)
+        {
+            do_dispatch(_proxyPublishMessageHandlers, result, proxyPublishMessage);
+        }
+
+
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, ProxyPublishResponseMessage_ptr proxyPublishResponseMessage)
+        {
+            do_dispatch(_proxyPublishResponseMessageHandlers, result, proxyPublishResponseMessage);
         }
 
 
@@ -355,6 +379,44 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _gossipMessageHandlers[inReplyTo] = handler;
+        }
+
+
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishMessage_ptr)> handler)
+        {
+            if (handler)
+            {
+                _proxyPublishMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _proxyPublishMessageHandlers.erase(0);
+            }
+        }
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _proxyPublishMessageHandlers[inReplyTo] = handler;
+        }
+
+
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)> handler)
+        {
+            if (handler)
+            {
+                _proxyPublishResponseMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _proxyPublishResponseMessageHandlers.erase(0);
+            }
+        }
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _proxyPublishResponseMessageHandlers[inReplyTo] = handler;
         }
 
 

@@ -52,6 +52,12 @@ namespace sopmq {
                 virtual void send_gossip(GossipMessage_ptr message,
                                          return_message_callback_t<GossipMessage_ptr>::type responseCallback) = 0;
                 
+                ///
+                /// Sends a proxy publish message to this node and registers for a callback when the status is available
+                ///
+                virtual void send_proxy_publish(PublishMessage_ptr clientMessage,
+                                                return_message_callback_t<ProxyPublishResponseMessage_ptr>::type responseCallback) = 0;
+                
                 inode_operations();
                 virtual ~inode_operations();
             };

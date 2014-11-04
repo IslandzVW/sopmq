@@ -79,6 +79,8 @@ namespace sopmq {
             void dispatch(const sopmq::shared::net::network_operation_result& result, ConsumeResponseMessage_ptr consumeResponseMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, GetChallengeMessage_ptr getChallengeMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, GossipMessage_ptr gossipMessage);
+            void dispatch(const sopmq::shared::net::network_operation_result& result, ProxyPublishMessage_ptr proxyPublishMessage);
+            void dispatch(const sopmq::shared::net::network_operation_result& result, ProxyPublishResponseMessage_ptr proxyPublishResponseMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, PublishMessage_ptr publishMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, PublishResponseMessage_ptr publishResponseMessage);
             //[[[end]]]
@@ -115,6 +117,12 @@ namespace sopmq {
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler);
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)> handler, std::uint32_t inReplyTo);
 
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishMessage_ptr)> handler);
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishMessage_ptr)> handler, std::uint32_t inReplyTo);
+
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)> handler);
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler);
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)> handler, std::uint32_t inReplyTo);
 
@@ -139,6 +147,8 @@ namespace sopmq {
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, ConsumeResponseMessage_ptr)>> _consumeResponseMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, GetChallengeMessage_ptr)>> _getChallengeMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, GossipMessage_ptr)>> _gossipMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishMessage_ptr)>> _proxyPublishMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)>> _proxyPublishResponseMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)>> _publishMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)>> _publishResponseMessageHandlers;
             //[[[end]]]

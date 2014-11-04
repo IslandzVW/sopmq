@@ -1,0 +1,16 @@
+import "Identifier.proto";
+import "VectorClock.proto";
+
+message ProxyPublishResponseMessage {
+	required Identifier identity = 1;
+
+	enum Status {
+		NOTAUTH = 1;
+		NOTHERE = 2;
+		QUEUED = 3;
+	}
+
+	required Status status  = 2;
+
+	required VectorClock clock = 3;
+}

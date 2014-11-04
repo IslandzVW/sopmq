@@ -37,6 +37,8 @@ namespace sopmq {
             MT_CONSUME_FROM_QUEUE,
             MT_CONSUME_RESPONSE,
             MT_GOSSIP,
+            MT_PROXY_PUBLISH,
+            MT_PROXY_PUBLISH_RESPONSE, 
             
             MT_INVALID_OUT_OF_RANGE
         };

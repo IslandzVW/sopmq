@@ -51,6 +51,8 @@
 #include "GossipNodeData.pb.h"
 #include "Identifier.pb.h"
 #include "NodeClock.pb.h"
+#include "ProxyPublishMessage.pb.h"
+#include "ProxyPublishResponseMessage.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
 #include "VectorClock.pb.h"
@@ -231,6 +233,14 @@ namespace sopmq {
 
                 case MT_GOSSIP:
                     messageutil::template_dispatch(ctx, result, std::make_shared<GossipMessage>());
+                    break;
+
+                case MT_PROXY_PUBLISH:
+                    messageutil::template_dispatch(ctx, result, std::make_shared<ProxyPublishMessage>());
+                    break;
+
+                case MT_PROXY_PUBLISH_RESPONSE:
+                    messageutil::template_dispatch(ctx, result, std::make_shared<ProxyPublishResponseMessage>());
                     break;
 
                 case MT_PUBLISH:

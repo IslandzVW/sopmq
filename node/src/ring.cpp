@@ -147,6 +147,14 @@ namespace sopmq {
                                         + boost::lexical_cast<std::string>(key));
             }
             
+            //compress the list. for testing purposes, we allow the
+            //quorum to be just a single node as long as the ring
+            //isnt aware that other nodes are down that should be up
+            if (outNodes[0] == outNodes[1])
+            {
+                outNodes[1] = nullptr;
+            }
+            
             return outNodes;
         }
         

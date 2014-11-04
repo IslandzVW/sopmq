@@ -76,6 +76,12 @@ typedef std::shared_ptr<Identifier> Identifier_ptr;
 class NodeClock;
 typedef std::shared_ptr<NodeClock> NodeClock_ptr;
 
+class ProxyPublishMessage;
+typedef std::shared_ptr<ProxyPublishMessage> ProxyPublishMessage_ptr;
+
+class ProxyPublishResponseMessage;
+typedef std::shared_ptr<ProxyPublishResponseMessage> ProxyPublishResponseMessage_ptr;
+
 class PublishMessage;
 typedef std::shared_ptr<PublishMessage> PublishMessage_ptr;
 

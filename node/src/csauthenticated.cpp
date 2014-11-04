@@ -97,7 +97,34 @@ namespace sopmq {
                 
                 try
                 {
-                    _ring.find_quorum_for_operation(sopmq::shared::util::murmur_hash3(message->queue_id()));
+                    auto nodes = _ring.find_quorum_for_operation(sopmq::shared::util::murmur_hash3(message->queue_id()));
+                    
+                    class context
+                    {
+                    public:
+                        typedef std::shared_ptr<context> ptr;
+                        
+                    public:
+                        context() { waitingResponses = 0; }
+                        int waitingResponses;
+                    };
+                    
+                    context::ptr ctx = std::make_shared<context>();
+                    
+                    for (node::ptr node : nodes)
+                    {
+                        if (node != nullptr)
+                        {
+                            ctx->waitingResponses++;
+                            node->operations().send_proxy_publish(message, [=](intra::operation_result<ProxyPublishResponseMessage_ptr> result){
+                                
+                                if (--ctx->waitingResponses == 0)
+                                {
+                                    //we have the result from both, combine and send the message stamp
+                                }
+                            });
+                        }
+                    }
                 }
                 catch (const unavailable_error& e)
                 {

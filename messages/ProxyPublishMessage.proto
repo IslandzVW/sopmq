@@ -1,0 +1,7 @@
+import "Identifier.proto";
+import "PublishMessage.proto";
+
+message ProxyPublishMessage {
+	required Identifier identity = 1;
+	required PublishMessage client_message = 2;
+}
