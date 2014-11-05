@@ -46,6 +46,9 @@ namespace sopmq {
                                         public std::enable_shared_from_this<csunauthenticated>
             {
             public:
+                typedef std::shared_ptr<csunauthenticated> ptr;
+
+            public:
                 csunauthenticated(boost::asio::io_service& ioService, connection_in::ptr conn,
                     const ring& ring);
                 virtual ~csunauthenticated();
@@ -85,6 +88,9 @@ namespace sopmq {
                 
                 void handle_write_result(const shared::net::network_operation_result& result);
                 
+                void successful_auth(AnswerChallengeMessage_ptr message);
+
+                void failed_auth(AnswerChallengeMessage_ptr message);
             };
         }
     }

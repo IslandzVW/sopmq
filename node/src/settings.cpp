@@ -16,6 +16,9 @@
  */
 
 #include "settings.h"
+#include "util.h"
+
+using sopmq::shared::util;
 
 namespace sopmq {
     namespace node {
@@ -43,6 +46,12 @@ namespace sopmq {
             return inst;
         }
         
+        const std::string& settings::ring_key_hash() const
+        {
+            static std::string hash = util::sha256_hex_string(this->ringKey);
+
+            return hash;
+        }
     }
 }
 

@@ -120,6 +120,16 @@ namespace sopmq {
             ///
             std::string unitTestUsername;
             
+            ///
+            /// The shared secret used to authenticate nodes to the ring
+            ///
+            std::string ringKey;
+
+            ///
+            /// Returns the sha256 hash of the ringKey setting
+            ///
+            const std::string& ring_key_hash() const;
+
         private:
             settings();
             ~settings();

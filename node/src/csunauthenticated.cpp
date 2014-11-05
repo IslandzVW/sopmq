@@ -70,15 +70,8 @@ namespace sopmq {
                 
                 LOG_SRC(debug) << "handle_get_challenge_message()";
                 
-                if (message->has_type())
-                {
-                    _authType = message->type();
-                    this->generate_challenge_response(_conn, message->identity().id());
-                }
-                else
-                {
-                    _conn->handle_error(network_error("GetChallengeMessage had no type specified"));
-                }
+                _authType = message->type();
+                this->generate_challenge_response(_conn, message->identity().id());
             }
             
             void csunauthenticated::generate_challenge_response(connection_in::ptr conn, std::uint32_t replyTo)
@@ -102,6 +95,25 @@ namespace sopmq {
                                    std::bind(&csunauthenticated::handle_write_result, shared_from_this(), _1));
                 _conn->read_message(_dispatcher, std::bind(&csunauthenticated::handle_read_result, shared_from_this(), _1));
             }
+
+            void csunauthenticated::successful_auth(AnswerChallengeMessage_ptr message)
+            {
+                AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(_conn->get_next_id(), message->identity().id());
+                response->set_authorized(true);
+                _conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                              shared_from_this(), _1));
+                csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, _conn, _ring);
+                _conn->change_state(authstate);
+            }
+
+            void csunauthenticated::failed_auth(AnswerChallengeMessage_ptr message)
+            {
+                _closeAfterTransmission = true;
+                AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(_conn->get_next_id(), message->identity().id());
+                response->set_authorized(false);
+                _conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
+                                                                              shared_from_this(), _1));
+            }
             
             void csunauthenticated::handle_answer_challenge_message(const shared::net::network_operation_result&, AnswerChallengeMessage_ptr message)
             {
@@ -118,44 +130,44 @@ namespace sopmq {
                     {
                         //user is good to go
                         _ioService.post([=] {
-                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
-                            response->set_authorized(true);
-                            self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                            self, _1));
-                            csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, self->_conn, self->_ring);
-                            self->_conn->change_state(authstate);
+                            self->successful_auth(message);
                         });
                     }
                     else
                     {
                         //no good
                         _ioService.post([=] {
-                            _closeAfterTransmission = true;
-                            AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
-                            response->set_authorized(false);
-                            self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                                self, _1));
+                            self->failed_auth(message);
                         });
                     }
                 };
                 
                 //short circuit for unit tests
-                if (! settings::instance().unitTestUsername.empty())
+                if (_authType == GetChallengeMessage_Type_CLIENT && !settings::instance().unitTestUsername.empty())
                 {
                     //check that the user trying to log in is using the unittest username
                     if (message->uname_hash() == util::sha256_hex_string(settings::instance().unitTestUsername))
                     {
-                        AuthAckMessage_ptr response = messageutil::make_message<AuthAckMessage>(self->_conn->get_next_id(), message->identity().id());
-                        response->set_authorized(true);
-                        self->_conn->send_message(message::MT_AUTH_ACK, response, std::bind(&csunauthenticated::handle_write_result,
-                                                                                        self, _1));
-                        csauthenticated::ptr authstate = std::make_shared<csauthenticated>(_ioService, self->_conn, self->_ring);
-                        self->_conn->change_state(authstate);
+                        self->successful_auth(message);
                         return;
                     }
                 }
                 
-                user_account::is_authorized(message->uname_hash(), _challenge, message->challenge_response(), authCallback);
+                if (_authType == GetChallengeMessage_Type_CLIENT)
+                {
+                    user_account::is_authorized(message->uname_hash(), _challenge, message->challenge_response(), authCallback);
+                }
+                else
+                {
+                    if (message->challenge_response() == util::sha256_hex_string(settings::instance().ring_key_hash() + _challenge))
+                    {
+                        self->successful_auth(message);
+                    }
+                    else
+                    {
+                        self->failed_auth(message);
+                    }
+                }
             }
             
             void csunauthenticated::handle_read_result(const shared::net::network_operation_result& result)

@@ -118,9 +118,16 @@ namespace sopmq {
                             ctx->waitingResponses++;
                             node->operations().send_proxy_publish(message, [=](intra::operation_result<ProxyPublishResponseMessage_ptr> result){
                                 
-                                if (--ctx->waitingResponses == 0)
+                                try
                                 {
-                                    //we have the result from both, combine and send the message stamp
+                                    if (--ctx->waitingResponses == 0)
+                                    {
+                                        //we have the result from both, combine and send the message stamp
+                                    }
+                                }
+                                catch (const std::runtime_error& e)
+                                {
+
                                 }
                             });
                         }
