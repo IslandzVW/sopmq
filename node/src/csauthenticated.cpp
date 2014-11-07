@@ -122,7 +122,7 @@ namespace sopmq {
                                 {
                                     if (--ctx->waitingResponses == 0)
                                     {
-                                        //we have the result from both, combine and send the message stamp
+                                        //we have the result from all nodes, combine and send the message stamp
                                     }
                                 }
                                 catch (const std::runtime_error& e)

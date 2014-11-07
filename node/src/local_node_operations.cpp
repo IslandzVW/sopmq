@@ -39,6 +39,11 @@ namespace sopmq {
                 throw std::logic_error("Refusing to gossip to self");
             }
             
+            void local_node_operations::send_proxy_publish(PublishMessage_ptr clientMessage,
+                                                           return_message_callback_t<ProxyPublishResponseMessage_ptr>::type responseCallback)
+            {
+                
+            }
             
         }
     }

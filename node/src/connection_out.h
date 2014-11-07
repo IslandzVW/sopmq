@@ -15,22 +15,38 @@
  * limitations under the License.
  */
 
-#include "inode_operations.h"
+#ifndef __sopmq__connection_out__
+#define __sopmq__connection_out__
+
+#include <boost/noncopyable.hpp>
+#include <memory>
+
+#include "connection_base.h"
+
+namespace sopmq {
+    namespace error {
+        class network_error;
+    }
+}
 
 namespace sopmq {
     namespace node {
-        namespace intra {
+        
+        class server;
+        
+        namespace connection {
             
-            inode_operations::inode_operations()
+            ///
+            /// A connection to another SOPMQ node
+            ///
+            class connection_out :  public boost::noncopyable,
+                                    public sopmq::shared::net::connection_base,
+                                    public std::enable_shared_from_this<connection_out>
             {
                 
-            }
-            
-            inode_operations::~inode_operations()
-            {
-                
-            }
-            
+            };
         }
     }
 }
+
+#endif /* defined(__sopmq__connection_out__) */

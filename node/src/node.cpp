@@ -19,6 +19,7 @@
 
 #include "settings.h"
 #include "gossiper.h"
+#include "local_node_operations.h"
 
 #include <memory>
 
@@ -94,7 +95,12 @@ namespace sopmq {
                 //determine the type of handler we need and create it
                 if (is_self())
                 {
-                    //_operations_handler = std::unique_ptr<<#class _Tp#>>
+                    //this is a local operation
+                    _operations_handler.reset(new sopmq::node::intra::local_node_operations());
+                }
+                else
+                {
+                    
                 }
             }
         }

@@ -15,22 +15,4 @@
  * limitations under the License.
  */
 
-#include "inode_operations.h"
-
-namespace sopmq {
-    namespace node {
-        namespace intra {
-            
-            inode_operations::inode_operations()
-            {
-                
-            }
-            
-            inode_operations::~inode_operations()
-            {
-                
-            }
-            
-        }
-    }
-}
+#include "connection_out.h"

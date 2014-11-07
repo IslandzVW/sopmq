@@ -34,6 +34,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <thread>
 
 namespace bmp = boost::multiprecision;
 
@@ -92,7 +93,7 @@ namespace sopmq {
             }
 
             ///
-            /// \brief Returns the Hex representation of the Murmur hash for this queue name
+            /// \brief Returns the 128bit murmur hash for this queue name
             ///
             const uint128& queue_id() const
             {
@@ -114,6 +115,8 @@ namespace sopmq {
 					_ttl = ttlSecs;
 				}
                 
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 _total_message_size += queued_messageX::calc_size(data->length());
                 _unstamped_messages.insert(typename message_map_t<RF>::type::value_type(id, queued_messageX(id, data)));
             }
@@ -126,6 +129,8 @@ namespace sopmq {
             ///
             bool stamp(boost::uuids::uuid id, vector_clock<RF> vclock)
             {
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 typedef typename message_map_t<RF>::type::iterator IterType;
                 
                 auto iter = _unstamped_messages.find(id);
@@ -163,6 +168,8 @@ namespace sopmq {
 			///
 			void expire_messages()
 			{
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 auto ttlSecs = boost::chrono::seconds(_ttl);
                 
                 for(auto it = _queued_messages.begin(), ite = _queued_messages.end(); it != ite;)
@@ -193,12 +200,14 @@ namespace sopmq {
                     }
                 }
 			}
+            
 
 			///
 			/// \brief The total memory size of all messages in this queue in bytes
 			///
 			uint32_t size()
 			{
+                std::lock_guard<std::mutex> lock(_queue_lock);
 				return _total_message_size;
 			}
             
@@ -207,6 +216,8 @@ namespace sopmq {
             ///
             std::vector<typename queued_message<RF>::ptr> peek(vector_clock<RF> lastMessage)
             {
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 std::vector<typename queued_message<RF>::ptr> messages;
                 
                 auto start = _queued_messages.find(lastMessage);
@@ -224,6 +235,8 @@ namespace sopmq {
             ///
             std::vector<typename queued_message<RF>::ptr> peekAll()
             {
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 std::vector<typename queued_message<RF>::ptr> messages;
                 
                 std::transform(_queued_messages.begin(),
@@ -239,6 +252,8 @@ namespace sopmq {
             ///
             void claim(boost::uuids::uuid messageId)
             {
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
                 auto iter = _message_index.find(messageId);
                 if (iter != _message_index.end())
                 {
@@ -246,6 +261,16 @@ namespace sopmq {
                     _queued_messages.erase(*iter);
                     _message_index.erase(messageId);
                 }
+            }
+            
+            ///
+            /// Time when the next message in this queue is due to expire
+            ///
+            boost::chrono::steady_clock::time_point next_expiry() const
+            {
+                std::lock_guard<std::mutex> lock(_queue_lock);
+                
+                
             }
             
         private:
@@ -296,6 +321,11 @@ namespace sopmq {
             /// messages in _queued_messages
             ///
             typename message_index_t<RF>::type _message_index;
+            
+            ///
+            /// Lock that protects all collections managed by this queue
+            ///
+            std::mutex _queue_lock;
         };
 
         ///

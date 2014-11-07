@@ -38,6 +38,9 @@ namespace sopmq {
                 ///
                 virtual void send_gossip(GossipMessage_ptr message,
                                          return_message_callback_t<GossipMessage_ptr>::type responseCallback);
+                
+                virtual void send_proxy_publish(PublishMessage_ptr clientMessage,
+                                                return_message_callback_t<ProxyPublishResponseMessage_ptr>::type responseCallback);
             };
             
         }
