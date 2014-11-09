@@ -21,8 +21,11 @@
 #include "message_queue.h"
 #include "uint128.h"
 
+#include <boost/heap/fibonacci_heap.hpp>
+
 #include <thread>
-#include <unordered_set>
+#include <unordered_map>
+#include <tuple>
 
 namespace sopmq {
     namespace node {
@@ -57,20 +60,29 @@ namespace sopmq {
                 auto qiter = _queues.find(queueId);
                 if (qiter == _queues.end())
                 {
-                    return _queues.emplace(message_queueX()).first;
+                    queue_tuple_t& queue = _queues.emplace(queue_tuple_t(message_queueX(), expiry_heap_t::handle_type())).first;
+                    auto handle = _queues_by_expiration.push(std::get<1>(queue));
+                    std::get<0>(queue) = handle;
                 }
                 else
                 {
-                    return *qiter;
+                    return qiter->second;
                 }
             }
             
+            
+            
         private:
+            typedef boost::heap::fibonacci_heap<message_queueX*> expiry_heap_t;
+            typedef std::tuple<message_queueX, typename expiry_heap_t::handle_type> queue_tuple_t;
+            
             std::mutex _list_lock;
             
-            std::unordered_set<message_queueX> _queues;
+            std::unordered_map<uint128, queue_tuple_t> _queues;
+            expiry_heap_t _queues_by_expiration;
         };
         
+        typedef queue_manager<3> queue_manager3;
     }
 }
 

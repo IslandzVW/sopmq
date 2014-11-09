@@ -23,6 +23,7 @@
 #include <string>
 #include <iostream>
 #include <climits>
+#include <functional>
 
 #include <boost/config.hpp>
 #include <boost/static_assert.hpp>
@@ -403,5 +404,29 @@ public:
 #pragma pack(pop)
 
 std::ostream &operator<<(std::ostream &o, const uint128 &n);
+
+namespace std {
+    
+    ///
+    /// For unordered_* hash functions
+    ///
+    template <>
+    struct hash<uint128>
+    {
+        std::size_t operator()(const uint128& k) const
+        {
+            using std::size_t;
+            using std::hash;
+            using std::string;
+            
+            // Compute individual hash values for first,
+            // second and third and combine them using XOR
+            // and bit shifting:
+            
+            return 3ULL * hash<uint64_t>()(k.lo) + hash<uint64_t>()(k.hi);
+        }
+    };
+    
+}
 
 #endif

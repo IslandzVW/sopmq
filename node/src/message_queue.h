@@ -268,9 +268,22 @@ namespace sopmq {
             ///
             boost::chrono::steady_clock::time_point next_expiry() const
             {
+                boost::chrono::steady_clock::time_point nextpoint
+                    = boost::chrono::steady_clock::time_point::max();
+                
                 std::lock_guard<std::mutex> lock(_queue_lock);
                 
+                auto it = _queued_messages.begin();
+                if (it != _queued_messages.end())
+                {
+                    nextpoint = std::min(nextpoint, it->second.local_time() + boost::chrono::seconds(_ttl));
+                }
                 
+                
+                for (auto kvp : _unstamped_messages)
+                {
+                    nextpoint = std::min(nextpoint, kvp->second.local_time() + boost::chrono::seconds(_ttl));
+                }
             }
             
         private:

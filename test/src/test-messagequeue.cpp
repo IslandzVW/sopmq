@@ -21,6 +21,8 @@
 #include "vector_clock.h"
 #include "node_clock.h"
 #include "util.h"
+#include "queue_manager.h"
+
 #include "MurmurHash3/MurmurHash3.h"
 
 #include <boost/uuid/uuid.hpp>
@@ -190,5 +192,11 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
     mq.expire_messages();
     
     ASSERT_EQ(0, mq.size());
+}
+
+TEST(MessageQueueTest, TestQueueManager)
+{
+    queue_manager3 qm;
+    
 }
 
