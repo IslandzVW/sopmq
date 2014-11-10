@@ -19,6 +19,7 @@
 #define __sopmq__queue_manager__
 
 #include "message_queue.h"
+#include "vector_clock.h"
 #include "uint128.h"
 
 #include <boost/heap/fibonacci_heap.hpp>
@@ -38,6 +39,7 @@ namespace sopmq {
         {
         public:
             typedef message_queue<RF> message_queueX;
+            typedef vector_clock<RF> vector_clockX;
             
         public:
             queue_manager()
@@ -60,25 +62,52 @@ namespace sopmq {
                 auto qiter = _queues.find(queueId);
                 if (qiter == _queues.end())
                 {
-                    queue_tuple_t& queue = _queues.emplace(queue_tuple_t(message_queueX(), expiry_heap_t::handle_type())).first;
-                    auto handle = _queues_by_expiration.push(std::get<1>(queue));
-                    std::get<0>(queue) = handle;
+                    typename expiry_heap_t::handle_type t;
+                    auto iter = _queues.emplace(queueId, queue_tuple_t(message_queueX(queueId), t));
+                    queue_tuple_t& val = iter.first->second;
+                    message_queueX& queue = std::get<0>(val);
+                    auto handle = _queues_by_expiration.push(&queue);
+                    std::get<1>(val) = handle;
+                    
+                    return queue;
                 }
                 else
                 {
-                    return qiter->second;
+                    return std::get<0>(qiter->second);
                 }
             }
             
+            ///
+            /// Enqueues the given message
+            ///
+            void enqueue_message(const uint128& queueId, const boost::uuids::uuid& messageId,
+                                 std::string* data, uint32_t ttlSecs)
+            {
+                auto& queue = this->get_queue(queueId);
+                
+                queue.enqueue(messageId, data, ttlSecs);
+            }
+            
+            
+            ///
+            /// Stamps the given message with a vector clock
+            ///
+            void stamp_message(const uint128& queueId, const boost::uuids::uuid& messageId,
+                               const vector_clockX& clock)
+            {
+                auto& queue = this->get_queue(queueId);
+                queue.stamp(messageId, clock);
+            }
             
             
         private:
             typedef boost::heap::fibonacci_heap<message_queueX*> expiry_heap_t;
-            typedef std::tuple<message_queueX, typename expiry_heap_t::handle_type> queue_tuple_t;
+            typedef std::pair<message_queueX, typename expiry_heap_t::handle_type> queue_tuple_t;
+            typedef std::unordered_map<uint128, queue_tuple_t> queue_map_t;
             
             std::mutex _list_lock;
             
-            std::unordered_map<uint128, queue_tuple_t> _queues;
+            queue_map_t _queues;
             expiry_heap_t _queues_by_expiration;
         };
         

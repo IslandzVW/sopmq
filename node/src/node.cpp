@@ -102,6 +102,8 @@ namespace sopmq {
                 {
                     
                 }
+                
+                return *_operations_handler;
             }
         }
         

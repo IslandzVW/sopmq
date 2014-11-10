@@ -197,6 +197,10 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
 TEST(MessageQueueTest, TestQueueManager)
 {
     queue_manager3 qm;
+    auto queueId = util::murmur_hash3(QUEUE_NAME, QUEUE_LEN);
     
+    auto m1id = sopmq::shared::util::random_uuid();
+    std::string m1content("message1");
+    qm.enqueue_message(queueId, m1id, &m1content, 0);
 }
 

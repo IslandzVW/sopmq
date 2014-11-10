@@ -22,6 +22,7 @@
 #include "message_not_found_error.h"
 #include "vector_clock.h"
 #include "uint128.h"
+#include "movable_noncopyable.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/chrono.hpp>
@@ -35,6 +36,7 @@
 #include <vector>
 #include <algorithm>
 #include <thread>
+#include <memory>
 
 namespace bmp = boost::multiprecision;
 
@@ -75,7 +77,7 @@ namespace sopmq {
         /// \brief Queue for incoming messages from producers
         ///
         template <size_t RF>
-        class message_queue
+        class message_queue : public ::sopmq::shared::movable_noncopyable
         {
         private:
             typedef queued_message<RF> queued_messageX;
@@ -87,11 +89,36 @@ namespace sopmq {
             ///
             message_queue(const uint128& queueId)
                 : _queue_id(queueId), _created_on(boost::chrono::steady_clock::now()), _total_message_size(0),
-                _ttl_set(false), _ttl(0)
+            _ttl_set(false), _ttl(0), _queue_lock(new std::mutex())
             {
 
             }
-
+            
+            message_queue(message_queue&& other)
+            : _queue_id(other._queue_id), _created_on(other._created_on), _total_message_size(other._total_message_size),
+            _ttl_set(other._ttl_set), _ttl(other._ttl), _last_message_received(other._last_message_received),
+            _unstamped_messages(std::move(other._unstamped_messages)), _queued_messages(std::move(other._queued_messages)),
+            _message_index(std::move(other._message_index)), _queue_lock(std::move(other._queue_lock))
+            {
+                
+            }
+            
+            message_queue& operator=(message_queue&& other)
+            {
+                _queue_id = other._queue_id;
+                _created_on = other._created_on;
+                _total_message_size = other._total_message_size;
+                _ttl_set = other._ttl_set;
+                _ttl = other._ttl;
+                _last_message_received = other._last_message_received;
+                _unstamped_messages = std::move(other._unstamped_messages);
+                _queued_messages = std::move(other._queued_messages);
+                _message_index = std::move(other._message_index);
+                _queue_lock = std::move(other._queue_lock);
+                
+                return *this;
+            }
+            
             ///
             /// \brief Returns the 128bit murmur hash for this queue name
             ///
@@ -115,7 +142,7 @@ namespace sopmq {
 					_ttl = ttlSecs;
 				}
                 
-                std::lock_guard<std::mutex> lock(_queue_lock);
+                std::lock_guard<std::mutex> lock(*_queue_lock);
                 
                 _total_message_size += queued_messageX::calc_size(data->length());
                 _unstamped_messages.insert(typename message_map_t<RF>::type::value_type(id, queued_messageX(id, data)));
@@ -129,7 +156,7 @@ namespace sopmq {
             ///
             bool stamp(boost::uuids::uuid id, vector_clock<RF> vclock)
             {
-                std::lock_guard<std::mutex> lock(_queue_lock);
+                std::lock_guard<std::mutex> lock(*_queue_lock);
                 
                 typedef typename message_map_t<RF>::type::iterator IterType;
                 
@@ -168,7 +195,7 @@ namespace sopmq {
 			///
 			void expire_messages()
 			{
-                std::lock_guard<std::mutex> lock(_queue_lock);
+                std::lock_guard<std::mutex> lock(*_queue_lock);
                 
                 auto ttlSecs = boost::chrono::seconds(_ttl);
                 
@@ -207,7 +234,7 @@ namespace sopmq {
 			///
 			uint32_t size()
 			{
-                std::lock_guard<std::mutex> lock(_queue_lock);
+                std::lock_guard<std::mutex> lock(*_queue_lock);
 				return _total_message_size;
 			}
             
@@ -235,7 +262,7 @@ namespace sopmq {
             ///
             std::vector<typename queued_message<RF>::ptr> peekAll()
             {
-                std::lock_guard<std::mutex> lock(_queue_lock);
+                std::lock_guard<std::mutex> lock(*_queue_lock);
                 
                 std::vector<typename queued_message<RF>::ptr> messages;
                 
@@ -338,7 +365,7 @@ namespace sopmq {
             ///
             /// Lock that protects all collections managed by this queue
             ///
-            std::mutex _queue_lock;
+            std::unique_ptr<std::mutex> _queue_lock;
         };
 
         ///
