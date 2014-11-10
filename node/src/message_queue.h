@@ -232,11 +232,19 @@ namespace sopmq {
 			///
 			/// \brief The total memory size of all messages in this queue in bytes
 			///
-			uint32_t size()
+			uint32_t memory_size()
 			{
                 std::lock_guard<std::mutex> lock(*_queue_lock);
 				return _total_message_size;
 			}
+            
+            ///
+            /// \brief The Total number of stamped and unstamped messages in the queue
+            ///
+            size_t total_count()
+            {
+                return _unstamped_messages.size() + _queued_messages.size();
+            }
             
             ///
             /// \brief Peeks messages greater than the given vclock

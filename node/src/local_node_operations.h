@@ -19,6 +19,7 @@
 #define __sopmq__local_node_operations__
 
 #include "inode_operations.h"
+#include "queue_manager.h"
 
 namespace sopmq {
     namespace node {

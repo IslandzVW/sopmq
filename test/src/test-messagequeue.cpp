@@ -169,8 +169,8 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
     std::string m1content("message1");
     mq.enqueue(m1id, &m1content, 0);
     
-    auto lastSize = mq.size();
-    ASSERT_GT(mq.size(), 0);
+    auto lastSize = mq.memory_size();
+    ASSERT_GT(mq.memory_size(), 0);
     
     node_clock a2 = {1, 1, 2}; //<<
     node_clock b2 = {2, 1, 0};
@@ -185,13 +185,13 @@ TEST(MessageQueueTest, ExpireUnstampedMessages)
     std::string m2content("message2");
     mq.enqueue(m2id, &m2content, 0);
     
-    ASSERT_GT(mq.size(), lastSize);
+    ASSERT_GT(mq.memory_size(), lastSize);
     
     boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
     
     mq.expire_messages();
     
-    ASSERT_EQ(0, mq.size());
+    ASSERT_EQ(0, mq.memory_size());
 }
 
 TEST(MessageQueueTest, TestQueueManager)
@@ -202,5 +202,24 @@ TEST(MessageQueueTest, TestQueueManager)
     auto m1id = sopmq::shared::util::random_uuid();
     std::string m1content("message1");
     qm.enqueue_message(queueId, m1id, &m1content, 0);
+    
+    node_clock a1 = {1, 1, 1}; //<<
+    node_clock b1 = {2, 1, 0};
+    node_clock c1 = {3, 1, 1}; //<<
+    
+    vector_clock3 m1clock;
+    m1clock.set(0, a1);
+    m1clock.set(1, b1);
+    m1clock.set(2, c1);
+    
+    qm.stamp_message(queueId, m1id, m1clock);
+    
+    auto& queue = qm.get_queue(queueId);
+    ASSERT_EQ(1, queue.total_count());
+    
+    auto msgs = queue.peekAll();
+    ASSERT_EQ(1, msgs.size());
+    
+    ASSERT_EQ("message1", msgs[0]->data());
 }
 
