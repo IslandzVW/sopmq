@@ -20,6 +20,7 @@
 #include "settings.h"
 #include "gossiper.h"
 #include "local_node_operations.h"
+#include "ring.h"
 
 #include <memory>
 
@@ -95,8 +96,8 @@ namespace sopmq {
                 //determine the type of handler we need and create it
                 if (is_self())
                 {
-                    //this is a local operation
-                    _operations_handler.reset(new sopmq::node::intra::local_node_operations());
+                    //this is a local operation, ops should've been constructed already
+                    throw std::logic_error("tried to return non-constructed operations for a local node");
                 }
                 else
                 {
@@ -114,6 +115,11 @@ namespace sopmq {
                                          shared::net::endpoint(settings::instance().bindAddress, settings::instance().port));
             
             return self;
+        }
+        
+        void node::init_local_operations(sopmq::node::ring& ring)
+        {
+            _operations_handler.reset(new sopmq::node::intra::local_node_operations(ring, *this, _clock));
         }
     }
 }

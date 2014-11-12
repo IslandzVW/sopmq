@@ -22,6 +22,7 @@
 #include "uint128.h"
 #include "failure_detector.h"
 #include "inode_operations.h"
+#include "node_clock.h"
 
 #include <memory>
 #include <boost/noncopyable.hpp>
@@ -33,6 +34,8 @@
 
 namespace sopmq {
     namespace node {
+        
+        class ring;
         
         ///
         /// Represents a node that we're aware of in our ring that can service
@@ -96,6 +99,11 @@ namespace sopmq {
             ///
             static node::ptr get_self();
             
+            ///
+            /// Creates inode_operations to perform tasks on the local node
+            ///
+            void init_local_operations(ring& ring);
+            
             
         private:
             ///
@@ -127,6 +135,11 @@ namespace sopmq {
             /// Whether or not this node has been forced into down status
             ///
             bool _forced_failure;
+            
+            ///
+            /// The clock for this node
+            ///
+            node_clock _clock;
         };
     }
 }

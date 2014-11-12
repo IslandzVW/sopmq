@@ -21,6 +21,7 @@
 #include "message_queue.h"
 #include "vector_clock.h"
 #include "uint128.h"
+#include "movable_noncopyable.h"
 
 #include <boost/heap/fibonacci_heap.hpp>
 
@@ -35,7 +36,7 @@ namespace sopmq {
         /// Manages all the queues in memory on a node
         ///
         template <size_t RF>
-        class queue_manager
+        class queue_manager : public shared::movable_noncopyable
         {
         public:
             typedef message_queue<RF> message_queueX;

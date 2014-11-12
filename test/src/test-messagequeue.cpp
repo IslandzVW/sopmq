@@ -220,6 +220,7 @@ TEST(MessageQueueTest, TestQueueManager)
     auto msgs = queue.peekAll();
     ASSERT_EQ(1, msgs.size());
     
+    ASSERT_EQ(m1id, msgs[0]->id());
     ASSERT_EQ("message1", msgs[0]->data());
 }
 

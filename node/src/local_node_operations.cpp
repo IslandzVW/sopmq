@@ -16,14 +16,25 @@
  */
 
 #include "local_node_operations.h"
+#include "PublishMessage.pb.h"
+#include "ProxyPublishResponseMessage.pb.h"
+#include "node.h"
+#include "util.h"
+#include "messageutil.h"
+#include "operation_result.h"
 
 #include <stdexcept>
+
+using node = sopmq::node::node;
+
+using namespace sopmq::shared;
 
 namespace sopmq {
     namespace node {
         namespace intra {
             
-            local_node_operations::local_node_operations()
+            local_node_operations::local_node_operations(ring& ring, node& node, node_clock& clock)
+            : _ring(ring), _node(node), _clock(clock)
             {
                 
             }
@@ -42,7 +53,26 @@ namespace sopmq {
             void local_node_operations::send_proxy_publish(PublishMessage_ptr clientMessage,
                                                            return_message_callback_t<ProxyPublishResponseMessage_ptr>::type responseCallback)
             {
+                auto hash = util::murmur_hash3(clientMessage->queue_id());
+                auto messageId = util::uuid_from_bytes(clientMessage->message_id());
                 
+                //clientMessage->mutable_content will be std::moved
+                _queue_manager.enqueue_message(hash, messageId, clientMessage->mutable_content(), clientMessage->ttl());
+                
+                //update our component of the vector clock
+                ++_clock.clock;
+                
+                //send the response back to the caller
+                ProxyPublishResponseMessage_ptr response
+                    = sopmq::message::messageutil::make_message<ProxyPublishResponseMessage>(0, clientMessage->identity().id());
+                
+                //share our knowlege of the clocks that handle this queue including ours that is now updated
+                
+                
+                //response->set_allocated_clock(<#::VectorClock *clock#>)
+                
+                operation_result<ProxyPublishResponseMessage_ptr> result(response);
+                responseCallback(result);
             }
             
         }

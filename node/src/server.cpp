@@ -39,7 +39,9 @@ namespace sopmq {
             BOOST_LOG_TRIVIAL(info) << "starting mq services on TCP/" << _port;
             
             //add ourselves to the ring
-            _ring.add_node(node::get_self());
+            auto self = node::get_self();
+            self->init_local_operations(_ring);
+            _ring.add_node(self);
         }
         
         void server::start()

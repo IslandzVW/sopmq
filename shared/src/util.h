@@ -66,6 +66,11 @@ namespace sopmq {
             static std::string* uuid_to_bytes(const boost::uuids::uuid& id);
             
             ///
+            /// Constructs a uuid from a set of bytes
+            ///
+            static boost::uuids::uuid uuid_from_bytes(const std::string& bytes);
+            
+            ///
             /// Computes the sha256 of the given data and returns a human readable hex string
             /// result
             ///

@@ -20,9 +20,14 @@
 
 #include "inode_operations.h"
 #include "queue_manager.h"
+#include "node_clock.h"
+#include "ring.h"
 
 namespace sopmq {
     namespace node {
+        
+        class node;
+        
         namespace intra {
             
             ///
@@ -31,7 +36,7 @@ namespace sopmq {
             class local_node_operations : public inode_operations
             {
             public:
-                local_node_operations();
+                local_node_operations(ring& ring, ::sopmq::node::node& node, node_clock& clock);
                 virtual ~local_node_operations();
                 
                 ///
@@ -42,6 +47,12 @@ namespace sopmq {
                 
                 virtual void send_proxy_publish(PublishMessage_ptr clientMessage,
                                                 return_message_callback_t<ProxyPublishResponseMessage_ptr>::type responseCallback);
+                
+            private:
+                ring& _ring;
+                node& _node;
+                node_clock& _clock;
+                queue_manager3 _queue_manager;
             };
             
         }

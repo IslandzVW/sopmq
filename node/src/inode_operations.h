@@ -32,7 +32,7 @@ namespace sopmq {
             template <typename ReturnMessageType>
             struct return_message_callback_t
             {
-                typedef std::function<void(operation_result<ReturnMessageType>)> type;
+                typedef std::function<void(operation_result<ReturnMessageType>&)> type;
             };
             
             ///

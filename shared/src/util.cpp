@@ -88,6 +88,16 @@ namespace sopmq {
         {
             return new std::string(id.begin(), id.end());
         }
+        
+        boost::uuids::uuid util::uuid_from_bytes(const std::string& bytes)
+        {
+            if (bytes.length() != boost::uuids::uuid::static_size()) throw std::runtime_error("uuid_from_bytes(): input was not the correct size");
+            
+            boost::uuids::uuid ret;
+            std::copy(bytes.begin(), bytes.end(), ret.begin());
+            
+            return ret;
+        }
 
         std::string util::sha256_hex_string(const std::string& data)
         {
