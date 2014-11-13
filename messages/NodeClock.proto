@@ -1,5 +1,5 @@
 message NodeClock {
 	required uint32 node_id = 1;
 	required uint32 generation = 2;
-	repeated uint64 clock = 3;
+	required uint64 clock = 3;
 }

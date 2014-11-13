@@ -22,6 +22,13 @@
 namespace sopmq {
     namespace node {
         
+        void node_clock::to_protobuf(NodeClock* pbclock) const
+        {
+            pbclock->set_node_id(this->node_id);
+            pbclock->set_generation(this->generation);
+            pbclock->set_clock(this->clock);
+        }
+        
         bool operator ==(const node_clock& lhs, const node_clock& rhs)
         {
             return  lhs.node_id == rhs.node_id &&

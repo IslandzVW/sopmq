@@ -104,6 +104,11 @@ namespace sopmq {
             ///
             void init_local_operations(ring& ring);
             
+            ///
+            /// Returns the clock associated with this node
+            ///
+            node_clock& clock();
+            
             
         private:
             ///

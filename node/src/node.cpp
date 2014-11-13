@@ -121,5 +121,10 @@ namespace sopmq {
         {
             _operations_handler.reset(new sopmq::node::intra::local_node_operations(ring, *this, _clock));
         }
+        
+        node_clock& node::clock()
+        {
+            return _clock;
+        }
     }
 }

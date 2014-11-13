@@ -19,6 +19,7 @@
 #define __sopmq__node_clock__
 
 #include <cstdint>
+#include "NodeClock.pb.h"
 
 namespace sopmq {
     namespace node {
@@ -44,6 +45,11 @@ namespace sopmq {
             //// This is the number of messages received since the node restarted
             ///
             std::uint64_t clock;
+            
+            ///
+            /// Returns the protobuf version of this clock
+            ///
+            void to_protobuf(NodeClock* pbclock) const;
         };
         
         bool operator ==(const node_clock& lhs, const node_clock& rhs);
