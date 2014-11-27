@@ -24,9 +24,11 @@
 #include "unavailable_error.h"
 #include "message_types.h"
 #include "util.h"
+#include "vector_clock.h"
 
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
+#include "ProxyPublishResponseMessage.pb.h"
 
 #include <functional>
 
@@ -107,6 +109,7 @@ namespace sopmq {
                     public:
                         context() { waitingResponses = 0; }
                         int waitingResponses;
+                        std::vector<vector_clock3> clocks;
                     };
                     
                     context::ptr ctx = std::make_shared<context>();
@@ -120,15 +123,27 @@ namespace sopmq {
                                 
                                 try
                                 {
-                                    if (--ctx->waitingResponses == 0)
+                                    result.rethrow_error();
+                                    
+                                    if (result.message()->status() == ProxyPublishResponseMessage_Status_QUEUED)
                                     {
-                                        //we have the result from all nodes, combine and send the message stamp
+                                        ctx->clocks.push_back(result.message()->clock());
+                                        if (--ctx->waitingResponses == 0)
+                                        {
+                                            //we have the result from all nodes, combine and send the message stamp
+                                            auto newclock = vector_clock3::max(ctx->clocks[0], ctx->clocks[1]);
+                                        }
                                     }
+                                }
+                                catch (const comparison_error& e) //issue with the size of the network vector clocks
+                                {
+                                    
                                 }
                                 catch (const std::runtime_error& e)
                                 {
 
                                 }
+                                
                             });
                         }
                     }

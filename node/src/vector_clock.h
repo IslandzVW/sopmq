@@ -20,12 +20,15 @@
 
 #include "node_clock.h"
 #include "comparison_error.h"
+#include "VectorClock.pb.h"
+#include "comparison_error.h"
 
 #include <array>
 #include <cstdint>
 #include <cstddef>
 #include <algorithm>
 #include <type_traits>
+#include <string>
 
 namespace sopmq {
     namespace node {
@@ -45,6 +48,27 @@ namespace sopmq {
             : _value()
             {
                 
+            }
+            
+            ///
+            /// Constructor to convert from a network VectorClock in a message to a server clock
+            ///
+            vector_clock(const VectorClock& netClock)
+            {
+                if (netClock.clocks_size() > RF)
+                {
+                    throw comparison_error("Network clock size of " + std::to_string(netClock.clocks_size()) +
+                                           " is greater than RF of " + std::to_string(RF));
+                }
+                
+                for (int i = 0; i < netClock.clocks_size(); ++i)
+                {
+                    const auto& clock = netClock.clocks(i);
+                    
+                    _value[i].node_id = clock.node_id();
+                    _value[i].generation = clock.generation();
+                    _value[i].clock = clock.clock();
+                }
             }
 
             /*
@@ -81,7 +105,7 @@ namespace sopmq {
                 //verify the clocks first
                 for (size_t i = 0; i < RF; ++i)
                 {
-                    if (a.value()[i].node_id != b.value()[b].node_id)
+                    if (a.value()[i].node_id != b.value()[i].node_id)
                     {
                         throw comparison_error("max() not valid for vector clocks with different quorums");
                     }
@@ -90,7 +114,7 @@ namespace sopmq {
                 vector_clock result;
                 for (size_t i = 0; i < RF; ++i)
                 {
-                    result.value()[i] = std::max(a.value()[i], b.value[i]);
+                    result.set(i, std::max(a.value()[i], b.value()[i]));
                 }
                 
                 return result;
