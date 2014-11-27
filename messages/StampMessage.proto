@@ -1,0 +1,9 @@
+import "Identifier.proto";
+import "VectorClock.proto";
+
+message StampMessage {
+	required Identifier identity = 1;
+
+	required bytes message_id = 2;	
+	required VectorClock clock = 3;
+}

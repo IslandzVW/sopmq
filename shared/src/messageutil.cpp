@@ -55,6 +55,7 @@
 #include "ProxyPublishResponseMessage.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
+#include "StampMessage.pb.h"
 #include "VectorClock.pb.h"
 //[[[end]]]
 
@@ -249,6 +250,10 @@ namespace sopmq {
 
                 case MT_PUBLISH_RESPONSE:
                     messageutil::template_dispatch(ctx, result, std::make_shared<PublishResponseMessage>());
+                    break;
+
+                case MT_STAMP:
+                    messageutil::template_dispatch(ctx, result, std::make_shared<StampMessage>());
                     break;
 
                 //[[[end]]]

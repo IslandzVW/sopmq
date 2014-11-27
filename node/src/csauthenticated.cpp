@@ -131,7 +131,9 @@ namespace sopmq {
                                         if (--ctx->waitingResponses == 0)
                                         {
                                             //we have the result from all nodes, combine and send the message stamp
-                                            auto newclock = vector_clock3::max(ctx->clocks[0], ctx->clocks[1]);
+                                            vector_clock3 newclock = vector_clock3::max(ctx->clocks[0], ctx->clocks[1]);
+                                            
+                                            
                                         }
                                     }
                                 }

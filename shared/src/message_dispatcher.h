@@ -83,6 +83,7 @@ namespace sopmq {
             void dispatch(const sopmq::shared::net::network_operation_result& result, ProxyPublishResponseMessage_ptr proxyPublishResponseMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, PublishMessage_ptr publishMessage);
             void dispatch(const sopmq::shared::net::network_operation_result& result, PublishResponseMessage_ptr publishResponseMessage);
+            void dispatch(const sopmq::shared::net::network_operation_result& result, StampMessage_ptr stampMessage);
             //[[[end]]]
             
         public:
@@ -129,6 +130,9 @@ namespace sopmq {
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler);
             void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo);
 
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, StampMessage_ptr)> handler);
+            void set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, StampMessage_ptr)> handler, std::uint32_t inReplyTo);
+
             //[[[end]]]
             
         private:
@@ -151,6 +155,7 @@ namespace sopmq {
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, ProxyPublishResponseMessage_ptr)>> _proxyPublishResponseMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, PublishMessage_ptr)>> _publishMessageHandlers;
             std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)>> _publishResponseMessageHandlers;
+            std::unordered_map<std::uint32_t, std::function<void(const sopmq::shared::net::network_operation_result&, StampMessage_ptr)>> _stampMessageHandlers;
             //[[[end]]]
             
             ///

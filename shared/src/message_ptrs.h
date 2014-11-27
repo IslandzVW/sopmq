@@ -88,6 +88,9 @@ typedef std::shared_ptr<PublishMessage> PublishMessage_ptr;
 class PublishResponseMessage;
 typedef std::shared_ptr<PublishResponseMessage> PublishResponseMessage_ptr;
 
+class StampMessage;
+typedef std::shared_ptr<StampMessage> StampMessage_ptr;
+
 class VectorClock;
 typedef std::shared_ptr<VectorClock> VectorClock_ptr;
 

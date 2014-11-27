@@ -52,6 +52,7 @@
 #include "ProxyPublishResponseMessage.pb.h"
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
+#include "StampMessage.pb.h"
 //[[[end]]]
 
 namespace sopmq {
@@ -143,6 +144,11 @@ namespace sopmq {
               handler.second(result, nullptr);
             }
 
+            for (auto handler : _stampMessageHandlers)
+            {
+              handler.second(result, nullptr);
+            }
+
             //[[[end]]]
         }
         
@@ -221,6 +227,12 @@ namespace sopmq {
         void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, PublishResponseMessage_ptr publishResponseMessage)
         {
             do_dispatch(_publishResponseMessageHandlers, result, publishResponseMessage);
+        }
+
+
+        void message_dispatcher::dispatch(const sopmq::shared::net::network_operation_result& result, StampMessage_ptr stampMessage)
+        {
+            do_dispatch(_stampMessageHandlers, result, stampMessage);
         }
 
         //[[[end]]]
@@ -455,6 +467,25 @@ namespace sopmq {
         void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, PublishResponseMessage_ptr)> handler, std::uint32_t inReplyTo)
         {
             _publishResponseMessageHandlers[inReplyTo] = handler;
+        }
+
+
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, StampMessage_ptr)> handler)
+        {
+            if (handler)
+            {
+                _stampMessageHandlers[0] = handler;
+            }
+            else
+            {
+                _stampMessageHandlers.erase(0);
+            }
+        }
+
+        void message_dispatcher::set_handler(std::function<void(const sopmq::shared::net::network_operation_result&, StampMessage_ptr)> handler, std::uint32_t inReplyTo)
+        {
+            _stampMessageHandlers[inReplyTo] = handler;
         }
 
 
