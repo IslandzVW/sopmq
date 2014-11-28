@@ -120,7 +120,7 @@ namespace sopmq {
             return ret;
         }
         
-        std::array<node::ptr, 2> ring::find_quorum_for_operation(uint128 key) const
+        std::array<node::ptr, 3> ring::find_quorum_for_operation(uint128 key) const
         {
             auto nodes = this->find_nodes_for_key(key);
             
@@ -129,7 +129,7 @@ namespace sopmq {
             shuffle(nodes.begin(), nodes.end(), std::default_random_engine(seed));
             
             //add nodes until we reach a quorum
-            std::array<node::ptr, 2> outNodes;
+            std::array<node::ptr, 3> outNodes;
             int i = 0;
             for (auto node : nodes)
             {
@@ -137,8 +137,6 @@ namespace sopmq {
                 {
                     outNodes[i++] = node;
                 }
-                
-                if (i == 2) break;
             }
             
             if (i < 2)
@@ -153,6 +151,16 @@ namespace sopmq {
             if (outNodes[0] == outNodes[1])
             {
                 outNodes[1] = nullptr;
+            }
+            
+            if (outNodes[1] == outNodes[2])
+            {
+                outNodes[2] = nullptr;
+            }
+            
+            if (outNodes[0] == outNodes[2])
+            {
+                outNodes[2] = nullptr;
             }
             
             return outNodes;

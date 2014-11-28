@@ -25,6 +25,7 @@
 #include "network_operation_result.h"
 #include "message_ptrs.h"
 #include "ring.h"
+#include "vector_clock.h"
 
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp>
@@ -66,6 +67,11 @@ namespace sopmq {
                 /// Called when the client is requesting to post a message to the ring.
                 ///
                 void handle_post_message(const shared::net::network_operation_result& result, PublishMessage_ptr message);
+                
+                ///
+                /// Sends a stamp message to the quorum of nodes that we recently published a message to
+                ///
+                void do_stamp_message(std::vector<node::ptr>& nodes, PublishMessage_ptr message, const vector_clock3& maxClock);
             };
             
         }

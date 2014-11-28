@@ -56,10 +56,13 @@ namespace sopmq {
             std::array<node::ptr, 3> find_nodes_for_key(uint128 key) const;
             
             ///
-            /// Finds a quorum of up nodes to fulfil a request for the given key
+            /// Finds a quorum of up nodes to fulfil a request for the given key.
+            /// The order of nodes returned are randomized. The first two nodes should be
+            /// tried first followed by the last
+            ///
             /// \throws unavailable_error If a quorum for this key is not known to be up
             ///
-            std::array<node::ptr, 2> find_quorum_for_operation(uint128 key) const;
+            std::array<node::ptr, 3> find_quorum_for_operation(uint128 key) const;
             
         private:
             typedef std::map<uint128, node::ptr>::const_iterator const_ring_iterator;

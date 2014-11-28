@@ -24,7 +24,7 @@
 #include "unavailable_error.h"
 #include "message_types.h"
 #include "util.h"
-#include "vector_clock.h"
+#include "quorum_logic.h"
 
 #include "PublishMessage.pb.h"
 #include "PublishResponseMessage.pb.h"
@@ -99,56 +99,56 @@ namespace sopmq {
                 
                 try
                 {
-                    auto nodes = _ring.find_quorum_for_operation(sopmq::shared::util::murmur_hash3(message->queue_id()));
+                    std::array<node::ptr, 3> nodes = _ring.find_quorum_for_operation(sopmq::shared::util::murmur_hash3(message->queue_id()));
                     
                     class context
                     {
                     public:
-                        typedef std::shared_ptr<context> ptr;
-                        
-                    public:
-                        context() { waitingResponses = 0; }
-                        int waitingResponses;
                         std::vector<vector_clock3> clocks;
                     };
                     
-                    context::ptr ctx = std::make_shared<context>();
+                    quorum_logic<3, context>::ptr logic = std::make_shared<quorum_logic<3, context> >(nodes);
                     
-                    for (node::ptr node : nodes)
-                    {
-                        if (node != nullptr)
-                        {
-                            ctx->waitingResponses++;
-                            node->operations().send_proxy_publish(message, [=](intra::operation_result<ProxyPublishResponseMessage_ptr> result){
+                    logic->set_function([=](node::ptr node) {
+                        
+                        node->operations().send_proxy_publish(message, [=](intra::operation_result<ProxyPublishResponseMessage_ptr> result){
+                            
+                            try
+                            {
+                                result.rethrow_error();
                                 
-                                try
+                                if (result.message()->status() == ProxyPublishResponseMessage_Status_QUEUED)
                                 {
-                                    result.rethrow_error();
+                                    logic->node_success(node);
+                                    logic->ctx().clocks.push_back(result.message()->clock());
                                     
-                                    if (result.message()->status() == ProxyPublishResponseMessage_Status_QUEUED)
+                                    if (logic->operation_succeeded())
                                     {
-                                        ctx->clocks.push_back(result.message()->clock());
-                                        if (--ctx->waitingResponses == 0)
-                                        {
-                                            //we have the result from all nodes, combine and send the message stamp
-                                            vector_clock3 newclock = vector_clock3::max(ctx->clocks[0], ctx->clocks[1]);
-                                            
-                                            
-                                        }
+                                        //we have the result from all nodes, combine and send the message stamp
+                                        vector_clock3 maxClock = vector_clock3::max(logic->ctx().clocks[0], logic->ctx().clocks[1]);
+                                        
+                                        //tell the quorum the resulting message ID
+                                        this->do_stamp_message(logic->successful_nodes(), message, maxClock);
                                     }
                                 }
-                                catch (const comparison_error& e) //issue with the size of the network vector clocks
+                                else
                                 {
-                                    
+                                    logic->node_failed(node);
                                 }
-                                catch (const std::runtime_error& e)
-                                {
-
-                                }
+                            }
+                            catch (const comparison_error& e) //issue with the size of the network vector clocks
+                            {
                                 
-                            });
-                        }
-                    }
+                            }
+                            catch (const std::runtime_error& e)
+                            {
+                                
+                            }
+                        });
+                    });
+
+                    
+                    logic->run();
                 }
                 catch (const unavailable_error& e)
                 {
@@ -162,6 +162,11 @@ namespace sopmq {
                     _conn->send_message(sopmq::message::MT_PUBLISH_RESPONSE, response, 
                         std::bind(&csauthenticated::handle_write_result, shared_from_this(), _1));
                 }
+            }
+            
+            void csauthenticated::do_stamp_message(std::vector<node::ptr>& nodes, PublishMessage_ptr message, const vector_clock3 &maxClock)
+            {
+                
             }
             
             std::string csauthenticated::get_description() const
