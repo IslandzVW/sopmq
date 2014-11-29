@@ -109,6 +109,17 @@ namespace sopmq {
                     
                     quorum_logic<3, context>::ptr logic = std::make_shared<quorum_logic<3, context> >(nodes);
                     
+                    // if we can not successfully message a quorum of nodes, this will fire off the failure
+                    logic->set_fail_function([=] {
+                        PublishResponseMessage_ptr response
+                            = messageutil::make_message<PublishResponseMessage>(_conn->get_next_id(), message->identity().id());
+                        
+                        response->set_status(PublishResponseMessage_Status_UNAVAILABLE);
+                        
+                        _conn->send_message(sopmq::message::MT_PUBLISH_RESPONSE, response,
+                                            std::bind(&csauthenticated::handle_write_result, shared_from_this(), _1));
+                    });
+                    
                     logic->set_function([=](node::ptr node) {
                         
                         node->operations().send_proxy_publish(message, [=](intra::operation_result<ProxyPublishResponseMessage_ptr> result){
@@ -133,16 +144,31 @@ namespace sopmq {
                                 }
                                 else
                                 {
+                                    LOG_SRC(warning)
+                                        << "send_proxy_publish(): node "
+                                        << node->node_id() << " failed with status "
+                                        << result.message()->status();
+                                    
                                     logic->node_failed(node);
                                 }
                             }
                             catch (const comparison_error& e) //issue with the size of the network vector clocks
                             {
-                                
+                                LOG_SRC(warning)
+                                    << "send_proxy_publish(): node "
+                                    << node->node_id() << " failed with error "
+                                    << e.what();
+                                    
+                                logic->node_failed(node);
                             }
                             catch (const std::runtime_error& e)
                             {
-                                
+                                LOG_SRC(warning)
+                                    << "send_proxy_publish(): node "
+                                    << node->node_id() << " failed with error "
+                                    << e.what();
+                                    
+                                logic->node_failed(node);
                             }
                         });
                     });

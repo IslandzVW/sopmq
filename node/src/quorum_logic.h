@@ -40,7 +40,7 @@ namespace sopmq {
             typedef std::shared_ptr<quorum_logic> ptr;
             
             quorum_logic(const std::array<node::ptr, RF>& allNodes)
-            : _all_nodes(allNodes)
+            : _all_nodes(allNodes), _lastNode(0)
             {
                 
             }
@@ -53,7 +53,10 @@ namespace sopmq {
             {
                 if (RF - _failed_nodes.size() > (RF / 2))
                 {
-                    return true;
+                    if (_lastNode + 1 < RF)
+                    {
+                        return true;
+                    }
                 }
                 
                 return false;
@@ -66,7 +69,7 @@ namespace sopmq {
             {
                 for (int i = 0; i < RF - (RF / 2); ++i)
                 {
-                    _function(_all_nodes[i]);
+                    _function(_all_nodes[_lastNode++]);
                 }
             }
             
@@ -100,6 +103,15 @@ namespace sopmq {
             void node_failed(node::ptr node)
             {
                 _failed_nodes.push_back(node);
+                
+                if (can_continue())
+                {
+                    _function(_all_nodes[_lastNode++]);
+                }
+                else
+                {
+                    _fail_function();
+                }
             }
             
             ///
@@ -118,13 +130,24 @@ namespace sopmq {
                 return _success_nodes;
             }
             
+            ///
+            /// A function to be called when a quorum can not be reached
+            ///
+            void set_fail_function(std::function<void()> failFunc)
+            {
+                _fail_function = failFunc;
+            }
+            
         private:
             Context _ctx;
             std::array<node::ptr, RF> _all_nodes;
             std::function<void(node::ptr)> _function;
+            std::function<void()> _fail_function;
             
             std::vector<node::ptr> _success_nodes;
             std::vector<node::ptr> _failed_nodes;
+            
+            int _lastNode;
         };
         
     }
